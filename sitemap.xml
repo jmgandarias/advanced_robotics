@@ -1,23 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://jmgandarias.com/mkdoc_UMA_template/</loc>
+         <loc>https://jmgandarias.com/advanced_robotics/</loc>
          <lastmod>2025-03-31</lastmod>
     </url>
     <url>
-         <loc>https://jmgandarias.com/mkdoc_UMA_template/about/</loc>
+         <loc>https://jmgandarias.com/advanced_robotics/about/</loc>
          <lastmod>2025-03-31</lastmod>
     </url>
     <url>
-         <loc>https://jmgandarias.com/mkdoc_UMA_template/about/acknowledgements/</loc>
+         <loc>https://jmgandarias.com/advanced_robotics/about/acknowledgements/</loc>
          <lastmod>2025-03-31</lastmod>
     </url>
     <url>
-         <loc>https://jmgandarias.com/mkdoc_UMA_template/about/changelog/</loc>
+         <loc>https://jmgandarias.com/advanced_robotics/about/changelog/</loc>
          <lastmod>2025-03-31</lastmod>
     </url>
     <url>
-         <loc>https://jmgandarias.com/mkdoc_UMA_template/about/license/</loc>
+         <loc>https://jmgandarias.com/advanced_robotics/about/license/</loc>
+         <lastmod>2025-03-31</lastmod>
+    </url>
+    <url>
+         <loc>https://jmgandarias.com/advanced_robotics/lab1/</loc>
+         <lastmod>2025-03-31</lastmod>
+    </url>
+    <url>
+         <loc>https://jmgandarias.com/advanced_robotics/lab2/</loc>
+         <lastmod>2025-03-31</lastmod>
+    </url>
+    <url>
+         <loc>https://jmgandarias.com/advanced_robotics/lab3/</loc>
+         <lastmod>2025-03-31</lastmod>
+    </url>
+    <url>
+         <loc>https://jmgandarias.com/advanced_robotics/lab4/</loc>
+         <lastmod>2025-03-31</lastmod>
+    </url>
+    <url>
+         <loc>https://jmgandarias.com/advanced_robotics/lab5/</loc>
+         <lastmod>2025-03-31</lastmod>
+    </url>
+    <url>
+         <loc>https://jmgandarias.com/advanced_robotics/lab6/</loc>
          <lastmod>2025-03-31</lastmod>
     </url>
 </urlset>
