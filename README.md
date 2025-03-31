@@ -1,6 +1,6 @@
 # Advanced Robotics
 
-Teaching material for [the Advanced Robotics course](https://jmgandarias.github.io/advaned_robotics), last year B.S. in Electronic, Robotics, and Mechatronics Engineering at [the University of Málaga](https://www.uma.es)
+Teaching material for [the Advanced Robotics course](https://jmgandarias.github.io/advanced_robotics), last year B.S. in Electronic, Robotics, and Mechatronics Engineering at [the University of Málaga](https://www.uma.es)
 
 Developed by [Juan M. Gandarias](https://jmgandarias.github.io/)
 
