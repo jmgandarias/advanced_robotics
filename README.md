@@ -1,10 +1,8 @@
-# UMA mkdocs template
+# Advanced Robotics
 
-This is [the University of Málaga](https://www.uma.es) template to create  mkdocs websites.
+Teaching material for [the Advanced Robotics course](https://jmgandarias.github.io/advaned_robotics), last year B.S. in Electronic, Robotics, and Mechatronics Engineering at [the University of Málaga](https://www.uma.es)
 
-By [Juan M. Gandarias](https://jmgandarias.com) 
-
-Systems Engineering and Automation Department
+Developed by [Juan M. Gandarias](https://jmgandarias.github.io/)
 
 ## Create your own material website
 

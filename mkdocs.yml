@@ -1,6 +1,6 @@
-site_name: "mkdocs UMA template"
-site_url: https://jmgandarias.com/mkdoc_UMA_template
-site_description: University of Málaga template to develop mkdocs websites. 
+site_name: "Advanced Robotics Course"
+site_url: https://jmgandarias.com/advanced_robotics
+site_description: Teaching material for the Advanced Robotics course at The University of Málaga. 
 theme:
   name: material
   icon:
@@ -43,8 +43,8 @@ theme:
 copyright: >
   &copy; <a href="https://jmgandarias.github.io">Juan M. Gandarias</a>, The University of Málaga, 2025 (License: <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC</a>)<br />
   <a href="#__consent">Change cookie settings</a>
-repo_url: https://github.com/jmgandarias/mkdoc_UMA_template
-repo_name: jmgandarias/mkdoc_UMA_template
+repo_url: https://github.com/jmgandarias/advanced_robotics
+repo_name: jmgandarias/advanced_robotics
 edit_uri: ./edit/main/docs
 
 plugins:
