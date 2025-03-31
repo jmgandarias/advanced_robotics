@@ -24,7 +24,7 @@
     
     
       
-        <title>Lab Session 1: Cartesian trajectory planning - Advanced Robotics Course</title>
+        <title>Exercise Overview - Advanced Robotics Course</title>
       
     
     
@@ -89,6 +89,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#exercise-overview" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -118,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Lab Session 1: Cartesian trajectory planning
+              Exercise Overview
             
           </span>
         </div>
@@ -940,6 +945,34 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cartesian-interpolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cartesian Interpolation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -971,9 +1004,59 @@
   
 
 
-  <h1>Lab Session 1: Cartesian trajectory planning</h1>
-
-<p>TBD</p>
+<div><h1 id="exercise-overview">Exercise Overview<a class="headerlink" href="#exercise-overview" title="Permanent link">¶</a></h1>
+<p>This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this topic. For this purpose, a series of functions developed for this effect will be used:</p>
+<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong><code>function T=zyz2tr(a)</code></strong>: Conversion of the row vector <code>a=[alpha,beta,gamma]</code> of ZYZ Euler angles to a 4x4 homogeneous transformation <span class="arithmatex">\(T\)</span>.</li>
+<li><strong><code>function a=tr2zyz(T, m)</code></strong>: Obtains the representation <code>a=[alpha,beta,gamma]</code> of the ZYZ Euler angles from the transformation <span class="arithmatex">\(T\)</span>. The sign of the parameter <span class="arithmatex">\(m\)</span> chooses the solution. If not specified, the positive solution is taken by default.</li>
+<li><strong><code>function q=tr2q(T, m)</code></strong>: Converts the homogeneous matrix <span class="arithmatex">\(T\)</span> to quaternion <span class="arithmatex">\(q\)</span>. The two solutions are chosen using the parameter <span class="arithmatex">\(m\)</span>. The sign of <span class="arithmatex">\(m\)</span> chooses the positive or negative solution. If <span class="arithmatex">\(m\)</span> is omitted, the positive solution is taken by default.</li>
+<li><strong><code>function T=q2tr(q)</code></strong>: Calculates the 4x4 homogeneous matrix <span class="arithmatex">\(T\)</span> corresponding to the quaternion <span class="arithmatex">\(q\)</span>.</li>
+<li><strong><code>function q=qqmul(q1, q2)</code></strong>: Quaternion multiplication. <span class="arithmatex">\(q\)</span> is the quaternion resulting from multiplying <span class="arithmatex">\(q_1\)</span> by <span class="arithmatex">\(q_2\)</span>. Both <span class="arithmatex">\(q_1\)</span> and <span class="arithmatex">\(q_2\)</span> must be two row vectors of four components. The result will also have the same format.</li>
+<li><strong><code>Práctic1_PlanifCart</code></strong>: Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in ZYZ Euler angles.</li>
+</ul>
+<h2 id="cartesian-interpolation">Cartesian Interpolation<a class="headerlink" href="#cartesian-interpolation" title="Permanent link">¶</a></h2>
+<p>Cartesian interpolation is characterized by achieving a linear variation of position and orientation, the latter using the representation of orientation through quaternions. Therefore, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point.</p>
+<p>Figure 1 shows the described situation, using the example of concatenating a displacement from location <span class="arithmatex">\(P_0\)</span> to <span class="arithmatex">\(P_1\)</span> with another from <span class="arithmatex">\(P_1\)</span> to <span class="arithmatex">\(P_2\)</span>. To avoid the velocity discontinuity that occurs at <span class="arithmatex">\(P_1\)</span>, a constant acceleration is used to adapt the velocity variation of vector <span class="arithmatex">\(X\)</span> from the first segment to the second.</p>
+<p><img alt="figure1" src="figure1.png">
+<em>Fgure 1. Diagram of the variation of position and velocity in the movement from <span class="arithmatex">\(P_0\)</span> to <span class="arithmatex">\(P_2\)</span> via <span class="arithmatex">\(P_1\)</span>.</em></p>
+<p>In this way, -τ units of time before reaching <span class="arithmatex">\(P_1\)</span> (time 0), the velocity will be linearly changed from <span class="arithmatex">\(\Delta P_1/T_1\)</span> to <span class="arithmatex">\(\Delta P_2/T_2\)</span>, to accommodate the velocity τ units of time after passing <span class="arithmatex">\(P_1\)</span>. Thus, the problem is defined as the calculation of a quadratic function <span class="arithmatex">\(X(t)\)</span> that starts at point <span class="arithmatex">\(P_A\)</span> and ends at <span class="arithmatex">\(P_B\)</span> (start and end points of the smoothing) defined in the time range <span class="arithmatex">\([-\tau, \tau]\)</span>.</p>
+<p>Applying the boundary conditions at both ends of the segment and defining the acceleration in the area, the position is obtained as:</p>
+<div class="arithmatex">\[
+P(t) = P_1 - \frac{(\tau - t)^2}{4\tau T_1} \Delta P_1 + \frac{(\tau + t)^2}{4\tau T_2} \Delta P_2
+\]</div>
+<p>And for the orientation:</p>
+<div class="arithmatex">\[
+q(t) = q_1 \cdot q \left[ -\frac{(\tau - t)^2}{4\tau T_1} \theta_1, n_1 \right] \cdot q \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, n_2 \right]
+\]</div>
+<p>Considering all the above, the following is requested:</p>
+<ol>
+<li>Define the quaternion interpolation function based on the Taylor method <code>[pr, qr]=qpinter(P1, P2, λ)</code> that calculates the intermediate quaternion between <span class="arithmatex">\(q_1\)</span> (initial) and <span class="arithmatex">\(q_2\)</span> (final). The value <span class="arithmatex">\(\lambda\)</span> must satisfy <span class="arithmatex">\(0\leq \lambda \leq 1\)</span>, so that <code>[p1, q1]=qpinter(P1, P2, 0)</code> and <code>[p2, q2]=qpinter(P1, P2, 1)</code>.</li>
+<li>Create a MATLAB function in the format <code>P=tramoq(P0, P1, P2, tau, T, t)</code> that calculates the transformation <span class="arithmatex">\(P\)</span> corresponding to the movement from <span class="arithmatex">\(P_0\)</span> to <span class="arithmatex">\(P_2\)</span> via <span class="arithmatex">\(P_1\)</span> smoothed by the Taylor method. The parameters <span class="arithmatex">\(\tau\)</span> and <span class="arithmatex">\(T\)</span> correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1, and <span class="arithmatex">\(T\)</span> indicates the time at which the location of the calculated path <span class="arithmatex">\(P\)</span> is reached.</li>
+<li>Graphically represent the evolution of position and orientation (in ZYZ Euler angles) throughout the trajectory.</li>
+</ol>
+<div class="arithmatex">\[
+P_0 = \begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0.374 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0.63 \\
+0 &amp; 0 &amp; 0 &amp; 1\\
+\end{pmatrix},
+\quad
+P_1 = \begin{pmatrix}
+0 &amp; 1 &amp; 0 &amp; 0.3038 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+-1 &amp; 0 &amp; 0 &amp; 0.051 \\
+0 &amp; 0 &amp; 0 &amp; 1\\
+\end{pmatrix},
+\quad
+P_2 = \begin{pmatrix}
+0 &amp; -1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0.302 \\
+-1 &amp; 0 &amp; 0 &amp; 0.558 \\
+0 &amp; 0 &amp; 0 &amp; 1 \\
+\end{pmatrix}
+\]</div></div>
 
 
 
@@ -996,7 +1079,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="March 31, 2025 09:01:50"><span class="timeago" datetime="2025-03-31T09:01:50+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="March 31, 2025 09:01:50">2025-03-31</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="March 31, 2025 10:23:40"><span class="timeago" datetime="2025-03-31T10:23:40+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="March 31, 2025 10:23:40">2025-03-31</span>
   </span>
 
     
