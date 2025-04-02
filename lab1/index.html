@@ -54,6 +54,8 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../assets/external/unpkg.com/katex@0/dist/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -1058,9 +1060,9 @@
   
 
 
-<div><h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">¶</a></h1>
+<div><h1 id="overview">Overview</h1>
 <p>This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, a series of functions will be used:</p>
-<h2 id="matlab-functions">Matlab functions<a class="headerlink" href="#matlab-functions" title="Permanent link">¶</a></h2>
+<h2 id="matlab-functions">Matlab functions</h2>
 <ul>
 <li><strong><code>function T=zyz2tr(a)</code></strong>: Converts the row vector <span class="arithmatex">\(a=[\alpha,\beta,\gamma]\)</span> of <span class="arithmatex">\(ZYZ\)</span> Euler angles to a <span class="arithmatex">\(4 \times 4\)</span> homogeneous transformation <span class="arithmatex">\(T\)</span>.</li>
 <li><strong><code>function a=tr2zyz(T, m)</code></strong>: Obtains the representation <span class="arithmatex">\(a=[\alpha,\beta,\gamma]\)</span> of the <span class="arithmatex">\(ZYZ\)</span> Euler angles from the transformation <span class="arithmatex">\(T\)</span>. The sign of the parameter <span class="arithmatex">\(m\)</span> chooses the solution. If not specified, the positive solution is taken by default.</li>
@@ -1069,7 +1071,7 @@
 <li><strong><code>function q=qqmul(q1, q2)</code></strong>: <span class="arithmatex">\(q\)</span> is the quaternion resulting from multiplying <span class="arithmatex">\(q_1\)</span> by <span class="arithmatex">\(q_2\)</span>. Both <span class="arithmatex">\(q_1\)</span> and <span class="arithmatex">\(q_2\)</span> must be two row vectors of four components. The result will also have the same format.</li>
 <li><strong><code>Práctic1_PlanifCart</code></strong>: Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in <span class="arithmatex">\(ZYZ\)</span> Euler angles.</li>
 </ul>
-<h2 id="cartesian-interpolation">Cartesian interpolation<a class="headerlink" href="#cartesian-interpolation" title="Permanent link">¶</a></h2>
+<h2 id="cartesian-interpolation">Cartesian interpolation</h2>
 <p>Cartesian interpolation is characterized by achieving a linear variation of position and orientation, the latter uses the representation of orientation through quaternions. Therefore, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point.</p>
 <p>Figure 1 shows the described situation, using the example of concatenating a displacement from location <span class="arithmatex">\(P_0\)</span> to <span class="arithmatex">\(P_1\)</span> with another from <span class="arithmatex">\(P_1\)</span> to <span class="arithmatex">\(P_2\)</span>. To avoid the velocity discontinuity that occurs at <span class="arithmatex">\(P_1\)</span>, a constant acceleration is used to adapt the velocity variation of vector <span class="arithmatex">\(X\)</span> from the first segment to the second.</p>
 <p><img alt="figure1" src="figure1.png"></p>
@@ -1083,7 +1085,7 @@ P(t) = P_1 - \frac{(\tau - t)^2}{4\tau T_1} \Delta P_1 + \frac{(\tau + t)^2}{4\t
 <div class="arithmatex">\[
 q(t) = q_1 \cdot q \left[ -\frac{(\tau - t)^2}{4\tau T_1} \theta_1, n_1 \right] \cdot q \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, n_2 \right]
 \]</div>
-<h2 id="exercises">Exercises<a class="headerlink" href="#exercises" title="Permanent link">¶</a></h2>
+<h2 id="exercises">Exercises</h2>
 <p>Considering all the above, and the following values for <span class="arithmatex">\(P_0, P_1, P_2\)</span>, the following exercises are requested:</p>
 <div class="arithmatex">\[
 P_0 = \begin{pmatrix}
@@ -1107,13 +1109,13 @@ P_2 = \begin{pmatrix}
 0 &amp; 0 &amp; 0 &amp; 1 \\
 \end{pmatrix}
 \]</div>
-<h3 id="1-quaternion-interpolation">1. Quaternion interpolation<a class="headerlink" href="#1-quaternion-interpolation" title="Permanent link">¶</a></h3>
+<h3 id="1-quaternion-interpolation">1. Quaternion interpolation</h3>
 <p>Define the quaternion interpolation function based on the Taylor method <code>[pr, qr]=qpinter(P1, P2, λ)</code> that calculates the intermediate quaternion between <span class="arithmatex">\(q_1\)</span> (initial) and <span class="arithmatex">\(q_2\)</span> (final). The value <span class="arithmatex">\(\lambda\)</span> must satisfy <span class="arithmatex">\(0\leq \lambda \leq 1\)</span>, so that <code>[p1, q1]=qpinter(P1, P2, 0)</code> and <code>[p2, q2]=qpinter(P1, P2, 1)</code>.</p>
-<h3 id="2-smooth-trajectory-generation">2. Smooth trajectory generation<a class="headerlink" href="#2-smooth-trajectory-generation" title="Permanent link">¶</a></h3>
+<h3 id="2-smooth-trajectory-generation">2. Smooth trajectory generation</h3>
 <p>Create a MATLAB function in the format <code>P=tramoq(P0, P1, P2, tau, T, t)</code> that calculates the transformation <span class="arithmatex">\(P\)</span> corresponding to the movement from <span class="arithmatex">\(P_0\)</span> to <span class="arithmatex">\(P_2\)</span> via <span class="arithmatex">\(P_1\)</span> smoothed by the Taylor method. The parameters <span class="arithmatex">\(\tau\)</span> and <span class="arithmatex">\(T\)</span> correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1, and <span class="arithmatex">\(T\)</span> indicates the time at which the location of the calculated path <span class="arithmatex">\(P\)</span> is reached.</p>
-<h3 id="3-graphical-representation">3. Graphical representation<a class="headerlink" href="#3-graphical-representation" title="Permanent link">¶</a></h3>
+<h3 id="3-graphical-representation">3. Graphical representation</h3>
 <p>Plot the evolution of position and orientation (in ZYZ Euler angles) throughout the trajectory.</p>
-<h2 id="expected-results">Expected results<a class="headerlink" href="#expected-results" title="Permanent link">¶</a></h2>
+<h2 id="expected-results">Expected results</h2>
 <p>The expected result is illustrated in the following video and figures</p></div>
 
 
@@ -1332,13 +1334,11 @@ P_2 = \begin{pmatrix}
       
         <script src="../js/timeago_mkdocs_material.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
+        <script src="../javascripts/katex.js"></script>
       
-        <script src="../https:/polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script src="../assets/external/unpkg.com/katex@0/dist/katex.min.js"></script>
       
-        <script src="../assets/external/cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-      
-        <script src="../assets/external/cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.39674748.js"></script>
+        <script src="../assets/external/unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
       
     
   </body>

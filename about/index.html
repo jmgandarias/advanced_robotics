@@ -52,6 +52,8 @@
     
       <link rel="stylesheet" href="../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../assets/external/unpkg.com/katex@0/dist/katex.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -996,7 +998,7 @@
 
   <h1>About</h1>
 
-<div><h2 id="welcome">Welcome<a class="headerlink" href="#welcome" title="Permanent link">¶</a></h2>
+<div><h2 id="welcome">Welcome</h2>
 <p>This is the home of the Advanced Robotics course: A fourth-year undergraduate course for Electronics, Robotics, and Mechatronics Engineering students in <a href="https://www.uma.es/escuela-de-ingenierias-industriales/">the School of Industrial Engineering</a> at <a href="https://www.uma.es">the University of Málaga</a>. The lab course is developed by <a href="https://jmgandarias.com">Dr Juan M. Gandarias</a>, an Assistant Professor in the <a href="https://www.uma.es/isa">Systems Engineering and Automation Department</a>.</p>
 <!-- The course here is designed to teach students how to use **ROS (the Robot Operating System)** to program robots, using a mix of simulation-based learning and real robot hardware. Most of the initial learning is done in simulation, and we've got [a WSL-based simulation environment that we use for this](../software/wsl-ros/README.md). Everything that is taught in simulation is applicable to real robots too, and - through this course - students are able to apply their new-found ROS knowledge to our [real TurtleBot3 Waffle Robots](./robots.md) in The Diamond. -->
 <!-- 
@@ -1204,13 +1206,11 @@ This site is now also used to support the teaching of labs for an [AMRC Training
       
         <script src="../js/timeago_mkdocs_material.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
+        <script src="../javascripts/katex.js"></script>
       
-        <script src="../https:/polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script src="../assets/external/unpkg.com/katex@0/dist/katex.min.js"></script>
       
-        <script src="../assets/external/cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-      
-        <script src="../assets/external/cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.39674748.js"></script>
+        <script src="../assets/external/unpkg.com/katex@0/dist/contrib/auto-render.min.js"></script>
       
     
   </body>
