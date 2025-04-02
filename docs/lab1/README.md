@@ -1,5 +1,4 @@
-
-# Overview
+# Lab 1: Cartesian trajectory planning
 
 This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, a series of functions will be used:
 
