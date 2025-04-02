@@ -19,6 +19,7 @@ Cartesian interpolation is characterized by achieving a linear variation of posi
 Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ with another from $P_1$ to $P_2$. To avoid the velocity discontinuity that occurs at $P_1$, a constant acceleration is used to adapt the velocity variation of vector $X$ from the first segment to the second.
 
 ![figure1](figure1.png)
+
 *Fgure 1. Diagram of the variation of position and velocity in the movement from $P_0$ to $P_2$ via $P_1$.*
 
 This way, $-\tau$ units of time before reaching $P_1$ (time 0), the velocity will be linearly changed from $\Delta P_1/T_1$ to $\Delta P_2/T_2$, to accommodate the velocity $\tau$ units of time after passing $P_1$. Thus, the problem is defined as the calculation of a quadratic function $X(t)$ that starts at point $P_A$ and ends at $P_B$ (start and end points of the smoothing) defined in the time range $[-\tau, \tau]$.
@@ -36,7 +37,7 @@ q(t) = q_1 \cdot q \left[ -\frac{(\tau - t)^2}{4\tau T_1} \theta_1, n_1 \right] 
 $$
 
 
-## Exercises 
+## Exercises
 
 Considering all the above, and the following values for $P_0, P_1, P_2$, the following exercises are requested:
 
