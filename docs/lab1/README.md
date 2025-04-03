@@ -17,9 +17,9 @@ Cartesian interpolation is characterized by achieving a linear variation of posi
 
 Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ with another from $P_1$ to $P_2$. To avoid the velocity discontinuity that occurs at $P_1$, a constant acceleration is used to adapt the velocity variation of vector $X$ from the first segment to the second.
 
-![figure1](figure1.png)
+<img src="images/smooth_trajectory.png" alt="smooth_trajectory" width="400"/>
 
-*Fgure 1. Diagram of the variation of position and velocity in the movement from $P_0$ to $P_2$ via $P_1$.*
+*Figure 1. Diagram of the variation of position and velocity in the movement from $P_0$ to $P_2$ via $P_1$.*
 
 This way, $-\tau$ units of time before reaching $P_1$ (time 0), the velocity will be linearly changed from $\Delta P_1/T_1$ to $\Delta P_2/T_2$, to accommodate the velocity $\tau$ units of time after passing $P_1$. Thus, the problem is defined as the calculation of a quadratic function $X(t)$ that starts at point $P_A$ and ends at $P_B$ (start and end points of the smoothing) defined in the time range $[-\tau, \tau]$.
 
@@ -77,4 +77,22 @@ Plot the evolution of position and orientation (in ZYZ Euler angles) throughout 
 
 ## Expected results
 
-The expected result is illustrated in the following video and figures
+The expected result is illustrated in the following video and figures:
+
+
+![type:video](./videos/result.mp4)
+
+*Video 1. Expected result of the lab session.*
+
+
+<img src="images/final_config.png" alt="/final_configuration" width="400"/>
+
+*Figure 2. Final configuration and smooth path.*
+
+<img src="images/position.png" alt="images/position" width="600"/>
+
+*Figure 3. Position trajectories.*
+
+<img src="images/orientation.png" alt="images/orientation" width="600"/>
+
+*Figure 4. Orientation trajectories.*
