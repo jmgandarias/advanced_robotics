@@ -1,1 +1,24 @@
-% function a=tr2zyz(T,m)%% Obtiene la representaci—n a=[alfa,beta,gamma] de los ‡ngulos de Euler ZYZ% de la transformaci—n T. El signo del par‡metro 'm' elige la solici—n. Si no% se especifica Žste, se toma por defecto la soluci—n positiva.%% V’ctor F. Mu–oz 2000function a=tr2zyz(T,m)if nargin==1, m=1; endM=sign(m);Sbeta=M*sqrt(T(3,1)^2+T(3,2)^2);beta=atan2(Sbeta,T(3,3));if abs(Sbeta)>1e-3,	alfa=atan2(T(2,3)/Sbeta,T(1,3)/Sbeta);	gamma=atan2(T(3,2)/Sbeta,-T(3,1)/Sbeta);else	alfa=0;	gamma=atan2(T(2,1),sign(T(3,3))*T(1,1));	warning('Configuraci—n degenerada');enda=[alfa,beta,gamma];
+% function a=tr2zyz(T,m)
+%
+% Obtiene la representaciÃ³n a=[alfa,beta,gamma] de los Ã¡ngulos de Euler ZYZ
+% de la transformaciÃ³n T. El signo del parï¿½metro 'm' elige la soliciÃ³n. Si no
+% se especifica este, se toma por defecto la soluciÃ³n positiva.
+%
+% VÃ­ctor F. MuÃ±oz 2000
+
+function a=tr2zyz(T,m)
+
+if nargin==1, m=1; end
+M=sign(m);
+
+Sbeta=M*sqrt(T(3,1)^2+T(3,2)^2);
+beta=atan2(Sbeta,T(3,3));
+if abs(Sbeta)>1e-3,
+	alfa=atan2(T(2,3)/Sbeta,T(1,3)/Sbeta);
+	gamma=atan2(T(3,2)/Sbeta,-T(3,1)/Sbeta);
+else
+	alfa=0;
+	gamma=atan2(T(2,1),sign(T(3,3))*T(1,1));
+	warning('Configuraciï¿½n degenerada');
+end
+a=[alfa,beta,gamma];
