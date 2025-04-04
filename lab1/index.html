@@ -1064,8 +1064,17 @@
 <p>This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, a series of functions will be used:</p>
 <h2 id="matlab-functions">Matlab functions</h2>
 <ul>
-<li><strong><code>function T=zyz2tr(a)</code></strong>: Converts the row vector <span class="arithmatex">\(a=[\alpha,\beta,\gamma]\)</span> of <span class="arithmatex">\(ZYZ\)</span> Euler angles to a <span class="arithmatex">\(4 \times 4\)</span> homogeneous transformation <span class="arithmatex">\(T\)</span>.</li>
-<li><strong><code>function a=tr2zyz(T, m)</code></strong>: Obtains the representation <span class="arithmatex">\(a=[\alpha,\beta,\gamma]\)</span> of the <span class="arithmatex">\(ZYZ\)</span> Euler angles from the transformation <span class="arithmatex">\(T\)</span>. The sign of the parameter <span class="arithmatex">\(m\)</span> chooses the solution. If not specified, the positive solution is taken by default.</li>
+<li>
+<p><strong><code>function T=zyz2tr(a)</code></strong>: Converts the row vector <span class="arithmatex">\(a=[\alpha,\beta,\gamma]\)</span> of <span class="arithmatex">\(ZYZ\)</span> Euler angles to a <span class="arithmatex">\(4 \times 4\)</span> homogeneous transformation <span class="arithmatex">\(T\)</span>.
+    <details>
+        <summary>Show function zyz2tr.m</summary>
+        <code>matlab title="zyz2tr.m"
+        --8&lt;-- "snippets/lab1/zyz2tr.m"</code>
+    </details></p>
+</li>
+<li>
+<p><strong><code>function a=tr2zyz(T, m)</code></strong>: Obtains the representation <span class="arithmatex">\(a=[\alpha,\beta,\gamma]\)</span> of the <span class="arithmatex">\(ZYZ\)</span> Euler angles from the transformation <span class="arithmatex">\(T\)</span>. The sign of the parameter <span class="arithmatex">\(m\)</span> chooses the solution. If not specified, the positive solution is taken by default.</p>
+</li>
 <li><strong><code>function q=tr2q(T, m)</code></strong>: Converts the homogeneous matrix <span class="arithmatex">\(T\)</span> to quaternion <span class="arithmatex">\(q\)</span>. The sign of <span class="arithmatex">\(m\)</span> chooses the positive or negative solution. If <span class="arithmatex">\(m\)</span> is omitted, the positive solution is taken by default.</li>
 <li><strong><code>function T=q2tr(q)</code></strong>: Calculates the <span class="arithmatex">\(4 \times 4\)</span> homogeneous matrix <span class="arithmatex">\(T\)</span> corresponding to the quaternion <span class="arithmatex">\(q\)</span>.</li>
 <li><strong><code>function q=qqmul(q1, q2)</code></strong>: <span class="arithmatex">\(q\)</span> is the quaternion resulting from multiplying <span class="arithmatex">\(q_1\)</span> by <span class="arithmatex">\(q_2\)</span>. Both <span class="arithmatex">\(q_1\)</span> and <span class="arithmatex">\(q_2\)</span> must be two row vectors of four components. The result will also have the same format.</li>
@@ -1147,7 +1156,7 @@ P_2 = \begin{pmatrix}
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 3, 2025 17:28:32"><span class="timeago" datetime="2025-04-03T17:28:32+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 3, 2025 17:28:32">2025-04-03</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 4, 2025 05:04:23"><span class="timeago" datetime="2025-04-04T05:04:23+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 4, 2025 05:04:23">2025-04-04</span>
   </span>
 
     
