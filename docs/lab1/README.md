@@ -2,9 +2,17 @@
 
 This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, a series of functions will be used:
 
+
 ## Matlab functions
 
 - **`function T=zyz2tr(a)`**: Converts the row vector $a=[\alpha,\beta,\gamma]$ of $ZYZ$ Euler angles to a $4 \times 4$ homogeneous transformation $T$.
+    <details>
+        <summary>Show function zyz2tr.m</summary>
+        ```matlab title="zyz2tr.m"
+        --8<-- "snippets/lab1/zyz2tr.m"
+        ```
+    </details>
+
 - **`function a=tr2zyz(T, m)`**: Obtains the representation $a=[\alpha,\beta,\gamma]$ of the $ZYZ$ Euler angles from the transformation $T$. The sign of the parameter $m$ chooses the solution. If not specified, the positive solution is taken by default.
 - **`function q=tr2q(T, m)`**: Converts the homogeneous matrix $T$ to quaternion $q$. The sign of $m$ chooses the positive or negative solution. If $m$ is omitted, the positive solution is taken by default.
 - **`function T=q2tr(q)`**: Calculates the $4 \times 4$ homogeneous matrix $T$ corresponding to the quaternion $q$.
