@@ -10,8 +10,8 @@ T=10;
 
 %% Exercise 1: Cartesian interpolation
 
-[p1, q1]=qpinter(P0, P1, 0)  %% (1)!
-[p2, q2]=qpinter(P0, P1, 1)
+[p0, q0]=qpinter(P0, P1, 0)  %% (1)!
+[p1, q1]=qpinter(P0, P1, 1)
 
 %% Exercise 2: Smooth trajectory generation
 
