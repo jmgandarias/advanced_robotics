@@ -73,6 +73,14 @@ This exercise illustrates the generation of Cartesian trajectories using one of 
         ```
     </details>
 
+- **`function q2=qinv(q)`**: $q$ is the quaternion resulting from multiplying $q_1$ by $q_2$. Both $q_1$ and $q_2$ must be two row vectors of four components. The result will also have the same format.
+    <details>
+        <summary>Show function qqmul.m</summary>
+        ```matlab title="qqmul.m"
+        --8<-- "snippets/lab1/qqmul.m"
+        ```
+    </details>
+
 ## Cartesian interpolation
 
 Cartesian interpolation is characterized by achieving a linear variation of position and orientation, the latter uses the representation of orientation through quaternions. Therefore, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point.
