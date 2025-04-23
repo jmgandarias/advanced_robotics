@@ -1,17 +1,17 @@
 % Lab 1: Cartesian trajectory planning
 clearvars
 
-P1=[1 0 0 0.3740; 0 1 0 0; 0 0 1 0.6300; 0 0 0 1];
-P2=[0 0 1 0.3038; 0 1 0 0; -1 0 0 0.0510; 0 0 0 1];
-P3=[0 -1 0 0; 0 0 1 0.3020; -1 0 0 0.5580; 0 0 0 1];
+P0=[1 0 0 0.3740; 0 1 0 0; 0 0 1 0.6300; 0 0 0 1];
+P1=[0 0 1 0.3038; 0 1 0 0; -1 0 0 0.0510; 0 0 0 1];
+P2=[0 -1 0 0; 0 0 1 0.3020; -1 0 0 0.5580; 0 0 0 1];
 
 tau=1;
 T=10;
 
 %% Exercise 1: Cartesian interpolation
 
-[p1, q1]=qpinter(P1, P2, 0)  %% (1)!
-[p2, q2]=qpinter(P1, P2, 1)
+[p1, q1]=qpinter(P0, P1, 0)  %% (1)!
+[p2, q2]=qpinter(P0, P1, 1)
 
 %% Exercise 2: Smooth trajectory generation
 
@@ -30,7 +30,7 @@ set(f1,'Name','Manipulador');
 x=[]; y=[]; z=[]; alfa=[]; beta=[]; gamma=[];
 for t=-T:0.1:T
     % Call the function to generate the smoothed cartesian path
-    [P,Q]=generate_smooth_path(P1,P2,P3,tau,T,t); %% (2)!
+    [P,Q]=generate_smooth_path(P0,P1,P2,tau,T,t); %% (2)!
     x=[x P(1)];
     y=[y P(2)];
     z=[z P(3)];
