@@ -73,7 +73,7 @@ This exercise illustrates the generation of Cartesian trajectories using one of 
         ```
     </details>
 
-- **`function q2=qinv(q)`**: $q$ is the quaternion resulting from multiplying $q_1$ by $q_2$. Both $q_1$ and $q_2$ must be two row vectors of four components. The result will also have the same format.
+- **`function q2=qinv(q)`**: $q_2$ is the quaternion resulting from computing the inverse of $q$.
     <details>
         <summary>Show function qinv.m</summary>
         ```matlab title="qinv.m"
@@ -120,7 +120,7 @@ P_0 = \begin{pmatrix}
 \end{pmatrix},
 \quad
 P_1 = \begin{pmatrix}
-0 & 1 & 0 & 0.3038 \\
+0 & 0 & 1 & 0.3038 \\
 0 & 1 & 0 & 0 \\
 -1 & 0 & 0 & 0.051 \\
 0 & 0 & 0 & 1\\
