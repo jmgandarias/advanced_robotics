@@ -1,4 +1,4 @@
-function [P, Q]=tramoq(P1, P2, P3, tau, T, t)
+function [P, Q]=generate_smooth_path(P1, P2, P3, tau, T, t)
     % Function that calculates the transformation (P - position, and Q - orientation) from P1 to P3 smoothing in P2 with Taylor method (quaternions)
 
     if (t<-T || t>T)

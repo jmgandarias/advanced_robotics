@@ -97,14 +97,14 @@ Applying the boundary conditions at both ends of the segment and defining the ac
 
 <a id="equation-1"></a>
 $$
-P(t) = P_1 - \frac{(\tau - t)^2}{4\tau T_1} \Delta P_1 + \frac{(\tau + t)^2}{4\tau T_2} \Delta P_2
+\mathbf{p}(t) = \mathbf{p}_1 - \frac{(\tau - t)^2}{4\tau T_1} \Delta \mathbf{p}_1 + \frac{(\tau + t)^2}{4\tau T_2} \Delta \mathbf{p}_2
 $$
 
 And the orientation as:
 
 <a id="equation-2"></a>
 $$
-q(t) = q_1 \cdot q \left[ -\frac{(\tau - t)^2}{4\tau T_1} \theta_1, n_1 \right] \cdot q \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, n_2 \right]
+\mathbf{q}(t) = \mathbf{q}_1 \cdot  \mathbf{q} \left[\frac{-(\tau - t)^2}{4\tau T_1} \theta_1, \mathbf{n}_1 \right] \cdot \mathbf{q} \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, \mathbf{n}_2 \right]
 $$
 
 ## Exercises
