@@ -16,7 +16,7 @@ Once you have installed the UMA environment, you should see that everything is w
 Try the following;
 
 ```bash
-create_catkin_workspace
+create_catkin_ws
 ```
 
 Put the name `advanced_robotics_ws` to your workspace. You should see the following
@@ -63,6 +63,9 @@ git clone https://github.com/jmgandarias/uma_arm_description.git
 !!! warning 
     This is a work-in-progress repository. Don't pay attention to the README.md file of that repo.
 
+!!! info 
+    You don't have to modify anything in this package. You just need it visualize the manipulator.
+
 Now, before compiling it, you'll need to install a series of dependencies:
 
 ```bash
@@ -86,7 +89,7 @@ cdw
 cb
 ```
 
-### Test the UMA manipulator package
+### 2.1. Test the UMA manipulator package
 
 Open one terminal and run:
 ```bash
@@ -130,11 +133,79 @@ The manipulator model you've loaded is purely a kinematic visualization (i.e., t
 
 There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as [Gazebo](https://gazebosim.org/home). However, as we are roboticists and want to see, touch, and lear the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equation of motion) of the manipulator down into a node.
 
-### Clone the advanced_robotics package
+### 3.1. Clone the advanced_robotics package
 
 To do this, we'll work with another package. You have to do the following
 
-### Implement the dynamics model
+```bash
+cdw
+cd src
+git clone https://github.com/jmgandarias/uma_arm_control.git
+```
+
+Once you have done this, your workspace folder should look like this
+
+![workspace_folders](images/workspace_folders.png)
+
+!!! tip
+    You can open the Ubuntu file manager even if you're using WSL running nautilus in a terminal
+    ```bash
+    nautilus
+    ```
+
+Now you can compile your workspace
+```bash
+cdw
+cb
+```
+
+![first_compilation](first_compilation.png)
+
+!!! success
+    Great work! You're now ready to implement the manipulator dynamics
+
+But first, let's have a look at the `uma_arm_control` package distribution
+
+### 3.2. Understanding the uma_arm_control package
+
+The package is structured as shown in the following image
+
+![uma_arm_control_structure](images/uma_arm_control_structure.png)
+
+!!! tip
+    You can directly open VSCode inside WSL by running `code` in a terminal
+
+- **config**
+
+    This folder contains configuration files that define various parameters. 
+
+    - **dynamics_params.yaml**: This file contains parameters related to the dynamics of the robotic arm. *:lock: You don't have to modify it.*
+    - **impedance_params.yaml**: This file includes parameters for the impedance controller. *:calendar: You'll need to modify it in future sessions.*
+
+- **launch**
+
+    This folder contains launch scripts.
+
+    - **uma_arm_dynamics_launch.py**: This Python script launches the dynamics simulation node for the robotic arm. *:lock: You don't have to modify it.*
+
+- **src**
+
+    This folder contains the source code for the dynamics control and simulation of the robotic arm:
+
+    - **uma_arm_dynamics.cpp**: This C++ file contains the implementation of the dynamics equations (equations of motion) for the robotic arm. *:pencil: You need to modify it in this lab.*
+
+- **utils:** This folder contains utility scripts that provide additional functionalities for the labs. *:lock: You don't have to modify it.*
+- **.gitignore:** Specifies which files and directories should be ignored by Git version control. *:lock: You don't have to modify it.*
+- **CMakeLists.txt:** Contains instructions for building the project using CMake, a build system generator. *:calendar: You'll need to modify it in future sessions.*
+- **LICENSE:** The license file that specifies the terms under which the project can be used and distributed. *:lock: You don't have to modify it.*
+- **package.xml:** Defines the package metadata for ROS, including dependencies and other information. *:lock: You don't have to modify it.*
+- **README.md:** Provides an overview of the project, instructions for setup, usage, and other relevant information. *:pencil: You should modify it and keep it updated as you work on the lab sessions.*
+
+
+
+### 3.3. Understanding the uma_arm_dynamics.cpp code
+
+### 3.4. Implementing the dynamics model
 
 The dynamics of an open kinematic chain robotic manipulator is given by
 
