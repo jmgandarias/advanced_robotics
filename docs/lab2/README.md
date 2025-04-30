@@ -19,9 +19,7 @@ Try the following;
 create_catkin_ws
 ```
 
-Put the name `advanced_robotics_ws` to your workspace. You should see the following
-
-
+Put the name `advanced_robotics_ws` to your workspace. 
 
 If, after installing it, you go to your catkin workspace folder and when you run this alias
 
