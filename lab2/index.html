@@ -960,13 +960,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-setup-ros2" class="md-nav__link">
+  <a href="#1-setup-ros-2" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Setup ROS2
+      1. Setup ROS 2
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="1. Setup ROS2">
+    <nav class="md-nav" aria-label="1. Setup ROS 2">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -987,6 +987,72 @@
   <a href="#2-install-uma-manipulator-package" class="md-nav__link">
     <span class="md-ellipsis">
       2. Install UMA manipulator package
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Install UMA manipulator package">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-the-uma-manipulator-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test the UMA manipulator package
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-simulate-the-robot-dynamics" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Simulate the robot dynamics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Simulate the robot dynamics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clone-the-advanced_robotics-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clone the advanced_robotics package
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implement-the-dynamics-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implement the dynamics model
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-graphical-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Graphical representation
     </span>
   </a>
   
@@ -1025,8 +1091,8 @@
 
 
 <div><h1 id="lab-2-manipulator-dynamics-simulation">Lab 2: Manipulator dynamics simulation<a class="headerlink" href="#lab-2-manipulator-dynamics-simulation" title="Permanent link">¶</a></h1>
-<h2 id="1-setup-ros2">1. Setup ROS2<a class="headerlink" href="#1-setup-ros2" title="Permanent link">¶</a></h2>
-<p>This lab session assumes you have ROS2 Humble installed in your computer.</p>
+<h2 id="1-setup-ros-2">1. Setup ROS 2<a class="headerlink" href="#1-setup-ros-2" title="Permanent link">¶</a></h2>
+<p>This lab session assumes you have ROS 2 Humble installed in your computer.</p>
 <p>You'll also need to install the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment_tools</a> as it will install some important packages and libraries that we'll use in the course.
 In that repo, you'll find the required steps to install it.</p>
 <p>If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.</p>
@@ -1035,7 +1101,7 @@ In that repo, you'll find the required steps to install it.</p>
 <p>Try the following;</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>create_catkin_workspace
 </code></pre></div>
-<p>Put the name <code>advanced_robotics_ws</code> to your workspace. You should see the following:</p>
+<p>Put the name <code>advanced_robotics_ws</code> to your workspace. You should see the following</p>
 <p>If, after installing it, you go to your catkin workspace folder and when you run this alias</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cb
 </code></pre></div>
@@ -1058,7 +1124,78 @@ In that repo, you'll find the required steps to install it.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>cdw
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>src
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/jmgandarias/uma_arm_description.git
-</code></pre></div></div>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is a work-in-progress repository. Don't pay attention to the README.md file of that repo.</p>
+</div>
+<p>Now, before compiling it, you'll need to install a series of dependencies:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-xacro
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-gazebo-ros-pkgs
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>sudo<span class="w">  </span>apt<span class="w"> </span>install<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-control<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-controllers<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-gazebo-ros2-control
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-joint-state-publisher-gui<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-rviz2
+</code></pre></div>
+<p>If you find an error trying to install these dependencies, most probably you'll need to update the packages repositories and upgrade them to the last version</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>upgrade
+</code></pre></div>
+<p>Once the dependencies are correctly installed, you can compile the workspace</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cdw
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>cb
+</code></pre></div>
+<h3 id="test-the-uma-manipulator-package">Test the UMA manipulator package<a class="headerlink" href="#test-the-uma-manipulator-package" title="Permanent link">¶</a></h3>
+<p>Open one terminal and run:
+</p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
+</code></pre></div>
+<p>You'll see RViz2 openning and showing the following:</p>
+<p><img alt="rviz2_uma_arm" src="images/rviz2_uma_arm.png"></p>
+<p>You can open a new terminal and run the <code>joint_state_publisher_gui</code>to move joints of the robot</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>ros2<span class="w"> </span>run<span class="w"> </span>joint_state_publisher_gui<span class="w"> </span>joint_state_publisher_gui<span class="w"> </span>
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you press <code>ctrl + shift + o</code> or <code>ctrl + shift + e</code> in the terminator terminal, it will split the terminals vertically or horizontally </p>
+</div>
+<p>Now, you should have the following in your terminals</p>
+<p><img alt="terminals_test_uma_arm" src="images/terminals_test_uma_arm.png"></p>
+<p>A GUI should have opened now allowing you to manually drive the joints of the manipulator</p>
+<p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/video_gui.mp4" type="video/mp4"></source></video></div></p>
+<div class="admonition success">
+<p class="admonition-title">Success</p>
+<p>Great work! Now you are ready to do the Lab session 2!</p>
+</div>
+<p>You can also close all the terminals (press <code>ctrl + c</code>).</p>
+<hr>
+<h2 id="3-simulate-the-robot-dynamics">3. Simulate the robot dynamics<a class="headerlink" href="#3-simulate-the-robot-dynamics" title="Permanent link">¶</a></h2>
+<p>The manipulator model you've loaded is purely a kinematic visualization (i.e., there is no dynamics - no forces, and there is no simulation)</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>RViz 2 is 3D visualization tool, not a simulator. It means it allows you to see the robot models, sensor data, and other information shared in your ROS 2 environment in real-time and offers you a GUI to select the information to be visualize, but it is NOT a simulation</p>
+</div>
+<p>There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as <a href="https://gazebosim.org/home">Gazebo</a>. However, as we are roboticists and want to see, touch, and lear the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equation of motion) of the manipulator down into a node.</p>
+<h3 id="clone-the-advanced_robotics-package">Clone the advanced_robotics package<a class="headerlink" href="#clone-the-advanced_robotics-package" title="Permanent link">¶</a></h3>
+<p>To do this, we'll work with another package. You have to do the following</p>
+<h3 id="implement-the-dynamics-model">Implement the dynamics model<a class="headerlink" href="#implement-the-dynamics-model" title="Permanent link">¶</a></h3>
+<p>The dynamics of an open kinematic chain robotic manipulator is given by</p>
+<div class="arithmatex">\[
+\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} +  \mathbf{F}_b \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \boldsymbol{\tau}_{ext}
+\]</div>
+<p>where</p>
+<ul>
+<li><span class="arithmatex">\(\mathbf{q}\)</span> is the vector of joint positions.</li>
+<li><span class="arithmatex">\(\dot{\mathbf{q}}\)</span> is the vector of joint velocities.</li>
+<li><span class="arithmatex">\(\ddot{\mathbf{q}}\)</span> is the vector of joint accelerations.</li>
+<li><span class="arithmatex">\(\mathbf{M}(\mathbf{q})\)</span> is the inertia matrix.</li>
+<li><span class="arithmatex">\(\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}})\)</span> is the Coriolis and centrifugal forces matrix.</li>
+<li><span class="arithmatex">\(\mathbf{F}_b\)</span> is the viscous friction matrix.</li>
+<li><span class="arithmatex">\(\boldsymbol{\tau}\)</span> is the vector of commanded joint torques.</li>
+<li><span class="arithmatex">\(\boldsymbol{\tau}_ext\)</span> is the vector of joint torques due to external forces.</li>
+</ul>
+<h3 id="_1"><a class="headerlink" href="#_1" title="Permanent link">¶</a></h3>
+<h2 id="4-graphical-representation">4. Graphical representation<a class="headerlink" href="#4-graphical-representation" title="Permanent link">¶</a></h2>
+<p>As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter.</p>
+<p>To represent time series of data in ROS 2, the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment</a> has installed the tool <a href="https://plotjuggler.io/">plotjuggler</a>.</p>
+<p>You can run it </p></div>
 
 
 
@@ -1081,7 +1218,7 @@ In that repo, you'll find the required steps to install it.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 29, 2025 18:01:30"><span class="timeago" datetime="2025-04-29T18:01:30+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 29, 2025 18:01:30">2025-04-29</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 30, 2025 06:39:27"><span class="timeago" datetime="2025-04-30T06:39:27+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 30, 2025 06:39:27">2025-04-30</span>
   </span>
 
     
