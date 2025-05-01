@@ -177,7 +177,7 @@ The package is structured as shown in the following image
 
     This folder contains configuration files that define various parameters. 
 
-    - **dynamics_params.yaml**: This file contains parameters related to the dynamics of the robotic arm. *:lock: You don't have to modify it.*
+    - **dynamics_params.yaml**: This file contains parameters related to the dynamics of the robotic arm. *:pencil: You need to modify it in this lab.*
     - **impedance_params.yaml**: This file includes parameters for the impedance controller. *:calendar: You'll need to modify it in future sessions.*
 
 - **launch**
@@ -200,8 +200,197 @@ The package is structured as shown in the following image
 - **README.md:** Provides an overview of the project, instructions for setup, usage, and other relevant information. *:pencil: You should modify it and keep it updated as you work on the lab sessions.*
 
 
-
 ### 3.3. Understanding the uma_arm_dynamics.cpp code
+
+##### 3.3.1. Libraries :lock:
+
+Includs the needed libraries. You don't have to modify it.
+
+<details>
+<summary>Show the code</summary>
+```cpp title="libraries.cpp"
+    --8<-- "snippets/lab2/libraries.cpp"
+```
+</details>
+
+##### 3.3.2. Constructor :lock:
+
+**ManipulatorDynamicsNode:** Inherits from rclcpp::Node, making it a ROS 2 node. The class `ManipulatorDynamicsNode` is a ROS 2 node responsible for computing the dynamics of the manipulator (robot arm). You don't have to modify it.
+
+**ManipulatorDynamicsNode():** Class constructor that Initializes the node with the name `manipulator_dynamics_node`.
+
+<details>
+<summary>Show the code</summary>
+```cpp title="constructor_initialization"
+    --8<-- "snippets/lab2/constructor_initialization.cpp"
+```
+</details>
+
+**Member variables initialization**
+
+- `joint_positions_`, `joint_velocities_`, `joint_accelerations_`, `joint_torques_`, `external_wrenches_`: These are Eigen vectors initialized to zero. We'll use the library [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) to work with vectors and matrices in C++.
+- `previous_time_`: Initialized to the current time using high_resolution_clock::now().
+
+**Parameters declaration**
+
+- `frequency`: The frequency at which the node operates (default 1000 Hz).
+- `m1`, `m2`: Masses of the manipulator's links.
+- `l1`, `l2`: Lengths of the manipulator's links.
+- `b1`, `b2`: Damping coefficients.
+- `g`: Gravitational acceleration.
+- `q0`: Initial joint positions.
+
+**Parameters Retrieval**
+
+- `get_parameter`: Retrieves the values of the declared parameters and assigns them to member variables. The values of the parameters are defined in the `dynamics_params.yaml` file inside the config folder.
+
+**Setting Initial Joint Positions**
+
+- `joint_positions_`: Sets the initial joint positions using the parameter q0.
+
+<details>
+<summary>Show the code</summary>
+```cpp title="constructor_publisher_subscriber"
+    --8<-- "snippets/lab2/constructor_publisher_subscriber.cpp"
+```
+</details>
+
+**Subscriptions**
+
+- `joint_torques_subscription_`: Subscribes to the `joint_torques` topic, which is expected to publish messages of type `std_msgs::msg::Float64MultiArray`. The callback function `joint_torques_callback` is bound to handle incoming messages.
+- `external_wrenches_subscription_`: Subscribes to the `external_wrenches` topic, which is expected to publish messages of type- `geometry_msgs::msg::Wrench`. The callback function `external_wrenches_callback` is bound to handle incoming messages.
+
+**Publishers**
+
+- `publisher_acceleration_`: Creates a publisher for the `joint_accelerations` topic, which will publish messages of type `std_msgs::msg::Float64MultiArray`.
+- `publisher_joint_state_`: Creates a publisher for the `joint_states` topic, which will publish messages of type `sensor_msgs::msg::JointState`.
+
+**Timer**
+
+- `timer_`: Sets up a timer that triggers the `timer_callback` function (explained below) at a period determined by the frequency parameter. The period is expected to be given in milliseconds, therefore, it is calculated as 
+
+$$
+period \, \text{[ms]} = \frac{1 \, [\cancel{\text{s}}] \cdot 1000 \, [\text{ms}/\cancel{\text{s}}]}{frequency \, [\text{Hz}]} 
+$$
+
+##### 3.3.3. Timer callback :lock:
+
+The `timer_callback` function is responsible for:
+
+- Calculating the `elapsed_time_` between callbacks.
+- Updating the new `joint_accelerations_`, `joint_velocities_`, and `joint_positions_` using the respective functions (you'll need to implement these functions later).
+- Publishing the updated joint states to the ROS topics.
+
+This function ensures that the manipulator's state is updated and communicated at regular intervals based on the timer's frequency.
+
+<details>
+<summary>Show the code</summary>
+```cpp title="timer_callback"
+    --8<-- "snippets/lab2/timer.cpp"
+```
+</details>
+
+##### 3.3.4. Topic callbacks :lock:
+
+These callback functions ensure that the node's state is updated with the latest data from the subscribed topics. Specifically:
+
+- `joint_torques_callback`: Updates the `joint_torques_`  based on incoming messages.
+- `external_wrenches_callback`: Updates the `external_wrenches_` based on incoming messages.
+
+<details>
+<summary>Show the code</summary>
+```cpp title="topic_callbacks"
+    --8<-- "snippets/lab2/callbacks.cpp"
+```
+</details>
+
+##### 3.3.5. Calculate acceleration :pencil:
+This method computes the `joint_accelerations_` of the manipulator by considering the equations of motion, including inertia, Coriolis and centrifugal forces, friction, gravitational forces, and external torques. You have to implement it as explained later.
+
+At the moment, the method returns $\mathbf{\ddot{q}} = [0, 0]$.
+
+ <details>
+<summary>Show the code</summary>
+```cpp title="calculate_acceleration"
+    --8<-- "snippets/lab2/calculate_acceleration.cpp"
+```
+</details>
+
+##### 3.3.6. Integrate position and velocity :pencil:
+This method computes the joint velocities and positions by integrating over the elapsed time. You have to implement it as explained later.
+
+At the moment, the methods return $\mathbf{\dot{q}} = \mathbf{q} = [0, 0]$.
+
+ <details>
+<summary>Show the code</summary>
+```cpp title="Integrate_vel_pos"
+    --8<-- "snippets/lab2/integrate_vel_pos.cpp"
+```
+</details>
+
+##### 3.3.7. Publish the data :lock:
+This method is responsible for publishing the computed `joint_accelerations_` and `joint_state` (`joint_positions_` and `joint_velocities_`) to their respective topics.
+
+ <details>
+<summary>Show the code</summary>
+```cpp title="publish_data"
+    --8<-- "snippets/lab2/publish_data.cpp"
+```
+</details>
+
+#### 3.3.8. Member variables
+
+Defines the member variables for the ManipulatorDynamicsNode class. Here's a detailed breakdown of these variables:
+Member Variables
+
+ <details>
+<summary>Show the code</summary>
+```cpp title="member_variables"
+    --8<-- "snippets/lab2/member_variables.cpp"
+```
+</details>
+
+**Publishers and Subscribers**
+
+- `joint_torques_subscription_`: Subscription to the "joint_torques" topic.
+- `external_wrenches_subscription_`: Subscription to the "external_wrenches" topic.
+- `publisher_acceleration_`: Publisher for the "joint_accelerations" topic.
+- `publisher_joint_state_`: Publisher for the "joint_states" topic.
+
+**Joint Variables**
+
+- `joint_positions_`: Eigen vector representing the positions of the joints ($\mathbf{q}$).
+- `joint_velocities_`: Eigen vector representing the velocities of the joints ($\mathbf{\dot{q}}$).
+- `joint_accelerations_`: Eigen vector representing the accelerations of the joints ($\mathbf{\ddot{q}}$).
+- `joint_torques_`: Eigen vector representing the torques applied to the joints ($\boldsymbol{\tau}$).
+- `external_wrenches_`: Eigen vector representing the external forces and torques applied to the EE ($\mathbf{F}_{ext}$).
+
+**Dynamic Parameters Variables**
+
+- `m1_`: Mass of the first link of the manipulator.
+- `m2_`: Mass of the second link of the manipulator.
+- `l1_`: Length of the first link of the manipulator.
+- `l2_`: Length of the second link of the manipulator.
+- `b1_`: Damping coefficient for the first joint.
+- `b2_`: Damping coefficient for the second joint.
+- `g_`: Gravitational acceleration.
+
+**Time Variables**
+
+- `timer_`: Timer that triggers the timer_callback function at a specified frequency.
+- `previous_time_`: Stores the time of the previous callback execution.
+- `elapsed_time_`: Stores the elapsed time between the current and previous callback executions ($\Delta t$).
+
+#### 3.3.9. Main
+
+Initializes the ROS 2 node, creates a shared pointer to an instance of the `ManipulatorDynamicsNode` class, keeps the node running, and shuts down the ROS 2 node when the node execution finishes.
+
+ <details>
+<summary>Show the code</summary>
+```cpp title="main"
+    --8<-- "snippets/lab2/main.cpp"
+```
+</details>
 
 ### 3.4. Implementing the dynamics model
 
@@ -222,12 +411,19 @@ where
 - $\boldsymbol{\tau}$ is the vector of commanded joint torques.
 - $\boldsymbol{\tau}_ext$ is the vector of joint torques due to external forces.
 
-### 
+## 4. Launh the dynamics simulator node
 
-## 4. Graphical representation
+## 5. Graphical representation
 
 As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter.
 
 To represent time series of data in ROS 2, the [uma_environment](https://github.com/jmgandarias/uma_environment_tools) has installed the tool [plotjuggler](https://plotjuggler.io/).
 
 You can run it 
+
+!!! question
+    What are the effects of modifying the dynamics parameters of the arm?
+
+    You can modify some of the following parameters inside the `dynamics_params.yaml`: `m1`, `m2`, `b1`, `b2`, and `g`.
+
+    *Note that you only need to modify those inside `uma_arm_dynamics`.* 
