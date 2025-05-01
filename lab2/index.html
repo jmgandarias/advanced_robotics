@@ -1042,6 +1042,93 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="3.3. Understanding the uma_arm_dynamics.cpp code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#331-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.1. Libraries
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#332-constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.2. Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#333-timer-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.3. Timer callback
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#334-topic-callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.4. Topic callbacks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#335-calculate-acceleration" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.5. Calculate acceleration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#336-integrate-position-and-velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.6. Integrate position and velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#337-publish-the-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.7. Publish the data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#338-member-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.8. Member variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#339-main" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3.9. Main
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1053,24 +1140,24 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-graphical-representation" class="md-nav__link">
+  <a href="#4-launh-the-dynamics-simulator-node" class="md-nav__link">
     <span class="md-ellipsis">
-      4. Graphical representation
+      4. Launh the dynamics simulator node
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-graphical-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Graphical representation
     </span>
   </a>
   
@@ -1231,7 +1318,7 @@ In that repo, you'll find the required steps to install it.</p>
 <p><strong>config</strong></p>
 <p>This folder contains configuration files that define various parameters. </p>
 <ul>
-<li><strong>dynamics_params.yaml</strong>: This file contains parameters related to the dynamics of the robotic arm. <em><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"> You don't have to modify it.</em></li>
+<li><strong>dynamics_params.yaml</strong>: This file contains parameters related to the dynamics of the robotic arm. <em><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> You need to modify it in this lab.</em></li>
 <li><strong>impedance_params.yaml</strong>: This file includes parameters for the impedance controller. <em><img alt="📆" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4c6.svg" title=":calendar:"> You'll need to modify it in future sessions.</em></li>
 </ul>
 </li>
@@ -1259,6 +1346,355 @@ In that repo, you'll find the required steps to install it.</p>
 <li><strong>README.md:</strong> Provides an overview of the project, instructions for setup, usage, and other relevant information. <em><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> You should modify it and keep it updated as you work on the lab sessions.</em></li>
 </ul>
 <h3 id="33-understanding-the-uma_arm_dynamicscpp-code">3.3. Understanding the uma_arm_dynamics.cpp code<a class="headerlink" href="#33-understanding-the-uma_arm_dynamicscpp-code" title="Permanent link">¶</a></h3>
+<h5 id="331-libraries">3.3.1. Libraries <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"><a class="headerlink" href="#331-libraries" title="Permanent link">¶</a></h5>
+<p>Includs the needed libraries. You don't have to modify it.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">libraries.cpp</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;rclcpp/rclcpp.hpp&gt;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sensor_msgs/msg/joint_state.hpp&gt;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;std_msgs/msg/float64_multi_array.hpp&gt;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;geometry_msgs/msg/wrench.hpp&gt;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;chrono&gt;</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Eigen/Dense&gt;</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">std</span><span class="o">::</span><span class="nn">chrono</span><span class="p">;</span>
+</code></pre></div>
+</details>
+
+<h5 id="332-constructor">3.3.2. Constructor <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"><a class="headerlink" href="#332-constructor" title="Permanent link">¶</a></h5>
+<p><strong>ManipulatorDynamicsNode:</strong> Inherits from rclcpp::Node, making it a ROS 2 node. The class <code>ManipulatorDynamicsNode</code> is a ROS 2 node responsible for computing the dynamics of the manipulator (robot arm). You don't have to modify it.</p>
+<p><strong>ManipulatorDynamicsNode():</strong> Class constructor that Initializes the node with the name <code>manipulator_dynamics_node</code>.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">constructor_initialization</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">ManipulatorDynamicsNode</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Node</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">        </span><span class="n">ManipulatorDynamicsNode</span><span class="p">()</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">            </span><span class="o">:</span><span class="w"> </span><span class="n">Node</span><span class="p">(</span><span class="s">"manipulator_dynamics_node"</span><span class="p">),</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">              </span><span class="n">joint_positions_</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">              </span><span class="n">joint_velocities_</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">              </span><span class="n">joint_accelerations_</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">              </span><span class="n">joint_torques_</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">              </span><span class="n">external_wrenches_</span><span class="p">(</span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">              </span><span class="n">previous_time_</span><span class="p">(</span><span class="n">high_resolution_clock</span><span class="o">::</span><span class="n">now</span><span class="p">())</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">            </span><span class="c1">// Frequency initialization</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"frequency"</span><span class="p">,</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">);</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">            </span><span class="c1">// Dynamics parameters initialization</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"m1"</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"m2"</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"l1"</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"l2"</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"b1"</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"b2"</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"g"</span><span class="p">,</span><span class="w"> </span><span class="mf">9.81</span><span class="p">);</span>
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="w">            </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">declare_parameter</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="s">"q0"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">});</span>
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a>
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="w">            </span><span class="c1">// Get frequency [Hz] parameter and compute period [s]</span>
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="w">            </span><span class="kt">double</span><span class="w"> </span><span class="n">frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"frequency"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a>
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="w">            </span><span class="c1">// Get dynamic parameters</span>
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="w">            </span><span class="n">m1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"m1"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a><span class="w">            </span><span class="n">m2_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"m2"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a><span class="w">            </span><span class="n">l1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"l1"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="w">            </span><span class="n">l2_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"l2"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a><span class="w">            </span><span class="n">g_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"g"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a><span class="w">            </span><span class="n">b1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"b1"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a><span class="w">            </span><span class="n">b2_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"b2"</span><span class="p">).</span><span class="n">as_double</span><span class="p">();</span>
+<a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a>
+<a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a><span class="w">            </span><span class="c1">// Set initial joint position</span>
+<a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a><span class="w">            </span><span class="n">joint_positions_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Map</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"q0"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">().</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+</details>
+
+<p><strong>Member variables initialization</strong></p>
+<ul>
+<li><code>joint_positions_</code>, <code>joint_velocities_</code>, <code>joint_accelerations_</code>, <code>joint_torques_</code>, <code>external_wrenches_</code>: These are Eigen vectors initialized to zero. We'll use the library <a href="https://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> to work with vectors and matrices in C++.</li>
+<li><code>previous_time_</code>: Initialized to the current time using high_resolution_clock::now().</li>
+</ul>
+<p><strong>Parameters declaration</strong></p>
+<ul>
+<li><code>frequency</code>: The frequency at which the node operates (default 1000 Hz).</li>
+<li><code>m1</code>, <code>m2</code>: Masses of the manipulator's links.</li>
+<li><code>l1</code>, <code>l2</code>: Lengths of the manipulator's links.</li>
+<li><code>b1</code>, <code>b2</code>: Damping coefficients.</li>
+<li><code>g</code>: Gravitational acceleration.</li>
+<li><code>q0</code>: Initial joint positions.</li>
+</ul>
+<p><strong>Parameters Retrieval</strong></p>
+<ul>
+<li><code>get_parameter</code>: Retrieves the values of the declared parameters and assigns them to member variables. The values of the parameters are defined in the <code>dynamics_params.yaml</code> file inside the config folder.</li>
+</ul>
+<p><strong>Setting Initial Joint Positions</strong></p>
+<ul>
+<li><code>joint_positions_</code>: Sets the initial joint positions using the parameter q0.</li>
+</ul>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">constructor_publisher_subscriber</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="w">     </span><span class="c1">// Create subscription to joint_torques</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">     </span><span class="n">joint_torques_subscription_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">create_subscription</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Float64MultiArray</span><span class="o">&gt;</span><span class="p">(</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">        </span><span class="s">"joint_torques"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ManipulatorDynamicsNode</span><span class="o">::</span><span class="n">joint_torques_callback</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">));</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="c1">// Create subscription to external wrenches</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="n">external_wrenches_subscription_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">create_subscription</span><span class="o">&lt;</span><span class="n">geometry_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Wrench</span><span class="o">&gt;</span><span class="p">(</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">        </span><span class="s">"external_wrenches"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ManipulatorDynamicsNode</span><span class="o">::</span><span class="n">external_wrenches_callback</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">));</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">    </span><span class="c1">// Create publisher for joint acceleration</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">    </span><span class="n">publisher_acceleration_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">create_publisher</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Float64MultiArray</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"joint_accelerations"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">    </span><span class="c1">// Create publisher for joint state</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="w">    </span><span class="n">publisher_joint_state_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">create_publisher</span><span class="o">&lt;</span><span class="n">sensor_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">JointState</span><span class="o">&gt;</span><span class="p">(</span><span class="s">"joint_states"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="w">    </span><span class="c1">// Set the timer callback at a period (in milliseconds, multiply it by 1000)</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="w">    </span><span class="n">timer_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">create_wall_timer</span><span class="p">(</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">chrono</span><span class="o">::</span><span class="n">milliseconds</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">1000</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">frequency</span><span class="p">)),</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ManipulatorDynamicsNode</span><span class="o">::</span><span class="n">timer_callback</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">));</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
+<p><strong>Subscriptions</strong></p>
+<ul>
+<li><code>joint_torques_subscription_</code>: Subscribes to the <code>joint_torques</code> topic, which is expected to publish messages of type <code>std_msgs::msg::Float64MultiArray</code>. The callback function <code>joint_torques_callback</code> is bound to handle incoming messages.</li>
+<li><code>external_wrenches_subscription_</code>: Subscribes to the <code>external_wrenches</code> topic, which is expected to publish messages of type- <code>geometry_msgs::msg::Wrench</code>. The callback function <code>external_wrenches_callback</code> is bound to handle incoming messages.</li>
+</ul>
+<p><strong>Publishers</strong></p>
+<ul>
+<li><code>publisher_acceleration_</code>: Creates a publisher for the <code>joint_accelerations</code> topic, which will publish messages of type <code>std_msgs::msg::Float64MultiArray</code>.</li>
+<li><code>publisher_joint_state_</code>: Creates a publisher for the <code>joint_states</code> topic, which will publish messages of type <code>sensor_msgs::msg::JointState</code>.</li>
+</ul>
+<p><strong>Timer</strong></p>
+<ul>
+<li><code>timer_</code>: Sets up a timer that triggers the <code>timer_callback</code> function (explained below) at a period determined by the frequency parameter. The period is expected to be given in milliseconds, therefore, it is calculated as </li>
+</ul>
+<div class="arithmatex">\[
+period \, \text{[ms]} = \frac{1 \, [\cancel{\text{s}}] \cdot 1000 \, [\text{ms}/\cancel{\text{s}}]}{frequency \, [\text{Hz}]} 
+\]</div>
+<h5 id="333-timer-callback">3.3.3. Timer callback <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"><a class="headerlink" href="#333-timer-callback" title="Permanent link">¶</a></h5>
+<p>The <code>timer_callback</code> function is responsible for:</p>
+<ul>
+<li>Calculating the <code>elapsed_time_</code> between callbacks.</li>
+<li>Updating the new <code>joint_accelerations_</code>, <code>joint_velocities_</code>, and <code>joint_positions_</code> using the respective functions (you'll need to implement these functions later).</li>
+<li>Publishing the updated joint states to the ROS topics.</li>
+</ul>
+<p>This function ensures that the manipulator's state is updated and communicated at regular intervals based on the timer's frequency.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">timer_callback</span><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="w">    </span><span class="c1">// Timer callback - when there is a timer callback, computes the new joint acceleration, velocity and position and publishes them</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">timer_callback</span><span class="p">()</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="c1">// Get the actual elapsed time</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">current_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">high_resolution_clock</span><span class="o">::</span><span class="n">now</span><span class="p">();</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">    </span><span class="n">elapsed_time_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">duration_cast</span><span class="o">&lt;</span><span class="n">duration</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">current_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">previous_time_</span><span class="p">).</span><span class="n">count</span><span class="p">();</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="n">previous_time_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">current_time</span><span class="p">;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">    </span><span class="c1">// Calculate JointState</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="n">joint_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_acceleration</span><span class="p">();</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="n">joint_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_velocity</span><span class="p">();</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">    </span><span class="n">joint_positions_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_position</span><span class="p">();</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">    </span><span class="c1">// Publish data</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">    </span><span class="n">publish_data</span><span class="p">();</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
+<h5 id="334-topic-callbacks">3.3.4. Topic callbacks <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"><a class="headerlink" href="#334-topic-callbacks" title="Permanent link">¶</a></h5>
+<p>These callback functions ensure that the node's state is updated with the latest data from the subscribed topics. Specifically:</p>
+<ul>
+<li><code>joint_torques_callback</code>: Updates the <code>joint_torques_</code>  based on incoming messages.</li>
+<li><code>external_wrenches_callback</code>: Updates the <code>external_wrenches_</code> based on incoming messages.</li>
+</ul>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">topic_callbacks</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="w">    </span><span class="k">private</span><span class="o">:</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">        </span><span class="c1">// Subscription callback - when a new message arrives, updates joint_torques_</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="n">joint_torques_callback</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Float64MultiArray</span><span class="o">::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">            </span><span class="n">joint_torques_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Map</span><span class="p">(</span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">        </span><span class="c1">// Subscription callback - when a new message arrives, updates external_wrenches_</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="n">external_wrenches_callback</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">geometry_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Wrench</span><span class="o">::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">            </span><span class="k">auto</span><span class="w"> </span><span class="n">forces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">msg</span><span class="o">-&gt;</span><span class="n">force</span><span class="p">;</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">            </span><span class="n">external_wrenches_</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forces</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">            </span><span class="n">external_wrenches_</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forces</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">        </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
+<h5 id="335-calculate-acceleration">3.3.5. Calculate acceleration <img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"><a class="headerlink" href="#335-calculate-acceleration" title="Permanent link">¶</a></h5>
+<p>This method computes the <code>joint_accelerations_</code> of the manipulator by considering the equations of motion, including inertia, Coriolis and centrifugal forces, friction, gravitational forces, and external torques. You have to implement it as explained later.</p>
+<p>At the moment, the method returns <span class="arithmatex">\(\mathbf{\ddot{q}} = [0, 0]\)</span>.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">calculate_acceleration</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="w">    </span><span class="c1">// Method to calculate joint acceleration</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_acceleration</span><span class="p">()</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">        </span><span class="c1">// Initialize M, C, Fb, g_vec, J, and tau_ext</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">        </span><span class="c1">// Initialize q1, q2, q_dot1, and q_dot2</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">        </span><span class="c1">// Placeholder calculations for M, C, Fb, g, and tau_ext</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">        </span><span class="c1">// Calculate matrix M</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">        </span><span class="c1">// Calculate vector C (C is 2x1 because it already includes q_dot)</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">        </span><span class="c1">// Calculate Fb matrix</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">        </span><span class="c1">// Calculate g_vect</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">        </span><span class="c1">// Calculate J</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">        </span><span class="c1">// Calculate tau_ext</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">        </span><span class="c1">// Calculate joint accelerations using the dynamic model: q'' = M^(-1)[tau - C(q,q')q' - Fbq' - g(q) + tau_ext]</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">        </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">q_ddot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">        </span><span class="n">q_ddot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">        </span><span class="c1">// Return joint accelerations</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">q_ddot</span><span class="p">;</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
+<h5 id="336-integrate-position-and-velocity">3.3.6. Integrate position and velocity <img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"><a class="headerlink" href="#336-integrate-position-and-velocity" title="Permanent link">¶</a></h5>
+<p>This method computes the joint velocities and positions by integrating over the elapsed time. You have to implement it as explained later.</p>
+<p>At the moment, the methods return <span class="arithmatex">\(\mathbf{\dot{q}} = \mathbf{q} = [0, 0]\)</span>.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">Integrate_vel_pos</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="w">     </span><span class="c1">// Method to calculate joint velocity</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">     </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_velocity</span><span class="p">()</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">     </span><span class="p">{</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">         </span><span class="c1">// Placeholder for velocity calculation</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">         </span><span class="c1">// Integrate velocity over the time step (elapsed_time_)</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">         </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">q_dot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">         </span><span class="n">q_dot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">q_dot</span><span class="p">;</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">     </span><span class="p">}</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">     </span><span class="c1">// Method to calculate joint position</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">     </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_position</span><span class="p">()</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">     </span><span class="p">{</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">         </span><span class="c1">// Placeholder for position calculation</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">         </span><span class="c1">// Integrate position over the time step (elapsed_time_)</span>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="w">         </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">q</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">         </span><span class="n">q</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a>
+<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">;</span>
+<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="w">     </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
+<h5 id="337-publish-the-data">3.3.7. Publish the data <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"><a class="headerlink" href="#337-publish-the-data" title="Permanent link">¶</a></h5>
+<p>This method is responsible for publishing the computed <code>joint_accelerations_</code> and <code>joint_state</code> (<code>joint_positions_</code> and <code>joint_velocities_</code>) to their respective topics.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">publish_data</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="w">    </span><span class="c1">// Method to publish the joint data</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">publish_data</span><span class="p">()</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">        </span><span class="c1">// publish joint acceleration</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">acceleration_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Float64MultiArray</span><span class="p">();</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">        </span><span class="n">acceleration_msg</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">joint_accelerations_</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="n">joint_accelerations_</span><span class="p">.</span><span class="n">data</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">joint_accelerations_</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">        </span><span class="n">publisher_acceleration_</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">acceleration_msg</span><span class="p">);</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">        </span><span class="c1">// publish joint state</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">joint_state_msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sensor_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">JointState</span><span class="p">();</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">        </span><span class="n">joint_state_msg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">stamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_clock</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">now</span><span class="p">();</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">        </span><span class="n">joint_state_msg</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">"joint_1"</span><span class="p">,</span><span class="w"> </span><span class="s">"joint_2"</span><span class="p">};</span><span class="w"> </span><span class="c1">// Replace with actual joint names</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">        </span><span class="n">joint_state_msg</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">joint_positions_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">joint_positions_</span><span class="p">(</span><span class="mi">1</span><span class="p">)};</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">        </span><span class="n">joint_state_msg</span><span class="p">.</span><span class="n">velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">joint_velocities_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="p">(</span><span class="mi">1</span><span class="p">)};</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="w">        </span><span class="n">publisher_joint_state_</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">joint_state_msg</span><span class="p">);</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
+<h4 id="338-member-variables">3.3.8. Member variables<a class="headerlink" href="#338-member-variables" title="Permanent link">¶</a></h4>
+<p>Defines the member variables for the ManipulatorDynamicsNode class. Here's a detailed breakdown of these variables:
+Member Variables</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">member_variables</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="w">    </span><span class="c1">// Member variables</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">        </span><span class="c1">// Publishers and subscribers</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Subscription</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Float64MultiArray</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">joint_torques_subscription_</span><span class="p">;</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Subscription</span><span class="o">&lt;</span><span class="n">geometry_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Wrench</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">external_wrenches_subscription_</span><span class="p">;</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Publisher</span><span class="o">&lt;</span><span class="n">std_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">Float64MultiArray</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">publisher_acceleration_</span><span class="p">;</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Publisher</span><span class="o">&lt;</span><span class="n">sensor_msgs</span><span class="o">::</span><span class="n">msg</span><span class="o">::</span><span class="n">JointState</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">publisher_joint_state_</span><span class="p">;</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">TimerBase</span><span class="o">::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">timer_</span><span class="p">;</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">        </span><span class="c1">// Joint variables</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">        </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">joint_positions_</span><span class="p">;</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">        </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="p">;</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">        </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">joint_accelerations_</span><span class="p">;</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="w">        </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">joint_torques_</span><span class="p">;</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="w">        </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">external_wrenches_</span><span class="p">;</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">        </span><span class="c1">// dynamic parameters variables</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">m1_</span><span class="p">;</span>
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">m2_</span><span class="p">;</span>
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">l1_</span><span class="p">;</span>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">l2_</span><span class="p">;</span>
+<a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">b1_</span><span class="p">;</span>
+<a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">b2_</span><span class="p">;</span>
+<a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">g_</span><span class="p">;</span>
+<a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>
+<a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a><span class="w">        </span><span class="c1">// Variable to store the previous callback time and elapsed time</span>
+<a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a><span class="w">        </span><span class="n">time_point</span><span class="o">&lt;</span><span class="n">high_resolution_clock</span><span class="o">&gt;</span><span class="w"> </span><span class="n">previous_time_</span><span class="p">;</span>
+<a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">elapsed_time_</span><span class="p">;</span>
+<a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a><span class="w">    </span><span class="p">};</span>
+</code></pre></div>
+</details>
+
+<p><strong>Publishers and Subscribers</strong></p>
+<ul>
+<li><code>joint_torques_subscription_</code>: Subscription to the "joint_torques" topic.</li>
+<li><code>external_wrenches_subscription_</code>: Subscription to the "external_wrenches" topic.</li>
+<li><code>publisher_acceleration_</code>: Publisher for the "joint_accelerations" topic.</li>
+<li><code>publisher_joint_state_</code>: Publisher for the "joint_states" topic.</li>
+</ul>
+<p><strong>Joint Variables</strong></p>
+<ul>
+<li><code>joint_positions_</code>: Eigen vector representing the positions of the joints (<span class="arithmatex">\(\mathbf{q}\)</span>).</li>
+<li><code>joint_velocities_</code>: Eigen vector representing the velocities of the joints (<span class="arithmatex">\(\mathbf{\dot{q}}\)</span>).</li>
+<li><code>joint_accelerations_</code>: Eigen vector representing the accelerations of the joints (<span class="arithmatex">\(\mathbf{\ddot{q}}\)</span>).</li>
+<li><code>joint_torques_</code>: Eigen vector representing the torques applied to the joints (<span class="arithmatex">\(\boldsymbol{\tau}\)</span>).</li>
+<li><code>external_wrenches_</code>: Eigen vector representing the external forces and torques applied to the EE (<span class="arithmatex">\(\mathbf{F}_{ext}\)</span>).</li>
+</ul>
+<p><strong>Dynamic Parameters Variables</strong></p>
+<ul>
+<li><code>m1_</code>: Mass of the first link of the manipulator.</li>
+<li><code>m2_</code>: Mass of the second link of the manipulator.</li>
+<li><code>l1_</code>: Length of the first link of the manipulator.</li>
+<li><code>l2_</code>: Length of the second link of the manipulator.</li>
+<li><code>b1_</code>: Damping coefficient for the first joint.</li>
+<li><code>b2_</code>: Damping coefficient for the second joint.</li>
+<li><code>g_</code>: Gravitational acceleration.</li>
+</ul>
+<p><strong>Time Variables</strong></p>
+<ul>
+<li><code>timer_</code>: Timer that triggers the timer_callback function at a specified frequency.</li>
+<li><code>previous_time_</code>: Stores the time of the previous callback execution.</li>
+<li><code>elapsed_time_</code>: Stores the elapsed time between the current and previous callback executions (<span class="arithmatex">\(\Delta t\)</span>).</li>
+</ul>
+<h4 id="339-main">3.3.9. Main<a class="headerlink" href="#339-main" title="Permanent link">¶</a></h4>
+<p>Initializes the ROS 2 node, creates a shared pointer to an instance of the <code>ManipulatorDynamicsNode</code> class, keeps the node running, and shuts down the ROS 2 node when the node execution finishes.</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">main</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">init</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="n">argv</span><span class="p">);</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">ManipulatorDynamicsNode</span><span class="o">&gt;</span><span class="p">();</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">spin</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">        </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">shutdown</span><span class="p">();</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+</details>
+
 <h3 id="34-implementing-the-dynamics-model">3.4. Implementing the dynamics model<a class="headerlink" href="#34-implementing-the-dynamics-model" title="Permanent link">¶</a></h3>
 <p>The dynamics of an open kinematic chain robotic manipulator is given by</p>
 <div class="arithmatex">\[
@@ -1275,11 +1711,17 @@ In that repo, you'll find the required steps to install it.</p>
 <li><span class="arithmatex">\(\boldsymbol{\tau}\)</span> is the vector of commanded joint torques.</li>
 <li><span class="arithmatex">\(\boldsymbol{\tau}_ext\)</span> is the vector of joint torques due to external forces.</li>
 </ul>
-<h3 id="_1"><a class="headerlink" href="#_1" title="Permanent link">¶</a></h3>
-<h2 id="4-graphical-representation">4. Graphical representation<a class="headerlink" href="#4-graphical-representation" title="Permanent link">¶</a></h2>
+<h2 id="4-launh-the-dynamics-simulator-node">4. Launh the dynamics simulator node<a class="headerlink" href="#4-launh-the-dynamics-simulator-node" title="Permanent link">¶</a></h2>
+<h2 id="5-graphical-representation">5. Graphical representation<a class="headerlink" href="#5-graphical-representation" title="Permanent link">¶</a></h2>
 <p>As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter.</p>
 <p>To represent time series of data in ROS 2, the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment</a> has installed the tool <a href="https://plotjuggler.io/">plotjuggler</a>.</p>
-<p>You can run it </p></div>
+<p>You can run it </p>
+<div class="admonition question">
+<p class="admonition-title">Question</p>
+<p>What are the effects of modifying the dynamics parameters of the arm?</p>
+<p>You can modify some of the following parameters inside the <code>dynamics_params.yaml</code>: <code>m1</code>, <code>m2</code>, <code>b1</code>, <code>b2</code>, and <code>g</code>.</p>
+<p><em>Note that you only need to modify those inside <code>uma_arm_dynamics</code>.</em> </p>
+</div></div>
 
 
 
@@ -1302,7 +1744,7 @@ In that repo, you'll find the required steps to install it.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 30, 2025 15:32:53"><span class="timeago" datetime="2025-04-30T15:32:53+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 30, 2025 15:32:53">2025-04-30</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 1, 2025 09:25:04"><span class="timeago" datetime="2025-05-01T09:25:04+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 1, 2025 09:25:04">2025-05-01</span>
   </span>
 
     
