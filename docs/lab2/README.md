@@ -431,31 +431,31 @@ m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) & m_2 \cdot l_2^2\\
 \end{bmatrix}
 $$
 
-$$
-P_0 = \begin{bmatrix}
-1 & 0 \\
-0 & 1 \\
-\end{bmatrix}
-$$
 
 $$
 \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} = \begin{bmatrix}
+& \\
 -m_2 \cdot l_1 \cdot l_2 \cdot \sin(q_2) \cdot (2 \cdot \dot{q}_1 \cdot \dot{q}_2 +\dot{q}_2^2) \\
 m_2 \cdot l_1 \cdot l_2 \cdot \dot{q}_1^2 \cdot \sin(q_2)\\
+& \\
 \end{bmatrix}
 $$
 
 $$
 \mathbf{F}_b = \begin{bmatrix}
+& \\
  b_1 & 0\\
 0 & b_2\\
+& \\
 \end{bmatrix}
 $$
 
 $$
 \mathbf{g}(\mathbf{q}) = \begin{bmatrix}
+& \\
 (m_1 + m_2) \cdot l_1 \cdot g_ \cdot \cos(q_1) + m_2 \cdot g_ \cdot l_2 \cdot \cos(q_1 + q_2) \\
-m_2 \cdot g \cdot l_2 \cdot \cos(q_1 + q_2)
+m_2 \cdot g \cdot l_2 \cdot \cos(q_1 + q_2)\\
+& \\
 \end{bmatrix}
 $$
 
@@ -463,8 +463,10 @@ We'll also need to compute the jacobian to include the external wrenches applied
 
 $$
 \mathbf{J}(\mathbf{q}) = \begin{bmatrix}
+& \\
 -l_1 \cdot \sin(q_1) - l_2 \cdot \sin(q_1 + q_2) & -l_2 \cdot \sin(q_1 + q_2) \\
-l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) & l_2 \cdot \cos(q_1 + q_2)
+l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) & l_2 \cdot \cos(q_1 + q_2)\\
+& \\
 \end{bmatrix}
 $$
 
