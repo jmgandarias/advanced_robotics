@@ -430,6 +430,15 @@ m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) & m_2 \cdot l_2^2\\
 $$
 
 $$
+P_0 = \begin{bmatrix}
+1 & 0 & 0 & 0.374 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0.63 \\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+$$
 \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} = \begin{bmatrix}
 -m_2 \cdot l_1 \cdot l_2 \cdot \sin(q_2) \cdot (2 \cdot \dot{q}_1 \cdot \dot{q}_2 +\dot{q}_2^2) \\
 m_2 \cdot l_1 \cdot l_2 \cdot \dot{q}_1^2 \cdot \sin(q_2)\\
