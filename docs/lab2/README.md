@@ -423,10 +423,10 @@ $$
 To calculate the joint accelerations, we first need to compute the matrices. They can be computed applying the Lagrange or the Newton-Euler formulations. In our case, the matrices are defined by:
 
 $$
-\mathbf{M}(\mathbf{q}) = \begin{bmatrix}
+\mathbf{M}(\mathbf{q}) = \left[ \begin{matrix}
 m_1 \cdot l_1^2 + m_2 \cdot (l_1^2 + 2 \cdot l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) & m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) \\ 
 m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) & m_2 \cdot l_2^2\\
-\end{bmatrix}
+\end{matrix} \right] 
 $$
 
 $$
