@@ -112,26 +112,26 @@ $$
 Considering all the above, and the following values for $P_0, P_1, P_2$, the following exercises are requested:
 
 $$
-P_0 = \begin{pmatrix}
+P_0 = \begin{bmatrix}
 1 & 0 & 0 & 0.374 \\
 0 & 1 & 0 & 0 \\
 0 & 0 & 1 & 0.63 \\
 0 & 0 & 0 & 1\\
-\end{pmatrix},
+\end{bmatrix},
 \quad
-P_1 = \begin{pmatrix}
+P_1 = \begin{bmatrix}
 0 & 0 & 1 & 0.3038 \\
 0 & 1 & 0 & 0 \\
 -1 & 0 & 0 & 0.051 \\
 0 & 0 & 0 & 1\\
-\end{pmatrix},
+\end{bmatrix},
 \quad
-P_2 = \begin{pmatrix}
+P_2 = \begin{bmatrix}
 0 & -1 & 0 & 0 \\
 0 & 0 & 1 & 0.302 \\
 -1 & 0 & 0 & 0.558 \\
 0 & 0 & 0 & 1 \\
-\end{pmatrix}
+\end{bmatrix}
 $$
 
 ### 1. Quaternion interpolation

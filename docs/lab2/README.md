@@ -394,22 +394,168 @@ Initializes the ROS 2 node, creates a shared pointer to an instance of the `Mani
 
 ### 3.4. Implementing the dynamics model
 
-The dynamics of an open kinematic chain robotic manipulator is given by
+The dynamics of an open kinematic chain robotic manipulator is given by 
 
 $$
-\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} +  \mathbf{F}_b \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \boldsymbol{\tau}_{ext}
+\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} +  \mathbf{F}_b \dot{\mathbf{q}} + \mathbf{g}(\mathbf{q}) = \boldsymbol{\tau} + \boldsymbol{\tau}_{ext}
 $$
 
 where
 
-- $\mathbf{q}$ is the vector of joint positions.
-- $\dot{\mathbf{q}}$ is the vector of joint velocities.
-- $\ddot{\mathbf{q}}$ is the vector of joint accelerations.
-- $\mathbf{M}(\mathbf{q})$ is the inertia matrix.
-- $\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}})$ is the Coriolis and centrifugal forces matrix.
-- $\mathbf{F}_b$ is the viscous friction matrix.
-- $\boldsymbol{\tau}$ is the vector of commanded joint torques.
-- $\boldsymbol{\tau}_ext$ is the vector of joint torques due to external forces.
+- $\mathbf{q} \in \mathbb{R}^{n \times 1}$ is the vector of joint positions (`joint_positions_`).
+- $\dot{\mathbf{q}} \in \mathbb{R}^{n \times 1}$ is the vector of joint velocities (`joint_velocities_`).
+- $\ddot{\mathbf{q}} \in \mathbb{R}^{n \times 1}$ is the vector of joint accelerations (`joint_accelerations_`).
+- $\mathbf{M}(\mathbf{q}) \in \mathbb{R}^{n \times n}$ is the inertia matrix.
+- $\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \in \mathbb{R}^{n \times n}$ is the Coriolis and centrifugal forces matrix.
+- $\mathbf{F}_b \in \mathbb{R}^{n \times n}$ is the viscous friction matrix.
+- $\mathbf{g} \in \mathbb{R}^{n \times 1}$ is the viscous friction matrix.
+- $\boldsymbol{\tau} \in \mathbb{R}^{n \times 1}$ is the vector of commanded joint torques (`joint_torques_`).
+- $\boldsymbol{\tau}_{ext} \in \mathbb{R}^{n \times 1}$ is the vector of joint torques due to external forces.
+
+In our case, as we have a 2 DoF manipulator, $n=2$.
+
+Hence, the acceleration due to applied torques is given by
+
+$$
+\ddot{\mathbf{q}}  = \mathbf{M}^{-1}(\mathbf{q}) \left[  \boldsymbol{\tau} + \boldsymbol{\tau}_{ext} - \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} - \mathbf{F}_b \dot{\mathbf{q}} - \mathbf{g}(\mathbf{q}) \right]
+$$
+
+To calculate the joint accelerations, we first need to compute the matrices. They can be computed applying the Lagrange or the Newton-Euler formulations. In our case, the matrices are defined by:
+
+$$
+\mathbf{M}(\mathbf{q}) = \begin{bmatrix}
+m_1 \cdot l_1^2 + m_2 \cdot (l_1^2 + 2 \cdot l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) & m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) \\ 
+m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) & m_2 \cdot l_2^2\\
+\end{bmatrix}
+$$
+
+$$
+\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} = \begin{bmatrix}
+-m_2 \cdot l_1 \cdot l_2 \cdot \sin(q_2) \cdot (2 \cdot \dot{q}_1 \cdot \dot{q}_2 +\dot{q}_2^2) \\
+m_2 \cdot l_1 \cdot l_2 \cdot \dot{q}_1^2 \cdot \sin(q_2)\\
+\end{bmatrix}
+$$
+
+$$
+\mathbf{F}_b = \begin{bmatrix}
+ b_1 & 0\\
+0 & b_2\\
+\end{bmatrix}
+$$
+
+$$
+\mathbf{g}(\mathbf{q}) = \begin{bmatrix}
+(m_1 + m_2) \cdot l_1 \cdot g_ \cdot \cos(q_1) + m_2 \cdot g_ \cdot l_2 \cdot \cos(q_1 + q_2) \\
+m_2 \cdot g \cdot l_2 \cdot \cos(q_1 + q_2)
+\end{bmatrix}
+$$
+
+We'll also need to compute the jacobian to include the external wrenches applied at the EE in our model
+
+$$
+\mathbf{J}(\mathbf{q}) = \begin{bmatrix}
+-l_1 \cdot \sin(q_1) - l_2 \cdot \sin(q_1 + q_2) & -l_2 \cdot \sin(q_1 + q_2) \\
+l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) & l_2 \cdot \cos(q_1 + q_2)
+\end{bmatrix}
+$$
+
+Then, we can calculate $\boldsymbol{\tau}_{ext}$ as 
+
+$$
+\boldsymbol{\tau}_{ext} = \mathbf{J}(\mathbf{q})^T \cdot \mathbf{F}_{ext}
+$$
+
+We can now code them as
+
+```cpp
+// Initialize M, C, Fb, g_vec, J, and tau_ext
+Eigen::MatrixXd M(2, 2);
+Eigen::VectorXd C(2);
+Eigen::MatrixXd Fb(2, 2);
+Eigen::VectorXd g_vec(2);
+Eigen::MatrixXd J(2, 2);
+Eigen::VectorXd tau_ext(2);
+
+// Initialize q1, q2, q_dot1, and q_dot2
+double q1 = joint_positions_(0);
+double q2 = joint_positions_(1);
+double q_dot1 = joint_velocities_(0);
+double q_dot2 = joint_velocities_(1);
+
+// Placeholder calculations for M, C, Fb, g, and tau_ext
+// Calculate matrix M
+M(0, 0) = m1_ * pow(l1_, 2) + m2_ * (pow(l1_, 2) + 2 * l1_ * l2_ * cos(q2) + pow(l2_, 2));
+M(0, 1) = m2_ * (l1_ * l2_ * cos(q2) + pow(l2_, 2));
+M(1, 0) = M(0, 1);
+M(1, 1) = m2_ * pow(l2_, 2);
+
+// Calculate vector C (C is 2x1 because it already includes q_dot)
+C << -m2_ * l1_ * l2_ * sin(q2) * (2 * q_dot1 * q_dot2 + pow(q_dot2, 2)),
+    m2_ * l1_ * l2_ * pow(q_dot1, 2) * sin(q2);
+
+// Calculate Fb matrix
+Fb << b1_, 0.0,
+    0.0, b2_;
+
+// Calculate g_vect
+g_vec << (m1_ + m2_) * l1_ * g_ * cos(q1) + m2_ * g_ * l2_ * cos(q1 + q2),
+    m2_ * g_ * l2_ * cos(q1 + q2);
+
+// Calculate J
+J << -l1_ * sin(q1) - l2_ * sin(q1 + q2), -l2_ * sin(q1 + q2),
+    l1_ * cos(q1) + l2_ * cos(q1 + q2), l2_ * cos(q1 + q2);
+
+// Calculate tau_ext
+tau_ext << J.transpose() * external_wrenches_;
+
+// Calculate joint acceleration using the dynamic model: M * q_ddot = torque - C * q_dot - Fb * joint_velocities_ - g + tau_ext
+Eigen::VectorXd q_ddot(2);
+q_ddot << M.inverse() * (joint_torques_ - C - Fb * joint_velocities_ - g_vec + tau_ext);
+
+return q_ddot;
+
+```
+
+
+As we are implementing a discrete system:
+
+$$
+\ddot{\mathbf{q}}_{k+1}  = \mathbf{M}^{-1}(\mathbf{q}_k) \left[  \boldsymbol{\tau}_k + \boldsymbol{\tau}_{{ext}_k} - \mathbf{C}(\mathbf{q}_k, \dot{\mathbf{q}}_k) \dot{\mathbf{q}}_k - \mathbf{F}_b \dot{\mathbf{q}}_k - \mathbf{g}(\mathbf{q}_k) \right]
+$$
+
+we can get the joint velocities and position by discrete integration over time as
+
+$$
+\dot{\mathbf{q}} = \int \ddot{\mathbf{q}} \, dt \implies \dot{\mathbf{q}}_{k+1} = \dot{\mathbf{q}}_k + \ddot{\mathbf{q}}_{k+1} \cdot \Delta t
+$$
+
+$$
+\mathbf{q} = \int \dot{\mathbf{q}} \, dt \implies \mathbf{q}_{k+1} = \mathbf{q}_k + \dot{\mathbf{q}}_{k+1} \cdot \Delta t
+$$
+
+We can now code them as
+
+```cpp
+// Method to calculate joint velocity
+Eigen::VectorXd calculate_velocity()
+{
+    // Placeholder for velocity calculation
+    // Integrate velocity over the time step (elapsed_time_)
+    Eigen::VectorXd q_dot = joint_velocities_ + joint_accelerations_ * elapsed_time_;
+
+    return q_dot;
+}
+
+// Method to calculate joint position
+Eigen::VectorXd calculate_position()
+{
+    // Placeholder for position calculation
+    // Integrate position over the time step (elapsed_time_)
+    Eigen::VectorXd q = joint_positions_ + joint_velocities_ * elapsed_time_;
+
+    return q;
+}
+```
 
 ## 4. Launh the dynamics simulator node
 
