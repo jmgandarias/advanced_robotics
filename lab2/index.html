@@ -1696,21 +1696,142 @@ Member Variables</p>
 </details>
 
 <h3 id="34-implementing-the-dynamics-model">3.4. Implementing the dynamics model<a class="headerlink" href="#34-implementing-the-dynamics-model" title="Permanent link">¶</a></h3>
-<p>The dynamics of an open kinematic chain robotic manipulator is given by</p>
+<p>The dynamics of an open kinematic chain robotic manipulator is given by </p>
 <div class="arithmatex">\[
-\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} +  \mathbf{F}_b \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \boldsymbol{\tau}_{ext}
+\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} +  \mathbf{F}_b \dot{\mathbf{q}} + \mathbf{g}(\mathbf{q}) = \boldsymbol{\tau} + \boldsymbol{\tau}_{ext}
 \]</div>
 <p>where</p>
 <ul>
-<li><span class="arithmatex">\(\mathbf{q}\)</span> is the vector of joint positions.</li>
-<li><span class="arithmatex">\(\dot{\mathbf{q}}\)</span> is the vector of joint velocities.</li>
-<li><span class="arithmatex">\(\ddot{\mathbf{q}}\)</span> is the vector of joint accelerations.</li>
-<li><span class="arithmatex">\(\mathbf{M}(\mathbf{q})\)</span> is the inertia matrix.</li>
-<li><span class="arithmatex">\(\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}})\)</span> is the Coriolis and centrifugal forces matrix.</li>
-<li><span class="arithmatex">\(\mathbf{F}_b\)</span> is the viscous friction matrix.</li>
-<li><span class="arithmatex">\(\boldsymbol{\tau}\)</span> is the vector of commanded joint torques.</li>
-<li><span class="arithmatex">\(\boldsymbol{\tau}_ext\)</span> is the vector of joint torques due to external forces.</li>
+<li><span class="arithmatex">\(\mathbf{q} \in \mathbb{R}^{n \times 1}\)</span> is the vector of joint positions (<code>joint_positions_</code>).</li>
+<li><span class="arithmatex">\(\dot{\mathbf{q}} \in \mathbb{R}^{n \times 1}\)</span> is the vector of joint velocities (<code>joint_velocities_</code>).</li>
+<li><span class="arithmatex">\(\ddot{\mathbf{q}} \in \mathbb{R}^{n \times 1}\)</span> is the vector of joint accelerations (<code>joint_accelerations_</code>).</li>
+<li><span class="arithmatex">\(\mathbf{M}(\mathbf{q}) \in \mathbb{R}^{n \times n}\)</span> is the inertia matrix.</li>
+<li><span class="arithmatex">\(\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \in \mathbb{R}^{n \times n}\)</span> is the Coriolis and centrifugal forces matrix.</li>
+<li><span class="arithmatex">\(\mathbf{F}_b \in \mathbb{R}^{n \times n}\)</span> is the viscous friction matrix.</li>
+<li><span class="arithmatex">\(\mathbf{g} \in \mathbb{R}^{n \times 1}\)</span> is the viscous friction matrix.</li>
+<li><span class="arithmatex">\(\boldsymbol{\tau} \in \mathbb{R}^{n \times 1}\)</span> is the vector of commanded joint torques (<code>joint_torques_</code>).</li>
+<li><span class="arithmatex">\(\boldsymbol{\tau}_{ext} \in \mathbb{R}^{n \times 1}\)</span> is the vector of joint torques due to external forces.</li>
 </ul>
+<p>In our case, as we have a 2 DoF manipulator, <span class="arithmatex">\(n=2\)</span>.</p>
+<p>Hence, the acceleration due to applied torques is given by</p>
+<div class="arithmatex">\[
+\ddot{\mathbf{q}}  = \mathbf{M}^{-1}(\mathbf{q}) \left[  \boldsymbol{\tau} + \boldsymbol{\tau}_{ext} - \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} - \mathbf{F}_b \dot{\mathbf{q}} - \mathbf{g}(\mathbf{q}) \right]
+\]</div>
+<p>To calculate the joint accelerations, we first need to compute the matrices. They can be computed applying the Lagrange or the Newton-Euler formulations. In our case, the matrices are defined by:</p>
+<div class="arithmatex">\[
+\mathbf{M}(\mathbf{q}) = \begin{bmatrix}
+m_1 \cdot l_1^2 + m_2 \cdot (l_1^2 + 2 \cdot l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) &amp; m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) \\ 
+m_2 \cdot (l_1 \cdot l_2 \cdot \cos(q_2) + l_2^2) &amp; m_2 \cdot l_2^2\\
+\end{bmatrix}
+\]</div>
+<div class="arithmatex">\[
+\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} = \begin{bmatrix}
+-m_2 \cdot l_1 \cdot l_2 \cdot \sin(q_2) \cdot (2 \cdot \dot{q}_1 \cdot \dot{q}_2 +\dot{q}_2^2) \\
+m_2 \cdot l_1 \cdot l_2 \cdot \dot{q}_1^2 \cdot \sin(q_2)\\
+\end{bmatrix}
+\]</div>
+<div class="arithmatex">\[
+\mathbf{F}_b = \begin{bmatrix}
+ b_1 &amp; 0\\
+0 &amp; b_2\\
+\end{bmatrix}
+\]</div>
+<div class="arithmatex">\[
+\mathbf{g}(\mathbf{q}) = \begin{bmatrix}
+(m_1 + m_2) \cdot l_1 \cdot g_ \cdot \cos(q_1) + m_2 \cdot g_ \cdot l_2 \cdot \cos(q_1 + q_2) \\
+m_2 \cdot g \cdot l_2 \cdot \cos(q_1 + q_2)
+\end{bmatrix}
+\]</div>
+<p>We'll also need to compute the jacobian to include the external wrenches applied at the EE in our model</p>
+<div class="arithmatex">\[
+\mathbf{J}(\mathbf{q}) = \begin{bmatrix}
+-l_1 \cdot \sin(q_1) - l_2 \cdot \sin(q_1 + q_2) &amp; -l_2 \cdot \sin(q_1 + q_2) \\
+l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)
+\end{bmatrix}
+\]</div>
+<p>Then, we can calculate <span class="arithmatex">\(\boldsymbol{\tau}_{ext}\)</span> as </p>
+<div class="arithmatex">\[
+\boldsymbol{\tau}_{ext} = \mathbf{J}(\mathbf{q})^T \cdot \mathbf{F}_{ext}
+\]</div>
+<p>We can now code them as</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1">// Initialize M, C, Fb, g_vec, J, and tau_ext</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">M</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">C</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">Fb</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">g_vec</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">J</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">tau_ext</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="c1">// Initialize q1, q2, q_dot1, and q_dot2</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="kt">double</span><span class="w"> </span><span class="n">q1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">joint_positions_</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="kt">double</span><span class="w"> </span><span class="n">q2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">joint_positions_</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="kt">double</span><span class="w"> </span><span class="n">q_dot1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="kt">double</span><span class="w"> </span><span class="n">q_dot2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a>
+<a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="c1">// Placeholder calculations for M, C, Fb, g, and tau_ext</span>
+<a id="__codelineno-23-16" name="__codelineno-23-16" href="#__codelineno-23-16"></a><span class="c1">// Calculate matrix M</span>
+<a id="__codelineno-23-17" name="__codelineno-23-17" href="#__codelineno-23-17"></a><span class="n">M</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">l1_</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">pow</span><span class="p">(</span><span class="n">l1_</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">l2_</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span>
+<a id="__codelineno-23-18" name="__codelineno-23-18" href="#__codelineno-23-18"></a><span class="n">M</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">l2_</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span>
+<a id="__codelineno-23-19" name="__codelineno-23-19" href="#__codelineno-23-19"></a><span class="n">M</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">M</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-23-20" name="__codelineno-23-20" href="#__codelineno-23-20"></a><span class="n">M</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">l2_</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-21" name="__codelineno-23-21" href="#__codelineno-23-21"></a>
+<a id="__codelineno-23-22" name="__codelineno-23-22" href="#__codelineno-23-22"></a><span class="c1">// Calculate vector C (C is 2x1 because it already includes q_dot)</span>
+<a id="__codelineno-23-23" name="__codelineno-23-23" href="#__codelineno-23-23"></a><span class="n">C</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">-</span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">q_dot1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">q_dot2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">q_dot2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)),</span>
+<a id="__codelineno-23-24" name="__codelineno-23-24" href="#__codelineno-23-24"></a><span class="w">    </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">q_dot1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q2</span><span class="p">);</span>
+<a id="__codelineno-23-25" name="__codelineno-23-25" href="#__codelineno-23-25"></a>
+<a id="__codelineno-23-26" name="__codelineno-23-26" href="#__codelineno-23-26"></a><span class="c1">// Calculate Fb matrix</span>
+<a id="__codelineno-23-27" name="__codelineno-23-27" href="#__codelineno-23-27"></a><span class="n">Fb</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">b1_</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
+<a id="__codelineno-23-28" name="__codelineno-23-28" href="#__codelineno-23-28"></a><span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">b2_</span><span class="p">;</span>
+<a id="__codelineno-23-29" name="__codelineno-23-29" href="#__codelineno-23-29"></a>
+<a id="__codelineno-23-30" name="__codelineno-23-30" href="#__codelineno-23-30"></a><span class="c1">// Calculate g_vect</span>
+<a id="__codelineno-23-31" name="__codelineno-23-31" href="#__codelineno-23-31"></a><span class="n">g_vec</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">m1_</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m2_</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">),</span>
+<a id="__codelineno-23-32" name="__codelineno-23-32" href="#__codelineno-23-32"></a><span class="w">    </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">);</span>
+<a id="__codelineno-23-33" name="__codelineno-23-33" href="#__codelineno-23-33"></a>
+<a id="__codelineno-23-34" name="__codelineno-23-34" href="#__codelineno-23-34"></a><span class="c1">// Calculate J</span>
+<a id="__codelineno-23-35" name="__codelineno-23-35" href="#__codelineno-23-35"></a><span class="n">J</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">-</span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">),</span><span class="w"> </span><span class="o">-</span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">),</span>
+<a id="__codelineno-23-36" name="__codelineno-23-36" href="#__codelineno-23-36"></a><span class="w">    </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">),</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">);</span>
+<a id="__codelineno-23-37" name="__codelineno-23-37" href="#__codelineno-23-37"></a>
+<a id="__codelineno-23-38" name="__codelineno-23-38" href="#__codelineno-23-38"></a><span class="c1">// Calculate tau_ext</span>
+<a id="__codelineno-23-39" name="__codelineno-23-39" href="#__codelineno-23-39"></a><span class="n">tau_ext</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">J</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">external_wrenches_</span><span class="p">;</span>
+<a id="__codelineno-23-40" name="__codelineno-23-40" href="#__codelineno-23-40"></a>
+<a id="__codelineno-23-41" name="__codelineno-23-41" href="#__codelineno-23-41"></a><span class="c1">// Calculate joint acceleration using the dynamic model: M * q_ddot = torque - C * q_dot - Fb * joint_velocities_ - g + tau_ext</span>
+<a id="__codelineno-23-42" name="__codelineno-23-42" href="#__codelineno-23-42"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">q_ddot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-23-43" name="__codelineno-23-43" href="#__codelineno-23-43"></a><span class="n">q_ddot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">M</span><span class="p">.</span><span class="n">inverse</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">joint_torques_</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Fb</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">g_vec</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tau_ext</span><span class="p">);</span>
+<a id="__codelineno-23-44" name="__codelineno-23-44" href="#__codelineno-23-44"></a>
+<a id="__codelineno-23-45" name="__codelineno-23-45" href="#__codelineno-23-45"></a><span class="k">return</span><span class="w"> </span><span class="n">q_ddot</span><span class="p">;</span>
+</code></pre></div>
+<p>As we are implementing a discrete system:</p>
+<div class="arithmatex">\[
+\ddot{\mathbf{q}}_{k+1}  = \mathbf{M}^{-1}(\mathbf{q}_k) \left[  \boldsymbol{\tau}_k + \boldsymbol{\tau}_{{ext}_k} - \mathbf{C}(\mathbf{q}_k, \dot{\mathbf{q}}_k) \dot{\mathbf{q}}_k - \mathbf{F}_b \dot{\mathbf{q}}_k - \mathbf{g}(\mathbf{q}_k) \right]
+\]</div>
+<p>we can get the joint velocities and position by discrete integration over time as</p>
+<div class="arithmatex">\[
+\dot{\mathbf{q}} = \int \ddot{\mathbf{q}} \, dt \implies \dot{\mathbf{q}}_{k+1} = \dot{\mathbf{q}}_k + \ddot{\mathbf{q}}_{k+1} \cdot \Delta t
+\]</div>
+<div class="arithmatex">\[
+\mathbf{q} = \int \dot{\mathbf{q}} \, dt \implies \mathbf{q}_{k+1} = \mathbf{q}_k + \dot{\mathbf{q}}_{k+1} \cdot \Delta t
+\]</div>
+<p>We can now code them as</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1">// Method to calculate joint velocity</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_velocity</span><span class="p">()</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="p">{</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="c1">// Placeholder for velocity calculation</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">    </span><span class="c1">// Integrate velocity over the time step (elapsed_time_)</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">q_dot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">joint_accelerations_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">elapsed_time_</span><span class="p">;</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q_dot</span><span class="p">;</span>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="p">}</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="c1">// Method to calculate joint position</span>
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_position</span><span class="p">()</span>
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a><span class="p">{</span>
+<a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a><span class="w">    </span><span class="c1">// Placeholder for position calculation</span>
+<a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a><span class="w">    </span><span class="c1">// Integrate position over the time step (elapsed_time_)</span>
+<a id="__codelineno-24-16" name="__codelineno-24-16" href="#__codelineno-24-16"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">joint_positions_</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">joint_velocities_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">elapsed_time_</span><span class="p">;</span>
+<a id="__codelineno-24-17" name="__codelineno-24-17" href="#__codelineno-24-17"></a>
+<a id="__codelineno-24-18" name="__codelineno-24-18" href="#__codelineno-24-18"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">;</span>
+<a id="__codelineno-24-19" name="__codelineno-24-19" href="#__codelineno-24-19"></a><span class="p">}</span>
+</code></pre></div>
 <h2 id="4-launh-the-dynamics-simulator-node">4. Launh the dynamics simulator node<a class="headerlink" href="#4-launh-the-dynamics-simulator-node" title="Permanent link">¶</a></h2>
 <h2 id="5-graphical-representation">5. Graphical representation<a class="headerlink" href="#5-graphical-representation" title="Permanent link">¶</a></h2>
 <p>As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter.</p>
@@ -1744,7 +1865,7 @@ Member Variables</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 1, 2025 09:25:04"><span class="timeago" datetime="2025-05-01T09:25:04+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 1, 2025 09:25:04">2025-05-01</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 2, 2025 09:23:43"><span class="timeago" datetime="2025-05-02T09:23:43+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 2, 2025 09:23:43">2025-05-02</span>
   </span>
 
     
