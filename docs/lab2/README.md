@@ -9,6 +9,10 @@ In that repo, you'll find the required steps to install it.
 
 If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.
 
+A video of the installation, including the troubleshooting (if you don't find the errors, you don't need to run that part!) is shown below. Note that the video shows the installation with WSL. If you're using a native Ubuntu 22.04, you can skip the first instruction.
+
+![type:video](./videos/installation_error.mp4)
+
 ### 1.1. Testing the UMA environment
 
 Once you have installed the UMA environment, you should see that everything is working correctly.
@@ -129,9 +133,9 @@ The manipulator model you've loaded is purely a kinematic visualization (i.e., t
 !!! info
     RViz 2 is 3D visualization tool, not a simulator. It means it allows you to see the robot models, sensor data, and other information shared in your ROS 2 environment in real-time and offers you a GUI to select the information to be visualize, but it is NOT a simulation
 
-There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as [Gazebo](https://gazebosim.org/home). However, as we are roboticists and want to see, touch, and lear the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equation of motion) of the manipulator down into a node.
+There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as [Gazebo](https://gazebosim.org/home). However, as we are roboticists and want to see, touch, and learn the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equations of motion) of the manipulator down into a node.
 
-### 3.1. Clone the advanced_robotics package
+### 3.1. Clone the uma_arm_control package
 
 To do this, we'll work with another package. You have to do the following
 
@@ -156,8 +160,6 @@ Now you can compile your workspace
 cdw
 cb
 ```
-
-![first_compilation](first_compilation.png)
 
 !!! success
     Great work! You're now ready to implement the manipulator dynamics
@@ -502,11 +504,11 @@ M(1, 1) = m2_ * pow(l2_, 2);
 
 // Calculate vector C (C is 2x1 because it already includes q_dot)
 C << -m2_ * l1_ * l2_ * sin(q2) * (2 * q_dot1 * q_dot2 + pow(q_dot2, 2)),
-    m2_ * l1_ * l2_ * pow(q_dot1, 2) * sin(q2);
+m2_ * l1_ * l2_ * pow(q_dot1, 2) * sin(q2);
 
 // Calculate Fb matrix
 Fb << b1_, 0.0,
-    0.0, b2_;
+0.0, b2_;
 
 // Calculate g_vect
 g_vec << (m1_ + m2_) * l1_ * g_ * cos(q1) + m2_ * g_ * l2_ * cos(q1 + q2),
@@ -527,6 +529,8 @@ return q_ddot;
 
 ```
 
+!!! tip
+    I suggest you use *VSCode* and install the *C/C++ Themes* extension. Once installed, you can auto format the code (usually by pressing `ctrl + shift + i`)
 
 As we are implementing a discrete system:
 
@@ -569,6 +573,60 @@ Eigen::VectorXd calculate_position()
 ```
 
 ## 4. Launh the dynamics simulator node
+
+Once you have coded the dynamics, open a terminal and compile it:
+
+```bash
+cdw
+cb
+```
+
+!!! success
+    Great! You've coded the manipulator dynamics and are now ready to launch the node to see how they work.
+
+First, you'll need to launch the UMA manipulator ([step 2.1.](#21-test-the-uma-manipulator-package)).
+
+Hence, you will need to open 2 terminals and launch the following:
+
+#### Terminal 1
+
+Launch the UMA manipulator model `uma_arm_visualization.launch.py`:
+
+```bash
+ros2 launch uma_arm_description uma_arm_visualization.launch.py
+```
+
+#### Terminal 2
+
+Launch the dynamics model `uma_arm_dynamics_launch.py`:
+
+```bash
+ros2 launch uma_arm_control uma_arm_dynamics_launch.py
+```
+
+Hence, you should see the following
+
+![launch_terminals](images/launch_terminals.png)
+
+
+And the result of the simulation is
+
+![type:video](./videos/simulation_dynamics.mp4)
+
+
+!!! tip
+    - Note that the order when launching the scripts is important. You should first launch the `uma_arm_visualization`. By doing this, the robot model is loaded but it doesn't do anything until there's a message published in the topic `/joint_state`. 
+    - Then you can launch the `uma_arm_dynamics`. This is what the dynamics model does: Computes the dynamic model, and publishes the joint state to update the visualization. Note also that the dynamics node doesn't need the uma_arm_visualization to work. If you only launch the dynamics, they're computed without showing them in the uma_arm_visualization. If you run the visualization after launching the 
+
+You can see the interaction between topics and nodes by openning another terminal and running
+
+```bash
+rqt_graph
+```
+
+You have to select the option `Node/Topics (all)` and then update the graph.
+
+![rqt_graph](images/rqt_graph.png)
 
 ## 5. Graphical representation
 
