@@ -1018,9 +1018,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#31-clone-the-advanced_robotics-package" class="md-nav__link">
+  <a href="#31-clone-the-uma_arm_control-package" class="md-nav__link">
     <span class="md-ellipsis">
-      3.1. Clone the advanced_robotics package
+      3.1. Clone the uma_arm_control package
     </span>
   </a>
   
@@ -1152,6 +1152,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="4. Launh the dynamics simulator node">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terminal-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal 1
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminal-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Terminal 2
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1201,6 +1225,8 @@
 <p>You'll also need to install the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment_tools</a> as it will install some important packages and libraries that we'll use in the course.
 In that repo, you'll find the required steps to install it.</p>
 <p>If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.</p>
+<p>A video of the installation, including the troubleshooting (if you don't find the errors, you don't need to run that part!) is shown below. Note that the video shows the installation with WSL. If you're using a native Ubuntu 22.04, you can skip the first instruction.</p>
+<p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/installation_error.mp4" type="video/mp4"></source></video></div></p>
 <h3 id="11-testing-the-uma-environment">1.1. Testing the UMA environment<a class="headerlink" href="#11-testing-the-uma-environment" title="Permanent link">¶</a></h3>
 <p>Once you have installed the UMA environment, you should see that everything is working correctly.</p>
 <p>Try the following;</p>
@@ -1281,8 +1307,8 @@ In that repo, you'll find the required steps to install it.</p>
 <p class="admonition-title">Info</p>
 <p>RViz 2 is 3D visualization tool, not a simulator. It means it allows you to see the robot models, sensor data, and other information shared in your ROS 2 environment in real-time and offers you a GUI to select the information to be visualize, but it is NOT a simulation</p>
 </div>
-<p>There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as <a href="https://gazebosim.org/home">Gazebo</a>. However, as we are roboticists and want to see, touch, and lear the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equation of motion) of the manipulator down into a node.</p>
-<h3 id="31-clone-the-advanced_robotics-package">3.1. Clone the advanced_robotics package<a class="headerlink" href="#31-clone-the-advanced_robotics-package" title="Permanent link">¶</a></h3>
+<p>There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as <a href="https://gazebosim.org/home">Gazebo</a>. However, as we are roboticists and want to see, touch, and learn the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equations of motion) of the manipulator down into a node.</p>
+<h3 id="31-clone-the-uma_arm_control-package">3.1. Clone the uma_arm_control package<a class="headerlink" href="#31-clone-the-uma_arm_control-package" title="Permanent link">¶</a></h3>
 <p>To do this, we'll work with another package. You have to do the following</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cdw
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nb">cd</span><span class="w"> </span>src
@@ -1300,7 +1326,6 @@ In that repo, you'll find the required steps to install it.</p>
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>cdw
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>cb
 </code></pre></div>
-<p><img alt="first_compilation" src="first_compilation.png"></p>
 <div class="admonition success">
 <p class="admonition-title">Success</p>
 <p>Great work! You're now ready to implement the manipulator dynamics</p>
@@ -1787,11 +1812,11 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 <a id="__codelineno-23-21" name="__codelineno-23-21" href="#__codelineno-23-21"></a>
 <a id="__codelineno-23-22" name="__codelineno-23-22" href="#__codelineno-23-22"></a><span class="c1">// Calculate vector C (C is 2x1 because it already includes q_dot)</span>
 <a id="__codelineno-23-23" name="__codelineno-23-23" href="#__codelineno-23-23"></a><span class="n">C</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="o">-</span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">q_dot1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">q_dot2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">q_dot2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)),</span>
-<a id="__codelineno-23-24" name="__codelineno-23-24" href="#__codelineno-23-24"></a><span class="w">    </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">q_dot1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q2</span><span class="p">);</span>
+<a id="__codelineno-23-24" name="__codelineno-23-24" href="#__codelineno-23-24"></a><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="n">q_dot1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">q2</span><span class="p">);</span>
 <a id="__codelineno-23-25" name="__codelineno-23-25" href="#__codelineno-23-25"></a>
 <a id="__codelineno-23-26" name="__codelineno-23-26" href="#__codelineno-23-26"></a><span class="c1">// Calculate Fb matrix</span>
 <a id="__codelineno-23-27" name="__codelineno-23-27" href="#__codelineno-23-27"></a><span class="n">Fb</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">b1_</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span>
-<a id="__codelineno-23-28" name="__codelineno-23-28" href="#__codelineno-23-28"></a><span class="w">    </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">b2_</span><span class="p">;</span>
+<a id="__codelineno-23-28" name="__codelineno-23-28" href="#__codelineno-23-28"></a><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">b2_</span><span class="p">;</span>
 <a id="__codelineno-23-29" name="__codelineno-23-29" href="#__codelineno-23-29"></a>
 <a id="__codelineno-23-30" name="__codelineno-23-30" href="#__codelineno-23-30"></a><span class="c1">// Calculate g_vect</span>
 <a id="__codelineno-23-31" name="__codelineno-23-31" href="#__codelineno-23-31"></a><span class="n">g_vec</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">m1_</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m2_</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l1_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">m2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">g_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">l2_</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">q1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q2</span><span class="p">),</span>
@@ -1810,6 +1835,10 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 <a id="__codelineno-23-44" name="__codelineno-23-44" href="#__codelineno-23-44"></a>
 <a id="__codelineno-23-45" name="__codelineno-23-45" href="#__codelineno-23-45"></a><span class="k">return</span><span class="w"> </span><span class="n">q_ddot</span><span class="p">;</span>
 </code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>I suggest you use <em>VSCode</em> and install the <em>C/C++ Themes</em> extension. Once installed, you can auto format the code (usually by pressing <code>ctrl + shift + i</code>)</p>
+</div>
 <p>As we are implementing a discrete system:</p>
 <div class="arithmatex">\[
 \ddot{\mathbf{q}}_{k+1}  = \mathbf{M}^{-1}(\mathbf{q}_k) \left[  \boldsymbol{\tau}_k + \boldsymbol{\tau}_{{ext}_k} - \mathbf{C}(\mathbf{q}_k, \dot{\mathbf{q}}_k) \dot{\mathbf{q}}_k - \mathbf{F}_b \dot{\mathbf{q}}_k - \mathbf{g}(\mathbf{q}_k) \right]
@@ -1843,6 +1872,40 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 <a id="__codelineno-24-19" name="__codelineno-24-19" href="#__codelineno-24-19"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="4-launh-the-dynamics-simulator-node">4. Launh the dynamics simulator node<a class="headerlink" href="#4-launh-the-dynamics-simulator-node" title="Permanent link">¶</a></h2>
+<p>Once you have coded the dynamics, open a terminal and compile it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>cdw
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>cb
+</code></pre></div>
+<div class="admonition success">
+<p class="admonition-title">Success</p>
+<p>Great! You've coded the manipulator dynamics and are now ready to launch the node to see how they work.</p>
+</div>
+<p>First, you'll need to launch the UMA manipulator (<a href="#21-test-the-uma-manipulator-package">step 2.1.</a>).</p>
+<p>Hence, you will need to open 2 terminals and launch the following:</p>
+<h4 id="terminal-1">Terminal 1<a class="headerlink" href="#terminal-1" title="Permanent link">¶</a></h4>
+<p>Launch the UMA manipulator model <code>uma_arm_visualization.launch.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
+</code></pre></div>
+<h4 id="terminal-2">Terminal 2<a class="headerlink" href="#terminal-2" title="Permanent link">¶</a></h4>
+<p>Launch the dynamics model <code>uma_arm_dynamics_launch.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>uma_arm_dynamics_launch.py
+</code></pre></div>
+<p>Hence, you should see the following</p>
+<p><img alt="launch_terminals" src="images/launch_terminals.png"></p>
+<p>And the result of the simulation is</p>
+<p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/simulation_dynamics.mp4" type="video/mp4"></source></video></div></p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<ul>
+<li>Note that the order when launching the scripts is important. You should first launch the <code>uma_arm_visualization</code>. By doing this, the robot model is loaded but it doesn't do anything until there's a message published in the topic <code>/joint_state</code>. </li>
+<li>Then you can launch the <code>uma_arm_dynamics</code>. This is what the dynamics model does: Computes the dynamic model, and publishes the joint state to update the visualization. Note also that the dynamics node doesn't need the uma_arm_visualization to work. If you only launch the dynamics, they're computed without showing them in the uma_arm_visualization. If you run the visualization after launching the </li>
+</ul>
+</div>
+<p>You can see the interaction between topics and nodes by openning another terminal and running</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>rqt_graph
+</code></pre></div>
+<p>You have to select the option <code>Node/Topics (all)</code> and then update the graph.</p>
+<p><img alt="rqt_graph" src="images/rqt_graph.png"></p>
 <h2 id="5-graphical-representation">5. Graphical representation<a class="headerlink" href="#5-graphical-representation" title="Permanent link">¶</a></h2>
 <p>As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter.</p>
 <p>To represent time series of data in ROS 2, the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment</a> has installed the tool <a href="https://plotjuggler.io/">plotjuggler</a>.</p>
@@ -1875,7 +1938,7 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 2, 2025 10:35:59"><span class="timeago" datetime="2025-05-02T10:35:59+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 2, 2025 10:35:59">2025-05-02</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 4, 2025 19:42:12"><span class="timeago" datetime="2025-05-04T19:42:12+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 4, 2025 19:42:12">2025-05-04</span>
   </span>
 
     
