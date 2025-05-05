@@ -2,9 +2,9 @@
 
 ## 1. Setup ROS 2
 
-This lab session assumes you have ROS 2 Humble installed in your computer.
+For this lab session we will use ROS 2 Humble.
 
-You'll also need to install the [uma_environment_tools](https://github.com/jmgandarias/uma_environment_tools) as it will install some important packages and libraries that we'll use in the course.
+You'll need to install the [uma_environment_tools](https://github.com/jmgandarias/uma_environment_tools) as it will install ROS2 Humble, and some important packages and libraries that we'll use in the course.
 In that repo, you'll find the required steps to install it.
 
 If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.
