@@ -1146,13 +1146,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-launh-the-dynamics-simulator-node" class="md-nav__link">
+  <a href="#4-launch-the-dynamics-simulator-node" class="md-nav__link">
     <span class="md-ellipsis">
-      4. Launh the dynamics simulator node
+      4. Launch the dynamics simulator node
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4. Launh the dynamics simulator node">
+    <nav class="md-nav" aria-label="4. Launch the dynamics simulator node">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1189,9 +1189,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#optional-nice-and-vectorial-graph-representions" class="md-nav__link">
+  <a href="#optional-nice-plots-and-vector-images" class="md-nav__link">
     <span class="md-ellipsis">
-      Optional - Nice and vectorial graph representions
+      Optional - Nice plots and vector images
     </span>
   </a>
   
@@ -1886,7 +1886,7 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 <a id="__codelineno-24-18" name="__codelineno-24-18" href="#__codelineno-24-18"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">;</span>
 <a id="__codelineno-24-19" name="__codelineno-24-19" href="#__codelineno-24-19"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="4-launh-the-dynamics-simulator-node">4. Launh the dynamics simulator node<a class="headerlink" href="#4-launh-the-dynamics-simulator-node" title="Permanent link">¶</a></h2>
+<h2 id="4-launch-the-dynamics-simulator-node">4. Launch the dynamics simulator node<a class="headerlink" href="#4-launch-the-dynamics-simulator-node" title="Permanent link">¶</a></h2>
 <p>Once you have coded the dynamics, open a terminal and compile it:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>cdw
 <a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>cb
@@ -1926,31 +1926,38 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 <p>To record the data of the experiment, you can do the following:</p>
 <ol>
 <li>
-<p>Open a terminal, create the experiments folder, and start the rosbag recording:</p>
+<p>If you want to be organized, you can create an experiments folder to store the data there:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nb">cd</span>
 <a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>mkdir<span class="w"> </span>experiments
-<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>ros2<span class="w"> </span>bag<span class="w"> </span>record<span class="w"> </span>--all<span class="w"> </span>-o<span class="w"> </span>experiment1
-<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>ros2<span class="w"> </span>bag<span class="w"> </span>record<span class="w"> </span>--all
+</code></pre></div>
+</li>
+<li>
+<p>Open a terminal and start the rosbag recording:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nb">cd</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nb">cd</span><span class="w"> </span>experiments
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>ros2<span class="w"> </span>bag<span class="w"> </span>record<span class="w"> </span>--all<span class="w"> </span>-o<span class="w"> </span>experiment1
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>ros2<span class="w"> </span>bag<span class="w"> </span>record<span class="w"> </span>--all
 </code></pre></div>
 </li>
 <li>
 <p>Open another terminal and launch the UMA manipulator model:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
 </code></pre></div>
 </li>
 <li>
 <p>Open another terminal and launch the dynamics model <code>uma_arm_dynamics_launch.py</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>uma_arm_dynamics_launch.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>uma_arm_dynamics_launch.py
 </code></pre></div>
 </li>
 </ol>
 <p>When the experiment is finished (let's say, after around 15 seconds - when the manipulator is more or less steady) you can stop it by cancel the recording and killing the nodes. </p>
 <p>To represent time series of data in ROS 2, the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment</a> has installed the tool <a href="https://plotjuggler.io/">plotjuggler</a>. You can find more information on how to use plotjuggler in <a href="https://www.youtube.com/watch?v=9kFRecDU1bg">this video</a>.</p>
 <p>You can run it by using the correspongind UMA environment alias</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>plotjuggler
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>plotjuggler
 </code></pre></div>
-<p>Inside plotjuggler, and following the steps in the previous video, you can play the recorder rosbag. 
-If you use the layout in <a download="download" href="../snippets/lab2/pos_vel_acc_layout.xml">pos_vel_acc_layout.xml</a>, you can plot the joint position, velocities, and accelerations.</p>
+<p>Inside plotjuggler, and following the steps in the previous video, you can play the recorded rosbag. 
+If you use the layout in <a download="download" href="../../snippets/lab2/pos_vel_acc_layout.xml">pos_vel_acc_layout.xml</a>, you can plot the joint position, velocities, and accelerations.</p>
+<p><img alt="experiment_results" src="images/experiment_results.png"></p>
 <div class="admonition question">
 <p class="admonition-title">Question</p>
 <p>What are the effects of modifying the dynamics parameters of the arm?</p>
@@ -1958,10 +1965,38 @@ If you use the layout in <a download="download" href="../snippets/lab2/pos_vel_a
 Run different experiments and plot the data to see the effects of those parameters.</p>
 <p><em>Note that you only need to modify those inside <code>uma_arm_dynamics</code>.</em> </p>
 </div>
-<h3 id="optional-nice-and-vectorial-graph-representions">Optional - Nice and vectorial graph representions<a class="headerlink" href="#optional-nice-and-vectorial-graph-representions" title="Permanent link">¶</a></h3>
-<p>Plotjuggler is an excellent tool to play ROS topics data, and gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with <a href="https://matplotlib.org/stable/tutorials/pyplot.html">matplotlib</a>).</p>
+<h3 id="optional-nice-plots-and-vector-images">Optional - Nice plots and vector images<a class="headerlink" href="#optional-nice-plots-and-vector-images" title="Permanent link">¶</a></h3>
+<p>Plotjuggler is an excellent tool to visualize ROS topics data, and it also gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with <a href="https://matplotlib.org/stable/tutorials/pyplot.html">matplotlib</a>).</p>
 <p>Plotjuggler allows you to save the data in <em>csv</em> format. This way, you can easily import the data with your preferred software to plot it. Below is an expample:</p>
-<p>An alternative to this is to directly use the <a href="https://es.mathworks.com/help/ros/ref/rosbag.html">ROS toolbox in Matlab</a> to get the </p></div>
+<ol>
+<li>
+<p>Click on the CSV exporter and export the data (export the data range into a file).</p>
+<p><img alt="CSV_export" src="images/CSV_export.png"></p>
+</li>
+<li>
+<p>Go to matlab, open the CSV file and select the data you want to get. In the figure below you can see how I select the time stamp (column A), and the joint position data of joint 1 (column F) and joint 2 (column H). Don't forget to exclude the rows with uninmportable cells. Then, select <em>Import selection as Generate Script</em> to generate a script that  </p>
+<p><img alt="csv_matlab_import" src="images/csv_matlab_import.png"></p>
+</li>
+<li>
+<p>You'll probably need to modify that script to change CSV location or the name of the variable that will store your data.</p>
+</li>
+<li>
+<p>Repeat these steps as much as you need it to get the data you want to plot. Here I give you the matlab scripts to get the joint, velocity, and acceleration data, respectively. </p>
+<ul>
+<li><a download="download" href="../../snippets/lab2/get_position_data.m">get_position_data.m</a></li>
+<li><a download="download" href="../../snippets/lab2/get_velocity_data.m">get_velocity_data.m</a></li>
+<li><a download="download" href="../../snippets/lab2/get_acceleration_data.m">get_acceleration_data.m</a></li>
+</ul>
+</li>
+<li>
+<p>Once you have the data in matlab, you can manipulate it the way you want. For example, you can create nicer plots with the units and names in the axes. Here I give you the script to create a nice plot with the experiment data.</p>
+</li>
+<li>
+<p>You can also export the figures in a <a href="https://en.wikipedia.org/wiki/Vector_graphics">vectorial graphic</a> format such as PDF to have the best resolution possible, such as this one:</p>
+<p><img alt="experiment_results" src="images/experiment_results.svg"></p>
+</li>
+</ol>
+<p>An alternative to this is to directly use the <a href="https://es.mathworks.com/help/ros/ref/rosbag.html">ROS toolbox in Matlab</a> to get the rosbag recorded data. But I'd rather export it with PlotJuggler.</p></div>
 
 
 
@@ -1984,7 +2019,7 @@ Run different experiments and plot the data to see the effects of those paramete
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 6, 2025 18:43:44"><span class="timeago" datetime="2025-05-06T18:43:44+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 6, 2025 18:43:44">2025-05-06</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 6, 2025 19:18:30"><span class="timeago" datetime="2025-05-06T19:18:30+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 6, 2025 19:18:30">2025-05-06</span>
   </span>
 
     
