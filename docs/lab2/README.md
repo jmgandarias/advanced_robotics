@@ -630,15 +630,63 @@ You have to select the option `Node/Topics (all)` and then update the graph.
 
 ## 5. Graphical representation
 
-As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter.
+As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter. One of the best ways to record the data of an experiment in ROS is to use [ros bags](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playing-Back-Data/Recording-And-Playing-Back-Data.html).
 
-To represent time series of data in ROS 2, the [uma_environment](https://github.com/jmgandarias/uma_environment_tools) has installed the tool [plotjuggler](https://plotjuggler.io/).
+To record the data of the experiment, you can do the following:
 
-You can run it 
+
+
+1. Open a terminal, create the experiments folder, and start the rosbag recording:
+
+    ```bash
+    cd
+    mkdir experiments
+    ros2 bag record --all -o experiment1
+    ros2 bag record --all
+    ```
+
+2. Open another terminal and launch the UMA manipulator model:
+
+    ```bash
+    ros2 launch uma_arm_description uma_arm_visualization.launch.py
+    ```
+
+3. Open another terminal and launch the dynamics model `uma_arm_dynamics_launch.py`:
+
+    ```bash
+    ros2 launch uma_arm_control uma_arm_dynamics_launch.py
+    ```
+
+When the experiment is finished (let's say, after around 15 seconds - when the manipulator is more or less steady) you can stop it by cancel the recording and killing the nodes. 
+
+To represent time series of data in ROS 2, the [uma_environment](https://github.com/jmgandarias/uma_environment_tools) has installed the tool [plotjuggler](https://plotjuggler.io/). You can find more information on how to use plotjuggler in [this video](https://www.youtube.com/watch?v=9kFRecDU1bg).
+
+You can run it by using the correspongind UMA environment alias
+
+```bash
+plotjuggler
+```
+
+Inside plotjuggler, and following the steps in the previous video, you can play the recorder rosbag. 
+If you use the layout in [pos_vel_acc_layout.xml](../snippets/lab2/pos_vel_acc_layout.xml){:download}, you can plot the joint position, velocities, and accelerations.
+
 
 !!! question
     What are the effects of modifying the dynamics parameters of the arm?
 
     You can modify some of the following parameters inside the `dynamics_params.yaml`: `m1`, `m2`, `b1`, `b2`, and `g`.
+    Run different experiments and plot the data to see the effects of those parameters.
 
     *Note that you only need to modify those inside `uma_arm_dynamics`.* 
+
+
+
+### Optional - Nice and vectorial graph representions
+
+Plotjuggler is an excellent tool to play ROS topics data, and gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with [matplotlib](https://matplotlib.org/stable/tutorials/pyplot.html)).
+
+Plotjuggler allows you to save the data in *csv* format. This way, you can easily import the data with your preferred software to plot it. Below is an expample:
+
+
+
+An alternative to this is to directly use the [ROS toolbox in Matlab](https://es.mathworks.com/help/ros/ref/rosbag.html) to get the 
