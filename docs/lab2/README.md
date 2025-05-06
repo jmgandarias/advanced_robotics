@@ -572,7 +572,7 @@ Eigen::VectorXd calculate_position()
 }
 ```
 
-## 4. Launh the dynamics simulator node
+## 4. Launch the dynamics simulator node
 
 Once you have coded the dynamics, open a terminal and compile it:
 
@@ -634,24 +634,29 @@ As robotics engineers, just seeing things work isn't enough for us. We want to u
 
 To record the data of the experiment, you can do the following:
 
-
-
-1. Open a terminal, create the experiments folder, and start the rosbag recording:
+1. If you want to be organized, you can create an experiments folder to store the data there:
 
     ```bash
     cd
     mkdir experiments
+    ```
+
+2. Open a terminal and start the rosbag recording:
+
+    ```bash
+    cd
+    cd experiments
     ros2 bag record --all -o experiment1
     ros2 bag record --all
     ```
 
-2. Open another terminal and launch the UMA manipulator model:
+3. Open another terminal and launch the UMA manipulator model:
 
     ```bash
     ros2 launch uma_arm_description uma_arm_visualization.launch.py
     ```
 
-3. Open another terminal and launch the dynamics model `uma_arm_dynamics_launch.py`:
+4. Open another terminal and launch the dynamics model `uma_arm_dynamics_launch.py`:
 
     ```bash
     ros2 launch uma_arm_control uma_arm_dynamics_launch.py
@@ -667,8 +672,10 @@ You can run it by using the correspongind UMA environment alias
 plotjuggler
 ```
 
-Inside plotjuggler, and following the steps in the previous video, you can play the recorder rosbag. 
-If you use the layout in [pos_vel_acc_layout.xml](../snippets/lab2/pos_vel_acc_layout.xml){:download}, you can plot the joint position, velocities, and accelerations.
+Inside plotjuggler, and following the steps in the previous video, you can play the recorded rosbag. 
+If you use the layout in [pos_vel_acc_layout.xml](../../snippets/lab2/pos_vel_acc_layout.xml){:download}, you can plot the joint position, velocities, and accelerations.
+
+![experiment_results](images/experiment_results.png)
 
 
 !!! question
@@ -680,13 +687,30 @@ If you use the layout in [pos_vel_acc_layout.xml](../snippets/lab2/pos_vel_acc_l
     *Note that you only need to modify those inside `uma_arm_dynamics`.* 
 
 
+### Optional - Nice plots and vector images
 
-### Optional - Nice and vectorial graph representions
-
-Plotjuggler is an excellent tool to play ROS topics data, and gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with [matplotlib](https://matplotlib.org/stable/tutorials/pyplot.html)).
+Plotjuggler is an excellent tool to visualize ROS topics data, and it also gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with [matplotlib](https://matplotlib.org/stable/tutorials/pyplot.html)).
 
 Plotjuggler allows you to save the data in *csv* format. This way, you can easily import the data with your preferred software to plot it. Below is an expample:
 
+1. Click on the CSV exporter and export the data (export the data range into a file).
 
+    ![CSV_export](images/CSV_export.png)
 
-An alternative to this is to directly use the [ROS toolbox in Matlab](https://es.mathworks.com/help/ros/ref/rosbag.html) to get the 
+2. Go to matlab, open the CSV file and select the data you want to get. In the figure below you can see how I select the time stamp (column A), and the joint position data of joint 1 (column F) and joint 2 (column H). Don't forget to exclude the rows with uninmportable cells. Then, select *Import selection as Generate Script* to generate a script that  
+
+    ![csv_matlab_import](images/csv_matlab_import.png)
+
+3. You'll probably need to modify that script to change CSV location or the name of the variable that will store your data.
+4. Repeat these steps as much as you need it to get the data you want to plot. Here I give you the matlab scripts to get the joint, velocity, and acceleration data, respectively. 
+
+    - [get_position_data.m](../../snippets/lab2/get_position_data.m){:download}
+    - [get_velocity_data.m](../../snippets/lab2/get_velocity_data.m){:download}
+    - [get_acceleration_data.m](../../snippets/lab2/get_acceleration_data.m){:download}
+
+5. Once you have the data in matlab, you can manipulate it the way you want. For example, you can create nicer plots with the units and names in the axes. Here I give you the script to create a nice plot with the experiment data.
+6. You can also export the figures in a [vectorial graphic](https://en.wikipedia.org/wiki/Vector_graphics) format such as PDF to have the best resolution possible, such as this one:
+
+    ![experiment_results](images/experiment_results.svg)
+
+An alternative to this is to directly use the [ROS toolbox in Matlab](https://es.mathworks.com/help/ros/ref/rosbag.html) to get the rosbag recorded data. But I'd rather export it with PlotJuggler.
