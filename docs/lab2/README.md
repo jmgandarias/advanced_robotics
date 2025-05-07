@@ -673,7 +673,7 @@ plotjuggler
 ```
 
 Inside plotjuggler, and following the steps in the previous video, you can play the recorded rosbag. 
-If you use the layout in [pos_vel_acc_layout.xml](../../snippets/lab2/pos_vel_acc_layout.xml){:download}, you can plot the joint position, velocities, and accelerations.
+If you use the layout in [pos_vel_acc_layout.xml](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/pos_vel_acc_layout.xml), you can plot the joint position, velocities, and accelerations.
 
 ![experiment_results](images/experiment_results.png)
 
@@ -704,11 +704,14 @@ Plotjuggler allows you to save the data in *csv* format. This way, you can easil
 3. You'll probably need to modify that script to change CSV location or the name of the variable that will store your data.
 4. Repeat these steps as much as you need it to get the data you want to plot. Here I give you the matlab scripts to get the joint, velocity, and acceleration data, respectively. 
 
-    - [get_position_data.m](../../snippets/lab2/get_position_data.m){:download}
-    - [get_velocity_data.m](../../snippets/lab2/get_velocity_data.m){:download}
-    - [get_acceleration_data.m](../../snippets/lab2/get_acceleration_data.m){:download}
+    - [get_position_data.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_position_data.m)
+    - [get_velocity_data.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_velocity_data.m)
+    - [get_acceleration_data.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_acceleration_data.m)
 
 5. Once you have the data in matlab, you can manipulate it the way you want. For example, you can create nicer plots with the units and names in the axes. Here I give you the script to create a nice plot with the experiment data.
+
+    - [plot_resutls.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/plot_resutls.m)
+
 6. You can also export the figures in a [vectorial graphic](https://en.wikipedia.org/wiki/Vector_graphics) format such as PDF to have the best resolution possible, such as this one:
 
     ![experiment_results](images/experiment_results.svg)
