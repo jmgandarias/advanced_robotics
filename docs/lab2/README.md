@@ -206,7 +206,7 @@ The package is structured as shown in the following image
 
 ##### 3.3.1. Libraries :lock:
 
-Includs the needed libraries. You don't have to modify it.
+Includes the needed libraries. You don't have to modify it.
 
 <details>
 <summary>Show the code</summary>
