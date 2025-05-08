@@ -83,6 +83,40 @@ As a result, now the manipulator stays in the initial position defined by $\math
 
 ### 3.1.3. Simulating the force sensor
 
+As we don't have a proper simulator where we could attach a simulated F/T sensor to the robot EE and apply forces against virtual objects, what we can do is to virtually apply forces to the EE of the robot. We can do this because, in the previous lab, we inmplemented considered the dynamics effects of external wrenches applied to the EE in the robot dynamics model.
+
+$$
+\boldsymbol{\tau}_{ext} = \mathbf{J}(\mathbf{q})^T \cdot \mathbf{F}_{ext}
+$$
+
+Hence, we can simulate an F/T sensor with a node that publishes virtual wrenches. To do this, you can use the `wrench_trackbar_publisher.py` utility included in the `uma_control` package.
+
+<details>
+    <summary>Show the code</summary>
+    ```python title="wrench_trackbar_publisher.py"
+        --8<-- "snippets/lab3/wrench_trackbar_publisher.py"
+    ```
+</details>
+
+Note that you don't have to change anything in that script. You can run it by openning a terminal and running the following:
+
+```bash
+cdw
+cd src/uma_arm_control/utils
+python3 wrench_trackbar_publisher.py
+```
+
+Once you have done this, you'll see a GUI that allows you to publish virtual forces and torques. Note that, as our robot has only 2 DoFs and the dynamics model considers only the 2D XY plane, only forces applied at the X and Y axes will have an effect on our robot. This GUI has two operation modes: The continuous mode and the instantaneuos mode. You can see how they work in this video:
+
+![type:video](./videos/video_FT_sensor.mp4)
+
+Launch the dynamics model and the gravity compensation controller and apply virtual forces. Your rqt_graph should then look like this:
+
+![rqt_forces](images/rqt_forces.png)
+
+!!! question
+    What is the behavior of the robot when you apply virtual forces to the EE? Use videos and/or plots to support your answer.
+
 ## 3.2. Linearization by inverse dynamics control
 
 ### 3.2.1. Implementation
