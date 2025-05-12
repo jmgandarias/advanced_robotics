@@ -121,12 +121,113 @@ Launch the dynamics model and the gravity compensation controller and apply virt
 
 ### 3.2.1. Implementation
 
+Now, we can compensate the whole non-linear dynamics of the manipulator by feedback linearization. This way, we'll theoretically be able to force the manipulator to achieve a desired dynamics behavior without being affected by their own dynamics (note that this is only true when the dynamics model perfectly matches the manipulator dynamics, which won't happen in the real world). 
+
+To do this, you need to implement the following control schema
+
+![inverse_dynamics_control](images/inverse_dynamics_control.svg)
+
+Then, we need to create a node that computes the non-linear dynamics cancellation based on the desired joint accelerations ($\ddot{\mathbf{q}}_d$) and the current joint state ($\mathbf{q}, \dot{\mathbf{q}}$). Then, the commanded joint torques computed with the inverse dynamics controller are given by
+
+$$
+\boldsymbol{\tau} = \mathbf{M}(\mathbf{q}) \cdot \ddot{\mathbf{q}}_d + \underbrace{\mathbf{C} (\mathbf{q}, \dot{\mathbf{q}}) \cdot \dot{\mathbf{q}} + \mathbf{F}_b \cdot \dot{\mathbf{q}} + \mathbf{g}}_{\mathbf{n}(\mathbf{q}, \dot{\mathbf{q}})}
+$$
+
+To implement the inverse dynamics controller you need to do the following:
+
+1. Create the inverse dynamics cancellation node: `dynamics_cancellation.cpp`
+
+ <details>
+    <summary>Show the code</summary>
+    ```cpp title="dynamics_cancellation.cpp"
+        --8<-- "snippets/lab3/dynamics_cancellation.cpp"
+    ```
+    </details>
+
+2. You need to program the method `cancel_dynamics()` to calculate de desired torques.
+    ```cpp
+    // Method to calculate the desired joint torques
+    Eigen::VectorXd cancel_dynamics()
+    {
+         // Initialize M, C, Fb, g_vec, and tau_ext
+
+        // Initialize q1, q2, q_dot1, and q_dot2
+
+        // Calculate matrix M
+
+        // Calculate vector C (C is 2x1 because it already includes q_dot)
+
+        // Calculate Fb matrix
+
+        // Calculate g_vect
+
+        // Calculate control torque using the dynamic model: torque = M * q_ddot + C * q_dot + Fb * q_dot + g
+        Eigen::VectorXd torque(2);
+        torque << 0, 0;
+
+        return torque;
+    }
+    ```
+3. Create the `dynamics_cancellation_launch.py` file (you need to do this in order to get the dynamic pameters from the config file). You don't need to do any modification in this file, just include it inside the launch folder.
+    <details>
+    <summary>Show the code</summary>
+    ```python title="dynamics_cancellation_launch.py"
+        --8<-- "snippets/lab3/dynamics_cancellation_launch.py"
+    ```
+    </details>
+4. Modify the `CMakeLists.txt` to include the new node
+    <details>
+    <summary>Show the code</summary>
+    ```cmake title="CMakeLists.txt"
+        --8<-- "snippets/lab3/CMakeLists_dynamics_cancellation.txt"
+    ```
+    </details>
+4. Once you have done this, the uma_arm_control package should look like this:
+
+    ![workspace_dynamics_cancellation](images/workspace_dynamics_cancellation.png)
+
+5. Now, you can compile the workspace
+    ```bash
+    cdw
+    cb
+    ```
+
+### 3.2.2. Launch the controller
+
+To launch the inverse dynamics controller you'll need to do the following:
+
+1. Open one terminal and launch the uma_arm_visualization.
+2. Open another terminal and launch the controller.
+3. Open another terminal and launch the dynamics model.
+
 ### 3.2.2. Expected results
+
+If the inverse dynamics controller works well, when a trajectory is commanded to the controller, the manipulator should exactly follow that trajectory. 
+We can test it by sending a cubic joint trajectory. To do this, the `uma_arm_control` package provides a cubic trajectory generator you can use.
+
+You can generate the desired joint trajectory by openning a new terminal and running the following:
+
+```bash
+cdw
+cd src/uma_arm_control/utils
+python3 cubic_trajectory.py
+```
+
+Once you have done this, your rqt_graph should then look like this:
+
+![rqt_trajectory](images/rqt_trajectory.png)
+
+If you record the data of the experiment, you'll see the following:
+
+![results_trajectory](images/results_trajectory.png)
+
 
 ## 3.3. Experiments
 
 !!! question
-    What happens if the compensation dynamics model is not exactly the same as the manipulator dynamics? 
+    - What happens if the compensation dynamics model is not exactly the same as the manipulator dynamics? 
 
-    1. Try to change the masses `m1`, `m2` and lengths `l1`, `l2` of the links in the `dynamics_params.yaml` (gravity_compensation) file. What are the effects of having incorrent dynamics parameters when launching the gravity compensation controller?
-    2. Try the same for the dynamics cancellation. In this case, you can also change the parameters `b1` and `b2`. What are the effects when launching the dynamics cancellation controller?
+        1. Try to change the masses `m1`, `m2` and lengths `l1`, `l2` of the links in the `dynamics_params.yaml` (gravity_compensation) file. What are the effects of having incorrent dynamics parameters when launching the gravity compensation controller?
+        2. Try the same for the dynamics cancellation. In this case, you can also change the parameters `b1` and `b2`. What are the effects when launching the dynamics cancellation controller?
+
+    - What is the behavior of the robot under the inverse dynamics controller when you apply virtual forces to the EE? Use videos and/or plots to support your answer.
