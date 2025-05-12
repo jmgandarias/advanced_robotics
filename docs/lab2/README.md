@@ -410,7 +410,7 @@ where
 - $\mathbf{M}(\mathbf{q}) \in \mathbb{R}^{n \times n}$ is the inertia matrix.
 - $\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \in \mathbb{R}^{n \times n}$ is the Coriolis and centrifugal forces matrix.
 - $\mathbf{F}_b \in \mathbb{R}^{n \times n}$ is the viscous friction matrix.
-- $\mathbf{g} \in \mathbb{R}^{n \times 1}$ is the viscous friction matrix.
+- $\mathbf{g} \in \mathbb{R}^{n \times 1}$ is the gravity vector.
 - $\boldsymbol{\tau} \in \mathbb{R}^{n \times 1}$ is the vector of commanded joint torques (`joint_torques_`).
 - $\boldsymbol{\tau}_{ext} \in \mathbb{R}^{n \times 1}$ is the vector of joint torques due to external forces.
 
