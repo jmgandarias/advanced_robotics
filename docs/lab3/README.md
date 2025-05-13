@@ -5,7 +5,7 @@ In this lab session you will learn how to implement inverse dynamics controllers
 ## 3.1. Gravity compensation
 
 ### 3.1.1. Implementation
-As you could have noticed in the previous lab, the gravitational effects on the manipulator makes it to "fall". Hence, out controller should include these effects when computing the joint torques that will be commanded to the actuators. The simplest inverse dynamics controller is the gravity compensation controller that set the torques of the actuators to be equal to those produced by gravity 
+As you could have noticed in the previous lab, the gravitational effects on the manipulator makes it to "fall". Hence, our controller should include these effects when computing the joint torques that will be commanded to the actuators. The simplest inverse dynamics controller is the gravity compensation controller that set the torques of the actuators to be equal to those produced by gravity 
 
 $$
 \boldsymbol{\tau} = \mathbf{g}(\mathbf{q})
@@ -231,3 +231,11 @@ If you record the data of the experiment, you'll see the following:
         2. Try the same for the dynamics cancellation. In this case, you can also change the parameters `b1` and `b2`. What are the effects when launching the dynamics cancellation controller?
 
     - What is the behavior of the robot under the inverse dynamics controller when you apply virtual forces to the EE? Use videos and/or plots to support your answer.
+
+## 3.4. Extra (optional)
+
+Create a node that implements the PD controller presented in Fig. 4 (stabilizing linear control block) of the lecture slides. Specify a desired joint position $\mathbf{q}_d$ (inside the joint workspace) and set $\dot{\mathbf{q}}_d = \boldsymbol{0}$, $\ddot{\mathbf{q}}_d = \boldsymbol{0}$. 
+
+This node must subscribe to the current joint state topic `/joint_states` to get the current joint positions ($\mathbf{q}$) and velocities ($\dot{\mathbf{q}}$); and it must then publish the desired joint accelerations ($\ddot{\mathbf{q}}_d$) in the topic `/desired_joint_accelerations` to which the dynamics cancellation node will subscribe.
+
+Select and report the values chosen for $\mathbf{K}_P$ and $\mathbf{K}_D$. You can use matlab to simulate the expected dynamic behavior of the overall system. 
