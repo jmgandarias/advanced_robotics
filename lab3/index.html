@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../assets/logo_uma_blanco.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -1052,6 +1052,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#34-extra-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.4. Extra (optional)
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1088,7 +1097,7 @@
 <p>In this lab session you will learn how to implement inverse dynamics controllers to compensate the non-linear dynamics of the manipulator to let you impose a specific  desired dynamic behavior of the manipulator. Note that you are expected to have finished the previous lab session as you'll need that implementation. </p>
 <h2 id="31-gravity-compensation">3.1. Gravity compensation<a class="headerlink" href="#31-gravity-compensation" title="Permanent link">¶</a></h2>
 <h3 id="311-implementation">3.1.1. Implementation<a class="headerlink" href="#311-implementation" title="Permanent link">¶</a></h3>
-<p>As you could have noticed in the previous lab, the gravitational effects on the manipulator makes it to "fall". Hence, out controller should include these effects when computing the joint torques that will be commanded to the actuators. The simplest inverse dynamics controller is the gravity compensation controller that set the torques of the actuators to be equal to those produced by gravity </p>
+<p>As you could have noticed in the previous lab, the gravitational effects on the manipulator makes it to "fall". Hence, our controller should include these effects when computing the joint torques that will be commanded to the actuators. The simplest inverse dynamics controller is the gravity compensation controller that set the torques of the actuators to be equal to those produced by gravity </p>
 <div class="arithmatex">\[
 \boldsymbol{\tau} = \mathbf{g}(\mathbf{q})
 \]</div>
@@ -1890,7 +1899,11 @@ We can test it by sending a cubic joint trajectory. To do this, the <code>uma_ar
 <p>What is the behavior of the robot under the inverse dynamics controller when you apply virtual forces to the EE? Use videos and/or plots to support your answer.</p>
 </li>
 </ul>
-</div></div>
+</div>
+<h2 id="34-extra-optional">3.4. Extra (optional)<a class="headerlink" href="#34-extra-optional" title="Permanent link">¶</a></h2>
+<p>Create a node that implements the PD controller presented in Fig. 4 (stabilizing linear control block) of the lecture slides. Specify a desired joint position <span class="arithmatex">\(\mathbf{q}_d\)</span> (inside the joint workspace) and set <span class="arithmatex">\(\dot{\mathbf{q}}_d = \boldsymbol{0}\)</span>, <span class="arithmatex">\(\ddot{\mathbf{q}}_d = \boldsymbol{0}\)</span>. </p>
+<p>This node must subscribe to the current joint state topic <code>/joint_states</code> to get the current joint positions (<span class="arithmatex">\(\mathbf{q}\)</span>) and velocities (<span class="arithmatex">\(\dot{\mathbf{q}}\)</span>); and it must then publish the desired joint accelerations (<span class="arithmatex">\(\ddot{\mathbf{q}}_d\)</span>) in the topic <code>/desired_joint_accelerations</code> to which the dynamics cancellation node will subscribe.</p>
+<p>Select and report the values chosen for <span class="arithmatex">\(\mathbf{K}_P\)</span> and <span class="arithmatex">\(\mathbf{K}_D\)</span>. You can use matlab to simulate the expected dynamic behavior of the overall system. </p></div>
 
 
 
@@ -1913,7 +1926,7 @@ We can test it by sending a cubic joint trajectory. To do this, the <code>uma_ar
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 12, 2025 11:00:50"><span class="timeago" datetime="2025-05-12T11:00:50+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 12, 2025 11:00:50">2025-05-12</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 13, 2025 15:21:29"><span class="timeago" datetime="2025-05-13T15:21:29+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 13, 2025 15:21:29">2025-05-13</span>
   </span>
 
     
