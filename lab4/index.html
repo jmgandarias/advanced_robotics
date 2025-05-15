@@ -24,7 +24,7 @@
     
     
       
-        <title>Lab Session 4: Impedance controller - Advanced Robotics Course</title>
+        <title>Lab Session 4: Impedance Control - Advanced Robotics Course</title>
       
     
     
@@ -91,6 +91,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#lab-session-4-impedance-control" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -120,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Lab Session 4: Impedance controller
+              Lab Session 4: Impedance Control
             
           </span>
         </div>
@@ -945,6 +950,34 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#41-cartesian-impedance-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1. Cartesian impedance control
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#42-controller-implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2. Controller implementation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -976,9 +1009,33 @@
   
 
 
-  <h1>Lab Session 4: Impedance controller</h1>
-
-<p>TBD</p>
+<div><h1 id="lab-session-4-impedance-control">Lab Session 4: Impedance Control<a class="headerlink" href="#lab-session-4-impedance-control" title="Permanent link">¶</a></h1>
+<h2 id="41-cartesian-impedance-control">4.1. Cartesian impedance control<a class="headerlink" href="#41-cartesian-impedance-control" title="Permanent link">¶</a></h2>
+<p>In this lab session we are going to implement a Cartesian Impedance Controller. </p>
+<p>The controller will be implemented according to the following scheme</p>
+<p><img alt="impedance_control" src="images/impedance_control.svg"></p>
+<h2 id="42-controller-implementation">4.2. Controller implementation<a class="headerlink" href="#42-controller-implementation" title="Permanent link">¶</a></h2>
+<p>This script computes the dynamic model of a RR manipulator according to the impedance model:</p>
+<p>F_ext - k x_error - B x'_error = M x''</p>
+<p>where x_error = x_d - x, and x'_error = x'_d - x'</p>
+<p>then: x'' = M^(-1)[F_ext - k x_error - B x'_error]</p>
+<ul>
+<li>To compute x_error and x'_error, we need the current x and x'.
+They can be computed with the forward kinematics model and first-order differential kinematics:</li>
+</ul>
+<p>Forward kinematics: x  =  f(q)
+First-order differential kinematics: x' = J(q) q'</p>
+<ul>
+<li>
+<p>We assume F_ext is given from the measures of an F/T sensor in the EE.</p>
+</li>
+<li>
+<p>The computed x'' represents the desired dynamic behavior of the manipulator at the EE level, but it must be transformed to the
+joint space. It can be done with the second order differential kinematics (deriving the first-order kinematics):</p>
+</li>
+</ul>
+<p>First-order differential kinematics:   q'  = J(q)^(-1) x'
+Second-order differential kinematics:  q'' = J(q)^(-1)[x'' - J'(q',q)q']</p></div>
 
 
 
@@ -1001,7 +1058,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="March 31, 2025 09:01:50"><span class="timeago" datetime="2025-03-31T09:01:50+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="March 31, 2025 09:01:50">2025-03-31</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 15, 2025 15:33:12"><span class="timeago" datetime="2025-05-15T15:33:12+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 15, 2025 15:33:12">2025-05-15</span>
   </span>
 
     
