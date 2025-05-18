@@ -9,6 +9,8 @@ The controller will be implemented according to the following scheme
 
 ## 4.2. Controller implementation
 
+To implement the impedance controller following the previous control scheme, you need to create a new node called impedance_controller.cpp.
+
 
 
 This script computes the dynamic model of a RR manipulator according to the impedance model:
@@ -32,3 +34,24 @@ joint space. It can be done with the second order differential kinematics (deriv
 
 First-order differential kinematics:   q'  = J(q)^(-1) x'
 Second-order differential kinematics:  q'' = J(q)^(-1)[x'' - J'(q',q)q']
+
+
+## 4.3. Experiment 1: 
+
+![results_force_x](images/results_force_x.png)
+
+![results_force_y](images/results_force_y.png)
+
+!!! question
+    - Does the forces applied in axis X generate motions in axis Y? And does the forces applied in axis Y generate motions in axis X? 
+    - Can you explain why applying forces in one axis generate motions in the other axis? 
+    - How do you think this phenomena can be reduced/mitigated?
+
+## 4.4. Experiment 2:
+
+![results_EE_pose](images/results_EE_pose.png)
+
+!!! question
+    - Play with the simulation by publishing different desired equilibrium poses. Test the simulation to the extreme by taking the robot to difficult joint configurations. Don't worry about the robot, it's just a simulation and it won't break :) 
+
+    - Did you find that the robot makes strange or unwanted motions, can you report them and explain why it happens?
