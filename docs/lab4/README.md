@@ -47,6 +47,11 @@ Second-order differential kinematics:  q'' = J(q)^(-1)[x'' - J'(q',q)q']
     - Can you explain why applying forces in one axis generate motions in the other axis? 
     - How do you think this phenomena can be reduced/mitigated?
 
+!!! question
+    - What are the effects of changing the impedance parameters (`M`, `B`, `K`) in the `impedance_params.yaml` file?
+    - What are the effects of having a "high impedance" in axis X and "low impedance" in axis Y?
+
+
 ## 4.4. Experiment 2:
 
 ![results_EE_pose](images/results_EE_pose.png)
