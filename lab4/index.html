@@ -1029,11 +1029,38 @@
 
 <div><h1 id="lab-session-4-impedance-control">Lab Session 4: Impedance Control<a class="headerlink" href="#lab-session-4-impedance-control" title="Permanent link">¶</a></h1>
 <h2 id="41-cartesian-impedance-control">4.1. Cartesian impedance control<a class="headerlink" href="#41-cartesian-impedance-control" title="Permanent link">¶</a></h2>
-<p>In this lab session we are going to implement a Cartesian Impedance Controller. </p>
-<p>The controller will be implemented according to the following scheme</p>
+<p>In this lab session we are going to implement a Cartesian Impedance Controller according to the following scheme:</p>
 <p><img alt="impedance_control" src="images/impedance_control.svg"></p>
 <h2 id="42-controller-implementation">4.2. Controller implementation<a class="headerlink" href="#42-controller-implementation" title="Permanent link">¶</a></h2>
-<p>To implement the impedance controller following the previous control scheme, you need to create a new node called impedance_controller.cpp.</p>
+<p>To implement the impedance controller following the previous control scheme. The controller has two levels. First, and close to the manipulaotr, we have the dynamics compensation at the joint level (the one you did in Lab 3). Then, at a higher level, we have the Cartesian impedance controller. As this controller operates at the operational space, we will need to transform joint and Cartesian variables using the kinematrics model, and the first- and second-order differential kinematics. To implement the impedance controller you need to create a new node called <code>impedance_controller.cpp</code>:</p>
+<p>As we did in Lab 3, you also need to create the <code>impedance_controller_launch.py</code>:</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">impedance_controller_launch.py</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">ament_index_python.packages</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_package_share_directory</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>            <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'uma_arm_control'</span><span class="p">),</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>            <span class="s1">'config'</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="s1">'impedance_params.yaml'</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">impedance_controller_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                <span class="n">package</span><span class="o">=</span><span class="s1">'uma_arm_control'</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                <span class="n">executable</span><span class="o">=</span><span class="s1">'impedance_controller'</span><span class="p">,</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                <span class="n">name</span><span class="o">=</span><span class="s1">'impedance_controller'</span><span class="p">,</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                <span class="n">output</span><span class="o">=</span><span class="s1">'screen'</span><span class="p">,</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="p">]</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>            <span class="p">)</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="k">return</span> <span class="n">LaunchDescription</span><span class="p">([</span><span class="n">impedance_controller_node</span><span class="p">])</span>
+</code></pre></div>
+</details>
+
+<p>Hence, your workspace will look like this:</p>
 <p>This script computes the dynamic model of a RR manipulator according to the impedance model:</p>
 <p>F_ext - k x_error - B x'_error = M x''</p>
 <p>where x_error = x_d - x, and x'_error = x'_d - x'</p>
@@ -1108,7 +1135,7 @@ Second-order differential kinematics:  q'' = J(q)^(-1)[x'' - J'(q',q)q']</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 18, 2025 19:51:11"><span class="timeago" datetime="2025-05-18T19:51:11+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 18, 2025 19:51:11">2025-05-18</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 20, 2025 09:04:53"><span class="timeago" datetime="2025-05-20T09:04:53+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 20, 2025 09:04:53">2025-05-20</span>
   </span>
 
     
