@@ -1,15 +1,30 @@
 # Lab Session 4: Impedance Control
 
 ## 4.1. Cartesian impedance control
-In this lab session we are going to implement a Cartesian Impedance Controller. 
-
-The controller will be implemented according to the following scheme
+In this lab session we are going to implement a Cartesian Impedance Controller according to the following scheme:
 
 ![impedance_control](images/impedance_control.svg)
 
 ## 4.2. Controller implementation
 
-To implement the impedance controller following the previous control scheme, you need to create a new node called impedance_controller.cpp.
+To implement the impedance controller following the previous control scheme. The controller has two levels. First, and close to the manipulaotr, we have the dynamics compensation at the joint level (the one you did in Lab 3). Then, at a higher level, we have the Cartesian impedance controller. As this controller operates at the operational space, we will need to transform joint and Cartesian variables using the kinematrics model, and the first- and second-order differential kinematics. To implement the impedance controller you need to create a new node called `impedance_controller.cpp`:
+
+
+
+
+As we did in Lab 3, you also need to create the `impedance_controller_launch.py`:
+
+<details>
+<summary>Show the code</summary>
+```python title="impedance_controller_launch.py"
+    --8<-- "snippets/lab4/impedance_controller_launch.py"
+```
+</details>
+
+
+Hence, your workspace will look like this:
+
+
 
 
 
