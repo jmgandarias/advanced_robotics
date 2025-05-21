@@ -7,7 +7,10 @@ In this lab session we are going to implement a Cartesian Impedance Controller a
 
 ## 4.2. Controller implementation
 
-The controller has two levels. First, and close to the manipulaotr, we have the dynamics compensation at the joint level (the one you did in Lab 3). Then, at a higher level, we have the Cartesian impedance controller. As this controller operates at the operational space, we will need to transform joint and Cartesian variables using the kinematrics model, and the first- and second-order differential kinematics. To implement the impedance controller you need to create a new node called `impedance_controller.cpp`:
+The controller has two levels:
+
+- First, and close to the manipulator, we have the dynamics compensation at the joint level (the one you did in [Lab 3](../lab3/README.md)). 
+- Then, at a higher level, we have the Cartesian impedance controller. As this controller operates in the operational space, we will need to transform between joint and Cartesian variables using the kinematics model, and the first- and second-order differential kinematics. To implement the impedance controller you need to create a new node called `impedance_controller.cpp`:
 
 <details>
 <summary>Show the code</summary>
@@ -21,6 +24,22 @@ This node subscribes to:
 - The desired equilibrium pose: equilibrium_pose ($\mathbf{x}_d$)
 - The current joint states: joint_states ($\mathbf{q}, \dot{\mathbf{q}}$)
 - The external wrenches: external_wrenches ($\mathbf{f}_{ext}$)
+
+The node gest the impedance parameters ($\mathbf{M}$, $\mathbf{B}$, $\mathbf{K}$) from the `impedance_params.yaml` config file in the form of matrices called `mass_matrix_`, `damping_matrix_`, and `stiffness_matrix_`, respectively:
+
+```cpp
+auto M_vec = this->get_parameter("M").as_double_array();
+auto B_vec = this->get_parameter("B").as_double_array();
+auto K_vec = this->get_parameter("K").as_double_array();
+
+check_matrix_size(M_vec, "M");
+check_matrix_size(B_vec, "B");
+check_matrix_size(K_vec, "K");
+
+mass_matrix_ = Eigen::MatrixXd::Map(M_vec.data(), 2, 2);
+damping_matrix_ = Eigen::MatrixXd::Map(B_vec.data(), 2, 2);
+stiffness_matrix_ = Eigen::MatrixXd::Map(K_vec.data(), 2, 2);
+```
 
 In each loop (`timer_callback()`), the controller does the following:
 
@@ -47,7 +66,7 @@ In each loop (`timer_callback()`), the controller does the following:
 
 2. :pencil: Then, the controller computes the forward kinematics needed to get $\mathbf{x}$ from $\mathbf{q}$ with the method `forward_kinematics()`:
     ```cpp
-    cartesian_pose_ = forward_kinematics();                                 // Calculate cartesian pose
+    cartesian_pose_ = forward_kinematics();  // Calculate cartesian pose
     ```
     You have to implement this method according to the forward kinematics:
 
@@ -75,7 +94,7 @@ In each loop (`timer_callback()`), the controller does the following:
 3. :pencil: The controller needs to calculate the Jacobians based on the new data
 
     ```cpp
-    update_jacobians();                                                     // Update jacobian and jacobian derivative
+    update_jacobians(); // Update jacobian and jacobian derivative
     ```
 
     You have to implement the `update_jacobians()` method according to the following equations:
@@ -125,7 +144,7 @@ In each loop (`timer_callback()`), the controller does the following:
 4. :pencil: Once $\mathbf{J}(\mathbf{q})$ has been computed, the controller can compute the `cartesian_velocities_` ($\mathbf{x}$) using the first-order differential kinematics (i.e., the Jacobian):
 
     ```cpp
-    cartesian_velocities_ = differential_kinematics();                      // Calculate Cartesian velocity with first-order differental kinematics
+    cartesian_velocities_ = differential_kinematics(); // Calculate Cartesian velocity with first-order differental kinematics
     ```
 
     You need to implement the `differential_kinematics()` method according to the following equations:
@@ -150,7 +169,7 @@ In each loop (`timer_callback()`), the controller does the following:
 5. :pencil: Once we have all the required data, we can compute de `desired_cartesian_accelerations_` ($\ddot{\mathbf{x}}_d$) according to the desired impedance behavior with the method `impedance_controller()`:
 
     ```cpp
-    desired_cartesian_accelerations_ = impedance_controller();              // Calculate desired cartesian accelerations with impedance controller
+    desired_cartesian_accelerations_ = impedance_controller(); // Calculate desired cartesian accelerations with impedance controller
     ```
 
     You can compute the desired cartesian accelerations according to the second-order impedance model:
@@ -252,25 +271,104 @@ Hence, your workspace will look like this:
 ![](images/workspace.png)
 
 
-## 4.3. Experiment 1: 
+## 4.3. Experiment 1: Apply virtual forces to the robot
+
+Note that to run the experiment you'll need to launch the following in different terminals (the order is important!):
+
+- UMA arm visualization: 
+    ```bash
+    ros2 launch uma_arm_description uma_arm_visualization.launch.py
+    ```
+- Impedance controller: 
+    ```bash
+    ros2 launch uma_arm_control impedance_controller_launch.py
+    ```
+- Dynamics cancellation: 
+    ```bash
+    ros2 launch uma_arm_control dynamics_cancellation_external_forces_launch.py
+    ```
+- External wrenches publisher: 
+    ```bash
+    cdw
+    cd src/uma_arm_control/utils
+    python3 wrench_trackbar_publisher.py 
+    ```
+- UMA arm dynamics: 
+    ```bash
+    ros2 launch uma_arm_control uma_arm_dynamics_launch.py
+    ```
+
+![type:video](./videos/video_results_impedance_force.mp4)
 
 ![results_force_x](images/results_force_x.png)
 
 ![results_force_y](images/results_force_y.png)
 
-!!! question
-    - Does the forces applied in axis X generate motions in axis Y? And does the forces applied in axis Y generate motions in axis X? 
-    - Can you explain why applying forces in one axis generate motions in the other axis? 
-    - How do you think this phenomena can be reduced/mitigated?
+**Note that the video and the plots correspond to different experiments.*
 
 !!! question
     - What are the effects of changing the impedance parameters (`M`, `B`, `K`) in the `impedance_params.yaml` file?
     - What are the effects of having a "high impedance" in axis X and "low impedance" in axis Y?
 
+!!! question
+    - Does the forces applied in the X axis generate motions in the Y axis? And does the forces applied in the Y axis generate motions in the X axis? 
+    - Can you explain why applying forces in one axis generate motions in the other axis? 
+    - How do you think this phenomena can be mitigated?
+    - **[OPTIONAL]** Eliminate this undesired behavior to get results similar to the images below:
 
-## 4.4. Experiment 2:
+    ![results_force_x_good_cancellation](images/results_force_x_good_cancellation.png)
+
+    ![results_force_xygood_cancellation](images/results_force_xygood_cancellation.png)
+
+
+
+## 4.4. Experiment 2: Change the equilibrium pose
+
+To carry out this experiemnt, you'll need to use the `equilibrium_pose_publisher.py` (please, be sure that you're using the code below. You might have an outdated version of this script in your workspace)
+
+<details>
+<summary>Show the code</summary>
+```python title="equilibrium_pose_publisher.py"
+    --8<-- "snippets/lab4/equilibrium_pose_publisher.py"
+```
+</details>
+
+Note that to run the experiment you'll need to launch the following in different terminals (the order is important!):
+
+- UMA arm visualization: 
+    ```bash
+    ros2 launch uma_arm_description uma_arm_visualization.launch.py
+    ```
+- Impedance controller: 
+    ```bash
+    ros2 launch uma_arm_control impedance_controller_launch.py
+    ```
+- Dynamics cancellation: 
+    ```bash
+    ros2 launch uma_arm_control dynamics_cancellation_external_forces_launch.py
+    ```
+- External wrenches publisher: 
+    ```bash
+    cdw
+    cd src/uma_arm_control/utils
+    python3 wrench_trackbar_publisher.py 
+    ```
+- Equilibrium pose publisher: 
+    ```bash
+    cdw
+    cd src/uma_arm_control/utils
+    python3 equilibrium_pose_publisher.py 
+    ```
+- UMA arm dynamics: 
+    ```bash
+    ros2 launch uma_arm_control uma_arm_dynamics_launch.py
+    ```
+
+![type:video](./videos/video_results_impedance_eq_pose.mp4)
 
 ![results_EE_pose](images/results_EE_pose.png)
+
+**Note that the video and the plots correspond to different experiments.*
 
 !!! question
     - Play with the simulation by publishing different desired equilibrium poses. Test the simulation to the extreme by taking the robot to difficult joint configurations. Don't worry about the robot, it's just a simulation and it won't break :) 
