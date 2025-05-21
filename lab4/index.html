@@ -978,18 +978,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#43-experiment-1" class="md-nav__link">
+  <a href="#43-experiment-1-apply-virtual-forces-to-the-robot" class="md-nav__link">
     <span class="md-ellipsis">
-      4.3. Experiment 1:
+      4.3. Experiment 1: Apply virtual forces to the robot
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#44-experiment-2" class="md-nav__link">
+  <a href="#44-experiment-2-change-the-equilibrium-pose" class="md-nav__link">
     <span class="md-ellipsis">
-      4.4. Experiment 2:
+      4.4. Experiment 2: Change the equilibrium pose
     </span>
   </a>
   
@@ -1032,7 +1032,11 @@
 <p>In this lab session we are going to implement a Cartesian Impedance Controller according to the following scheme:</p>
 <p><img alt="impedance_control" src="images/impedance_control.svg"></p>
 <h2 id="42-controller-implementation">4.2. Controller implementation<a class="headerlink" href="#42-controller-implementation" title="Permanent link">¶</a></h2>
-<p>The controller has two levels. First, and close to the manipulaotr, we have the dynamics compensation at the joint level (the one you did in Lab 3). Then, at a higher level, we have the Cartesian impedance controller. As this controller operates at the operational space, we will need to transform joint and Cartesian variables using the kinematrics model, and the first- and second-order differential kinematics. To implement the impedance controller you need to create a new node called <code>impedance_controller.cpp</code>:</p>
+<p>The controller has two levels:</p>
+<ul>
+<li>First, and close to the manipulator, we have the dynamics compensation at the joint level (the one you did in <a href="../lab3/">Lab 3</a>). </li>
+<li>Then, at a higher level, we have the Cartesian impedance controller. As this controller operates in the operational space, we will need to transform between joint and Cartesian variables using the kinematics model, and the first- and second-order differential kinematics. To implement the impedance controller you need to create a new node called <code>impedance_controller.cpp</code>:</li>
+</ul>
 <details>
 <summary>Show the code</summary>
 <div class="highlight"><span class="filename">impedance_controller.cpp</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="w">    </span><span class="cm">/*</span>
@@ -1405,58 +1409,71 @@
 <li>The current joint states: joint_states (<span class="arithmatex">\(\mathbf{q}, \dot{\mathbf{q}}\)</span>)</li>
 <li>The external wrenches: external_wrenches (<span class="arithmatex">\(\mathbf{f}_{ext}\)</span>)</li>
 </ul>
+<p>The node gest the impedance parameters (<span class="arithmatex">\(\mathbf{M}\)</span>, <span class="arithmatex">\(\mathbf{B}\)</span>, <span class="arithmatex">\(\mathbf{K}\)</span>) from the <code>impedance_params.yaml</code> config file in the form of matrices called <code>mass_matrix_</code>, <code>damping_matrix_</code>, and <code>stiffness_matrix_</code>, respectively:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">M_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"M"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">();</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">auto</span><span class="w"> </span><span class="n">B_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"B"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">();</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">auto</span><span class="w"> </span><span class="n">K_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"K"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">();</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">check_matrix_size</span><span class="p">(</span><span class="n">M_vec</span><span class="p">,</span><span class="w"> </span><span class="s">"M"</span><span class="p">);</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">check_matrix_size</span><span class="p">(</span><span class="n">B_vec</span><span class="p">,</span><span class="w"> </span><span class="s">"B"</span><span class="p">);</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">check_matrix_size</span><span class="p">(</span><span class="n">K_vec</span><span class="p">,</span><span class="w"> </span><span class="s">"K"</span><span class="p">);</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">mass_matrix_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="o">::</span><span class="n">Map</span><span class="p">(</span><span class="n">M_vec</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">damping_matrix_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="o">::</span><span class="n">Map</span><span class="p">(</span><span class="n">B_vec</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">stiffness_matrix_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="o">::</span><span class="n">Map</span><span class="p">(</span><span class="n">K_vec</span><span class="p">.</span><span class="n">data</span><span class="p">(),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
 <p>In each loop (<code>timer_callback()</code>), the controller does the following:</p>
 <details>
 <summary>Show the code</summary>
-<div class="highlight"><span class="filename">timer_callback</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">    </span><span class="c1">// Timer callback - when there is a timer callback, computes the new joint acceleration, velocity and position and publishes them</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">timer_callback</span><span class="p">()</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">equilibrium_pose_received_</span><span class="p">)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">            </span><span class="p">{</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">                </span><span class="n">RCLCPP_WARN_THROTTLE</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_clock</span><span class="p">(),</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">                                     </span><span class="s">"Waiting for all inputs: joint_states [%s], external_wrenches [%s], equilibrium_pose [%s]"</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">                                     </span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">                                     </span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">                                     </span><span class="n">equilibrium_pose_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">);</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">                </span><span class="k">return</span><span class="p">;</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">            </span><span class="p">}</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">            </span><span class="n">cartesian_pose_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forward_kinematics</span><span class="p">();</span><span class="w">                                 </span><span class="c1">// Calculate cartesian pose</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">            </span><span class="n">update_jacobians</span><span class="p">();</span><span class="w">                                                     </span><span class="c1">// Update jacobian and jacobian derivative</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">            </span><span class="n">cartesian_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">differential_kinematics</span><span class="p">();</span><span class="w">                      </span><span class="c1">// Calculate Cartesian velocity with first-order differental kinematics</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">            </span><span class="n">desired_cartesian_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">impedance_controller</span><span class="p">();</span><span class="w">              </span><span class="c1">// Calculate desired cartesian accelerations with impedance controller</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">            </span><span class="n">desired_joint_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_desired_joint_accelerations</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate the desired_joint_accelerations</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">desired_joint_accelerations_</span><span class="p">.</span><span class="n">array</span><span class="p">().</span><span class="n">isNaN</span><span class="p">()).</span><span class="n">any</span><span class="p">())</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">            </span><span class="p">{</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">                </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Computed NaN in desired_joint_accelerations. Skipping publish."</span><span class="p">);</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">                </span><span class="k">return</span><span class="p">;</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">            </span><span class="p">}</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">            </span><span class="c1">// Publish data</span>
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">            </span><span class="n">publish_data</span><span class="p">();</span>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">        </span><span class="p">}</span>
+<div class="highlight"><span class="filename">timer_callback</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="w">    </span><span class="c1">// Timer callback - when there is a timer callback, computes the new joint acceleration, velocity and position and publishes them</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="kt">void</span><span class="w"> </span><span class="nf">timer_callback</span><span class="p">()</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">equilibrium_pose_received_</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">            </span><span class="p">{</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">                </span><span class="n">RCLCPP_WARN_THROTTLE</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_clock</span><span class="p">(),</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">                                     </span><span class="s">"Waiting for all inputs: joint_states [%s], external_wrenches [%s], equilibrium_pose [%s]"</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">                                     </span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">                                     </span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">                                     </span><span class="n">equilibrium_pose_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">);</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">                </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">            </span><span class="n">cartesian_pose_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forward_kinematics</span><span class="p">();</span><span class="w">                                 </span><span class="c1">// Calculate cartesian pose</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">            </span><span class="n">update_jacobians</span><span class="p">();</span><span class="w">                                                     </span><span class="c1">// Update jacobian and jacobian derivative</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">            </span><span class="n">cartesian_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">differential_kinematics</span><span class="p">();</span><span class="w">                      </span><span class="c1">// Calculate Cartesian velocity with first-order differental kinematics</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">            </span><span class="n">desired_cartesian_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">impedance_controller</span><span class="p">();</span><span class="w">              </span><span class="c1">// Calculate desired cartesian accelerations with impedance controller</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">            </span><span class="n">desired_joint_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_desired_joint_accelerations</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate the desired_joint_accelerations</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">desired_joint_accelerations_</span><span class="p">.</span><span class="n">array</span><span class="p">().</span><span class="n">isNaN</span><span class="p">()).</span><span class="n">any</span><span class="p">())</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">            </span><span class="p">{</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">                </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Computed NaN in desired_joint_accelerations. Skipping publish."</span><span class="p">);</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">                </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">            </span><span class="p">}</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">            </span><span class="c1">// Publish data</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">            </span><span class="n">publish_data</span><span class="p">();</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">        </span><span class="p">}</span>
 </code></pre></div>
 </details>
 
 <ol>
 <li>
 <p><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"> First, the controller checks that the <code>joint_states</code>, the <code>external_wrenches</code>, and the <code>equilibrium_pose</code> are received correctly. Otherwise, the controller doesn't publish any reference.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">equilibrium_pose_received_</span><span class="p">)</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">{</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="n">RCLCPP_WARN_THROTTLE</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_clock</span><span class="p">(),</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">                             </span><span class="s">"Waiting for all inputs: joint_states [%s], external_wrenches [%s], equilibrium_pose [%s]"</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">                             </span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">                             </span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">                             </span><span class="n">equilibrium_pose_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">);</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="k">return</span><span class="p">;</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">equilibrium_pose_received_</span><span class="p">)</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">        </span><span class="n">RCLCPP_WARN_THROTTLE</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="o">*</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_clock</span><span class="p">(),</span><span class="w"> </span><span class="mi">2000</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">                             </span><span class="s">"Waiting for all inputs: joint_states [%s], external_wrenches [%s], equilibrium_pose [%s]"</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">                             </span><span class="n">joint_states_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">                             </span><span class="n">external_wrench_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">                             </span><span class="n">equilibrium_pose_received_</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"OK"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"MISSING"</span><span class="p">);</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="p">}</span>
 </code></pre></div>
 </li>
 <li>
 <p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> Then, the controller computes the forward kinematics needed to get <span class="arithmatex">\(\mathbf{x}\)</span> from <span class="arithmatex">\(\mathbf{q}\)</span> with the method <code>forward_kinematics()</code>:
-    </p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">cartesian_pose_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forward_kinematics</span><span class="p">();</span><span class="w">                                 </span><span class="c1">// Calculate cartesian pose</span>
+    </p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">cartesian_pose_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forward_kinematics</span><span class="p">();</span><span class="w">  </span><span class="c1">// Calculate cartesian pose</span>
 </code></pre></div>
     You have to implement this method according to the forward kinematics:
 <div class="arithmatex">\[
@@ -1467,20 +1484,20 @@
     \\
 \end{matrix}\right] 
 \]</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// Method to calculate forward kinematics</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">forward_kinematics</span><span class="p">()</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">{</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="c1">// Placeholder for forward kinematics x = [l1 * cos(q1) + l2 * cos(q1 + q2), l2 * sin(q1) + l2 * sin(q1 + q2)]</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// Method to calculate forward kinematics</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">forward_kinematics</span><span class="p">()</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">{</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="c1">// Placeholder for forward kinematics x = [l1 * cos(q1) + l2 * cos(q1 + q2), l2 * sin(q1) + l2 * sin(q1 + q2)]</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
 </code></pre></div>
 </li>
 <li>
 <p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> The controller needs to calculate the Jacobians based on the new data</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">update_jacobians</span><span class="p">();</span><span class="w">                                                     </span><span class="c1">// Update jacobian and jacobian derivative</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">update_jacobians</span><span class="p">();</span><span class="w"> </span><span class="c1">// Update jacobian and jacobian derivative</span>
 </code></pre></div>
 <p>You have to implement the <code>update_jacobians()</code> method according to the following equations:</p>
 <div class="arithmatex">\[ 
@@ -1499,50 +1516,50 @@
     \\
 \end{matrix}\right] 
 \]</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Method to update jacobian and jacobian derivative</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">update_jacobians</span><span class="p">()</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">{</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="c1">// Placeholder for jacobian and jacobian_derivative matrices</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="c1">// Calculate J(q)</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">jacobian_</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="c1">// Calculate J'(q,q')</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="n">jacobian_derivative_</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Jacobian:</span><span class="se">\n</span><span class="s">[%.3f, %.3f]</span><span class="se">\n</span><span class="s">[%.3f, %.3f]"</span><span class="p">,</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">                </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">                </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">det</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jacobian_</span><span class="p">.</span><span class="n">determinant</span><span class="p">();</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Jacobian determinant: %.6f"</span><span class="p">,</span><span class="w"> </span><span class="n">det</span><span class="p">);</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Method to update jacobian and jacobian derivative</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">update_jacobians</span><span class="p">()</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="c1">// Placeholder for jacobian and jacobian_derivative matrices</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="c1">// Calculate J(q)</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">jacobian_</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="c1">// Calculate J'(q,q')</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="n">jacobian_derivative_</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">        </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Jacobian:</span><span class="se">\n</span><span class="s">[%.3f, %.3f]</span><span class="se">\n</span><span class="s">[%.3f, %.3f]"</span><span class="p">,</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">                </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">                </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">jacobian_</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">det</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jacobian_</span><span class="p">.</span><span class="n">determinant</span><span class="p">();</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Jacobian determinant: %.6f"</span><span class="p">,</span><span class="w"> </span><span class="n">det</span><span class="p">);</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="p">}</span>
 </code></pre></div>
 </li>
 <li>
 <p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> Once <span class="arithmatex">\(\mathbf{J}(\mathbf{q})\)</span> has been computed, the controller can compute the <code>cartesian_velocities_</code> (<span class="arithmatex">\(\mathbf{x}\)</span>) using the first-order differential kinematics (i.e., the Jacobian):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">cartesian_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">differential_kinematics</span><span class="p">();</span><span class="w">                      </span><span class="c1">// Calculate Cartesian velocity with first-order differental kinematics</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">cartesian_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">differential_kinematics</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate Cartesian velocity with first-order differental kinematics</span>
 </code></pre></div>
 <p>You need to implement the <code>differential_kinematics()</code> method according to the following equations:</p>
 <div class="arithmatex">\[
 \dot{\mathbf{x}} = \mathbf{J}(\mathbf{q}) \dot{\mathbf{q}}  
 \]</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// Method to calculate Cartesian velocity with the first-order differential kinematics</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">differential_kinematics</span><span class="p">()</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">{</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="c1">// Placeholder for first-order differential kinematics</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_dot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">x_dot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x_dot</span><span class="p">;</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// Method to calculate Cartesian velocity with the first-order differential kinematics</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">differential_kinematics</span><span class="p">()</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">{</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="c1">// Placeholder for first-order differential kinematics</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_dot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">x_dot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x_dot</span><span class="p">;</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">}</span>
 </code></pre></div>
 </li>
 <li>
 <p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> Once we have all the required data, we can compute de <code>desired_cartesian_accelerations_</code> (<span class="arithmatex">\(\ddot{\mathbf{x}}_d\)</span>) according to the desired impedance behavior with the method <code>impedance_controller()</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">desired_cartesian_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">impedance_controller</span><span class="p">();</span><span class="w">              </span><span class="c1">// Calculate desired cartesian accelerations with impedance controller</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">desired_cartesian_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">impedance_controller</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate desired cartesian accelerations with impedance controller</span>
 </code></pre></div>
 <p>You can compute the desired cartesian accelerations according to the second-order impedance model:</p>
 <div class="arithmatex">\[
@@ -1559,27 +1576,27 @@
 \dot{\mathbf{\~{x}}} &amp;= \dot{\mathbf{x}} - \dot{\mathbf{x}}_d
 \end{split}
 \]</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Method to compute the impedance controller</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">impedance_controller</span><span class="p">()</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">{</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="c1">// Placeholder for impedance controller calculation</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_dot_d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// We assume desired cartesian velocity = 0</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="c1">// Calculate Cartesian errors</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_error</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_dot_error</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="c1">// Replace with actual impedance controller equation: x'' = M^(-1)[F_ext - k x_error - B x'_error]</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_ddot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">    </span><span class="n">x_ddot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x_ddot</span><span class="p">;</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Method to compute the impedance controller</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">impedance_controller</span><span class="p">()</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">{</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="c1">// Placeholder for impedance controller calculation</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_dot_d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Zero</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// We assume desired cartesian velocity = 0</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="c1">// Calculate Cartesian errors</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_error</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_dot_error</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="c1">// Replace with actual impedance controller equation: x'' = M^(-1)[F_ext - k x_error - B x'_error]</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="n">x_ddot</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="n">x_ddot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x_ddot</span><span class="p">;</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="p">}</span>
 </code></pre></div>
 </li>
 <li>
 <p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f4dd.svg" title=":pencil:"> Now, we can calculate the <code>desired_joint_accelerations</code> with the second-order differential kinematics</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">desired_joint_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_desired_joint_accelerations</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate the desired_joint_accelerations</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">desired_joint_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">calculate_desired_joint_accelerations</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate the desired_joint_accelerations</span>
 </code></pre></div>
 <p>The second-order differential kinematics can be calculated as:</p>
 <div class="arithmatex">\[
@@ -1588,74 +1605,88 @@
 \ddot{\mathbf{q}} &amp;= \mathbf{J}(\mathbf{q})^{-1}[\ddot{\mathbf{x}} - \dot{\mathbf{J}}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}}]
 \end{split}
 \]</div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// Method to calculate joint acceleration with the inverse of second-order differential kinematics</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_desired_joint_accelerations</span><span class="p">()</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">{</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="c1">// Placeholder for the second-order differential kinematics</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="c1">// q'' = J(q)^(-1)[x'' - J'(q,q')q']</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"x_ddot: [%.3f, %.3f]"</span><span class="p">,</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">                </span><span class="n">desired_cartesian_accelerations_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">desired_cartesian_accelerations_</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="n">q_ddot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q_ddot</span><span class="p">;</span>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">// Method to calculate joint acceleration with the inverse of second-order differential kinematics</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="w"> </span><span class="nf">calculate_desired_joint_accelerations</span><span class="p">()</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">{</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="c1">// Placeholder for the second-order differential kinematics</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="c1">// q'' = J(q)^(-1)[x'' - J'(q,q')q']</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="n">RCLCPP_INFO</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"x_ddot: [%.3f, %.3f]"</span><span class="p">,</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">                </span><span class="n">desired_cartesian_accelerations_</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">desired_cartesian_accelerations_</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">q_ddot</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q_ddot</span><span class="p">;</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="p">}</span>
 </code></pre></div>
 </li>
 <li>
 <p><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/1f512.svg" title=":lock:"> Finally, the controller checks that the accelerations are calculated correctly before publishing the data</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">desired_joint_accelerations_</span><span class="p">.</span><span class="n">array</span><span class="p">().</span><span class="n">isNaN</span><span class="p">()).</span><span class="n">any</span><span class="p">())</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="p">{</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Computed NaN in desired_joint_accelerations. Skipping publish."</span><span class="p">);</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="k">return</span><span class="p">;</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">}</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1">// Publish data</span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">publish_data</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">desired_joint_accelerations_</span><span class="p">.</span><span class="n">array</span><span class="p">().</span><span class="n">isNaN</span><span class="p">()).</span><span class="n">any</span><span class="p">())</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="p">{</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">RCLCPP_ERROR</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_logger</span><span class="p">(),</span><span class="w"> </span><span class="s">"Computed NaN in desired_joint_accelerations. Skipping publish."</span><span class="p">);</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1">// Publish data</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="n">publish_data</span><span class="p">();</span>
 </code></pre></div>
 </li>
 </ol>
 <p>As we did in Lab 3, you also need to create the <code>impedance_controller_launch.py</code>:</p>
 <details>
 <summary>Show the code</summary>
-<div class="highlight"><span class="filename">impedance_controller_launch.py</span><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">ament_index_python.packages</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_package_share_directory</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>            <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'uma_arm_control'</span><span class="p">),</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>            <span class="s1">'config'</span><span class="p">,</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>            <span class="s1">'impedance_params.yaml'</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        <span class="p">)</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>        <span class="n">impedance_controller_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>                <span class="n">package</span><span class="o">=</span><span class="s1">'uma_arm_control'</span><span class="p">,</span>
-<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>                <span class="n">executable</span><span class="o">=</span><span class="s1">'impedance_controller'</span><span class="p">,</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>                <span class="n">name</span><span class="o">=</span><span class="s1">'impedance_controller'</span><span class="p">,</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>                <span class="n">output</span><span class="o">=</span><span class="s1">'screen'</span><span class="p">,</span>
-<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>                <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="p">]</span>
-<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>            <span class="p">)</span>
-<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>
-<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>        <span class="k">return</span> <span class="n">LaunchDescription</span><span class="p">([</span><span class="n">impedance_controller_node</span><span class="p">])</span>
+<div class="highlight"><span class="filename">impedance_controller_launch.py</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LaunchDescription</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">launch_ros.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">ament_index_python.packages</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_package_share_directory</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_launch_description</span><span class="p">():</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>        <span class="n">config</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>            <span class="n">get_package_share_directory</span><span class="p">(</span><span class="s1">'uma_arm_control'</span><span class="p">),</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>            <span class="s1">'config'</span><span class="p">,</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>            <span class="s1">'impedance_params.yaml'</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>        <span class="p">)</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>        <span class="n">impedance_controller_node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>                <span class="n">package</span><span class="o">=</span><span class="s1">'uma_arm_control'</span><span class="p">,</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>                <span class="n">executable</span><span class="o">=</span><span class="s1">'impedance_controller'</span><span class="p">,</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>                <span class="n">name</span><span class="o">=</span><span class="s1">'impedance_controller'</span><span class="p">,</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>                <span class="n">output</span><span class="o">=</span><span class="s1">'screen'</span><span class="p">,</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>                <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="n">config</span><span class="p">]</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>            <span class="p">)</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>        <span class="k">return</span> <span class="n">LaunchDescription</span><span class="p">([</span><span class="n">impedance_controller_node</span><span class="p">])</span>
 </code></pre></div>
 </details>
 
 <p>Hence, your workspace will look like this:</p>
 <p><img alt="" src="images/workspace.png"></p>
-<h2 id="43-experiment-1">4.3. Experiment 1:<a class="headerlink" href="#43-experiment-1" title="Permanent link">¶</a></h2>
+<h2 id="43-experiment-1-apply-virtual-forces-to-the-robot">4.3. Experiment 1: Apply virtual forces to the robot<a class="headerlink" href="#43-experiment-1-apply-virtual-forces-to-the-robot" title="Permanent link">¶</a></h2>
+<p>Note that to run the experiment you'll need to launch the following in different terminals (the order is important!):</p>
+<ul>
+<li>UMA arm visualization: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
+</code></pre></div></li>
+<li>Impedance controller: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>impedance_controller_launch.py
+</code></pre></div></li>
+<li>Dynamics cancellation: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>dynamics_cancellation_external_forces_launch.py
+</code></pre></div></li>
+<li>External wrenches publisher: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>cdw
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nb">cd</span><span class="w"> </span>src/uma_arm_control/utils
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>python3<span class="w"> </span>wrench_trackbar_publisher.py<span class="w"> </span>
+</code></pre></div></li>
+<li>UMA arm dynamics: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>uma_arm_dynamics_launch.py
+</code></pre></div></li>
+</ul>
+<p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/video_results_impedance_force.mp4" type="video/mp4"></source></video></div></p>
 <p><img alt="results_force_x" src="images/results_force_x.png"></p>
 <p><img alt="results_force_y" src="images/results_force_y.png"></p>
-<div class="admonition question">
-<p class="admonition-title">Question</p>
-<ul>
-<li>Does the forces applied in axis X generate motions in axis Y? And does the forces applied in axis Y generate motions in axis X? </li>
-<li>Can you explain why applying forces in one axis generate motions in the other axis? </li>
-<li>How do you think this phenomena can be reduced/mitigated?</li>
-</ul>
-</div>
+<p>*<em>Note that the video and the plots correspond to different experiments.</em></p>
 <div class="admonition question">
 <p class="admonition-title">Question</p>
 <ul>
@@ -1663,8 +1694,142 @@
 <li>What are the effects of having a "high impedance" in axis X and "low impedance" in axis Y?</li>
 </ul>
 </div>
-<h2 id="44-experiment-2">4.4. Experiment 2:<a class="headerlink" href="#44-experiment-2" title="Permanent link">¶</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Question</p>
+<ul>
+<li>Does the forces applied in the X axis generate motions in the Y axis? And does the forces applied in the Y axis generate motions in the X axis? </li>
+<li>Can you explain why applying forces in one axis generate motions in the other axis? </li>
+<li>How do you think this phenomena can be mitigated?</li>
+<li><strong>[OPTIONAL]</strong> Eliminate this undesired behavior to get results similar to the images below:</li>
+</ul>
+<p><img alt="results_force_x_good_cancellation" src="images/results_force_x_good_cancellation.png"></p>
+<p><img alt="results_force_xygood_cancellation" src="images/results_force_xygood_cancellation.png"></p>
+</div>
+<h2 id="44-experiment-2-change-the-equilibrium-pose">4.4. Experiment 2: Change the equilibrium pose<a class="headerlink" href="#44-experiment-2-change-the-equilibrium-pose" title="Permanent link">¶</a></h2>
+<p>To carry out this experiemnt, you'll need to use the <code>equilibrium_pose_publisher.py</code> (please, be sure that you're using the code below. You might have an outdated version of this script in your workspace)</p>
+<details>
+<summary>Show the code</summary>
+<div class="highlight"><span class="filename">equilibrium_pose_publisher.py</span><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>    <span class="c1">#!/usr/bin/python3</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">rclpy</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">rclpy.node</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">geometry_msgs.msg</span><span class="w"> </span><span class="kn">import</span> <span class="n">PoseStamped</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>    <span class="k">class</span><span class="w"> </span><span class="nc">EquilibriumPosePublisher</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">'equilibrium_pose_publisher'</span><span class="p">)</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">publisher_pose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_publisher</span><span class="p">(</span><span class="n">PoseStamped</span><span class="p">,</span> <span class="s1">'equilibrium_pose'</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>            <span class="c1"># Initial pose values</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_x</span> <span class="o">=</span> <span class="mf">1.3071</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_y</span> <span class="o">=</span> <span class="mf">0.701</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_x</span>
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_y</span>
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>            <span class="c1"># Create GUI</span>
+<a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+<a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Equilibrium Pose Publisher"</span><span class="p">)</span>
+<a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>
+<a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_trackbar</span><span class="p">(</span><span class="s1">'Pose X'</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_pending_pose_x</span><span class="p">)</span>
+<a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_trackbar</span><span class="p">(</span><span class="s1">'Pose Y'</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_pending_pose_y</span><span class="p">)</span>
+<a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a>
+<a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_x</span><span class="p">)</span>
+<a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_y</span><span class="p">)</span>
+<a id="__codelineno-21-29" name="__codelineno-21-29" href="#__codelineno-21-29"></a>
+<a id="__codelineno-21-30" name="__codelineno-21-30" href="#__codelineno-21-30"></a>            <span class="n">publish_button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"Publish Equilibrium Pose"</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">update_current_pose</span><span class="p">)</span>
+<a id="__codelineno-21-31" name="__codelineno-21-31" href="#__codelineno-21-31"></a>            <span class="n">publish_button</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<a id="__codelineno-21-32" name="__codelineno-21-32" href="#__codelineno-21-32"></a>
+<a id="__codelineno-21-33" name="__codelineno-21-33" href="#__codelineno-21-33"></a>            <span class="c1"># Start publishing timer (300 Hz)</span>
+<a id="__codelineno-21-34" name="__codelineno-21-34" href="#__codelineno-21-34"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">create_timer</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">300.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">publish_equilibrium_pose</span><span class="p">)</span>
+<a id="__codelineno-21-35" name="__codelineno-21-35" href="#__codelineno-21-35"></a>
+<a id="__codelineno-21-36" name="__codelineno-21-36" href="#__codelineno-21-36"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">create_trackbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+<a id="__codelineno-21-37" name="__codelineno-21-37" href="#__codelineno-21-37"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+<a id="__codelineno-21-38" name="__codelineno-21-38" href="#__codelineno-21-38"></a>            <span class="n">frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+<a id="__codelineno-21-39" name="__codelineno-21-39" href="#__codelineno-21-39"></a>            <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">min_val</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span>
+<a id="__codelineno-21-40" name="__codelineno-21-40" href="#__codelineno-21-40"></a>            <span class="n">trackbar</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">from_</span><span class="o">=</span><span class="n">min_val</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">max_val</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">,</span>
+<a id="__codelineno-21-41" name="__codelineno-21-41" href="#__codelineno-21-41"></a>                                <span class="n">command</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">sliderlength</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<a id="__codelineno-21-42" name="__codelineno-21-42" href="#__codelineno-21-42"></a>            <span class="n">trackbar</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span>
+<a id="__codelineno-21-43" name="__codelineno-21-43" href="#__codelineno-21-43"></a>            <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">max_val</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span>
+<a id="__codelineno-21-44" name="__codelineno-21-44" href="#__codelineno-21-44"></a>            <span class="k">return</span> <span class="n">trackbar</span>
+<a id="__codelineno-21-45" name="__codelineno-21-45" href="#__codelineno-21-45"></a>
+<a id="__codelineno-21-46" name="__codelineno-21-46" href="#__codelineno-21-46"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">update_pending_pose_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<a id="__codelineno-21-47" name="__codelineno-21-47" href="#__codelineno-21-47"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-21-48" name="__codelineno-21-48" href="#__codelineno-21-48"></a>
+<a id="__codelineno-21-49" name="__codelineno-21-49" href="#__codelineno-21-49"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">update_pending_pose_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<a id="__codelineno-21-50" name="__codelineno-21-50" href="#__codelineno-21-50"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-21-51" name="__codelineno-21-51" href="#__codelineno-21-51"></a>
+<a id="__codelineno-21-52" name="__codelineno-21-52" href="#__codelineno-21-52"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">update_current_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-21-53" name="__codelineno-21-53" href="#__codelineno-21-53"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_x</span>
+<a id="__codelineno-21-54" name="__codelineno-21-54" href="#__codelineno-21-54"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending_pose_y</span>
+<a id="__codelineno-21-55" name="__codelineno-21-55" href="#__codelineno-21-55"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">get_logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Updated pose to: X = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_pose_x</span><span class="si">}</span><span class="s1">, Y = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_pose_y</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<a id="__codelineno-21-56" name="__codelineno-21-56" href="#__codelineno-21-56"></a>
+<a id="__codelineno-21-57" name="__codelineno-21-57" href="#__codelineno-21-57"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">publish_equilibrium_pose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-21-58" name="__codelineno-21-58" href="#__codelineno-21-58"></a>            <span class="n">msg</span> <span class="o">=</span> <span class="n">PoseStamped</span><span class="p">()</span>
+<a id="__codelineno-21-59" name="__codelineno-21-59" href="#__codelineno-21-59"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_clock</span><span class="p">()</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">to_msg</span><span class="p">()</span>
+<a id="__codelineno-21-60" name="__codelineno-21-60" href="#__codelineno-21-60"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">frame_id</span> <span class="o">=</span> <span class="s2">"base_link"</span>
+<a id="__codelineno-21-61" name="__codelineno-21-61" href="#__codelineno-21-61"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_x</span>
+<a id="__codelineno-21-62" name="__codelineno-21-62" href="#__codelineno-21-62"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_pose_y</span>
+<a id="__codelineno-21-63" name="__codelineno-21-63" href="#__codelineno-21-63"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-21-64" name="__codelineno-21-64" href="#__codelineno-21-64"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-21-65" name="__codelineno-21-65" href="#__codelineno-21-65"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-21-66" name="__codelineno-21-66" href="#__codelineno-21-66"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span>
+<a id="__codelineno-21-67" name="__codelineno-21-67" href="#__codelineno-21-67"></a>            <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">orientation</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">1.0</span>
+<a id="__codelineno-21-68" name="__codelineno-21-68" href="#__codelineno-21-68"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">publisher_pose</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<a id="__codelineno-21-69" name="__codelineno-21-69" href="#__codelineno-21-69"></a>
+<a id="__codelineno-21-70" name="__codelineno-21-70" href="#__codelineno-21-70"></a>        <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-21-71" name="__codelineno-21-71" href="#__codelineno-21-71"></a>            <span class="c1"># Start ROS spinning in a background thread</span>
+<a id="__codelineno-21-72" name="__codelineno-21-72" href="#__codelineno-21-72"></a>            <span class="n">ros_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">rclpy</span><span class="o">.</span><span class="n">spin</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-21-73" name="__codelineno-21-73" href="#__codelineno-21-73"></a>            <span class="n">ros_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<a id="__codelineno-21-74" name="__codelineno-21-74" href="#__codelineno-21-74"></a>
+<a id="__codelineno-21-75" name="__codelineno-21-75" href="#__codelineno-21-75"></a>            <span class="c1"># Start the GUI main loop</span>
+<a id="__codelineno-21-76" name="__codelineno-21-76" href="#__codelineno-21-76"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+<a id="__codelineno-21-77" name="__codelineno-21-77" href="#__codelineno-21-77"></a>
+<a id="__codelineno-21-78" name="__codelineno-21-78" href="#__codelineno-21-78"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-21-79" name="__codelineno-21-79" href="#__codelineno-21-79"></a>        <span class="n">rclpy</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+<a id="__codelineno-21-80" name="__codelineno-21-80" href="#__codelineno-21-80"></a>        <span class="n">node</span> <span class="o">=</span> <span class="n">EquilibriumPosePublisher</span><span class="p">()</span>
+<a id="__codelineno-21-81" name="__codelineno-21-81" href="#__codelineno-21-81"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-21-82" name="__codelineno-21-82" href="#__codelineno-21-82"></a>            <span class="n">node</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<a id="__codelineno-21-83" name="__codelineno-21-83" href="#__codelineno-21-83"></a>        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+<a id="__codelineno-21-84" name="__codelineno-21-84" href="#__codelineno-21-84"></a>            <span class="k">pass</span>
+<a id="__codelineno-21-85" name="__codelineno-21-85" href="#__codelineno-21-85"></a>        <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-21-86" name="__codelineno-21-86" href="#__codelineno-21-86"></a>            <span class="n">node</span><span class="o">.</span><span class="n">destroy_node</span><span class="p">()</span>
+<a id="__codelineno-21-87" name="__codelineno-21-87" href="#__codelineno-21-87"></a>            <span class="n">rclpy</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+<a id="__codelineno-21-88" name="__codelineno-21-88" href="#__codelineno-21-88"></a>
+<a id="__codelineno-21-89" name="__codelineno-21-89" href="#__codelineno-21-89"></a>    <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+<a id="__codelineno-21-90" name="__codelineno-21-90" href="#__codelineno-21-90"></a>        <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+</details>
+
+<p>Note that to run the experiment you'll need to launch the following in different terminals (the order is important!):</p>
+<ul>
+<li>UMA arm visualization: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
+</code></pre></div></li>
+<li>Impedance controller: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>impedance_controller_launch.py
+</code></pre></div></li>
+<li>Dynamics cancellation: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>dynamics_cancellation_external_forces_launch.py
+</code></pre></div></li>
+<li>External wrenches publisher: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>cdw
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nb">cd</span><span class="w"> </span>src/uma_arm_control/utils
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>python3<span class="w"> </span>wrench_trackbar_publisher.py<span class="w"> </span>
+</code></pre></div></li>
+<li>Equilibrium pose publisher: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>cdw
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="nb">cd</span><span class="w"> </span>src/uma_arm_control/utils
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>python3<span class="w"> </span>equilibrium_pose_publisher.py<span class="w"> </span>
+</code></pre></div></li>
+<li>UMA arm dynamics: 
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_control<span class="w"> </span>uma_arm_dynamics_launch.py
+</code></pre></div></li>
+</ul>
+<p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/video_results_impedance_eq_pose.mp4" type="video/mp4"></source></video></div></p>
 <p><img alt="results_EE_pose" src="images/results_EE_pose.png"></p>
+<p>*<em>Note that the video and the plots correspond to different experiments.</em></p>
 <div class="admonition question">
 <p class="admonition-title">Question</p>
 <ul>
@@ -1698,7 +1863,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 20, 2025 16:42:04"><span class="timeago" datetime="2025-05-20T16:42:04+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 20, 2025 16:42:04">2025-05-20</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 21, 2025 08:56:54"><span class="timeago" datetime="2025-05-21T08:56:54+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 21, 2025 08:56:54">2025-05-21</span>
   </span>
 
     
