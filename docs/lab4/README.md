@@ -74,7 +74,7 @@ In each loop (`timer_callback()`), the controller does the following:
     \mathbf{x} = \left[ \begin{matrix}
         \\
         l_1 cos(q_1) + l_2 cos(q_1 + q_2)\\
-        l_2 sin(q_1) + l_2 sin(q_1 + q_2)\\
+        l_1 sin(q_1) + l_2 sin(q_1 + q_2)\\
         \\
     \end{matrix}\right] 
     $$
@@ -262,6 +262,15 @@ As we did in Lab 3, you also need to create the `impedance_controller_launch.py`
 <summary>Show the code</summary>
 ```python title="impedance_controller_launch.py"
     --8<-- "snippets/lab4/impedance_controller_launch.py"
+```
+</details>
+
+Finally, you also need to modify your `CMakeLists.txt`:
+
+<details>
+<summary>Show the code</summary>
+```txt title="CMakeLists.txt"
+    --8<-- "snippets/lab4/CMakeLists.txt"
 ```
 </details>
 

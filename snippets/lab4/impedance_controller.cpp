@@ -220,7 +220,7 @@ private:
     // Method to calculate forward kinematics
     Eigen::VectorXd forward_kinematics()
     {
-        // Placeholder for forward kinematics x = [l1 * cos(q1) + l2 * cos(q1 + q2), l2 * sin(q1) + l2 * sin(q1 + q2)]
+        // Placeholder for forward kinematics x = [l1 * cos(q1) + l2 * cos(q1 + q2), l1 * sin(q1) + l2 * sin(q1 + q2)]
         Eigen::VectorXd x(2);
         x << 0, 0;
 
