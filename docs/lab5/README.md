@@ -56,7 +56,7 @@ $$
 and the desired force is 
 
 $$
-\mathbf{f}_d = [-10, 0] N
+\mathbf{f}_d = [10, 0] N
 $$
 
 when
@@ -132,5 +132,5 @@ $$
 $$
 
 !!! question
-    - Does this produced any improvement in the controller? Why?
+    - Does this produce any improvement in the controller? Why?
     - Can you improve it more? How?
