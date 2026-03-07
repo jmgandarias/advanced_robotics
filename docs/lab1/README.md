@@ -1,6 +1,106 @@
 # Lab 1: Cartesian trajectory planning
 
-This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, a series of functions will be used:
+
+## 1. Setup ROS 2
+
+For this lab session we will use ROS 2 Humble.
+
+This is optional: You may want to install the [uma_environment_tools](https://github.com/jmgandarias/uma_environment_tools) as it will install ROS2 Humble, and some important packages and libraries that may be useful later in the course.
+In that repo, you'll find the required steps to install it.
+
+If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.
+
+A video of the installation, including the troubleshooting (if you don't find the errors, you don't need to run that part!) is shown below. Note that the video shows the installation with WSL. If you're using a native Ubuntu 22.04, you can skip the first instruction.
+
+![type:video](./videos/installation_error.mp4)
+
+### 1.1. Testing the UMA environment
+
+If you have installed the UMA environment, you should see that everything is working correctly.
+
+Try the following;
+
+```bash
+create_catkin_ws
+```
+
+Put the name `advanced_robotics_ws` to your workspace.
+
+If, after installing it, you go to your catkin workspace folder and when you run this alias
+
+```bash
+cb
+```
+
+you find an error like `'ROS colcon build is not installed'`, then you'll need to uninstall ros and install the environment again:
+
+```bash
+sudo apt remove ~nros-humble-* && sudo apt autoremove
+sudo rm /etc/apt/sources.list.d/ros2.list
+sudo apt update
+sudo apt autoremove
+# Consider upgrading for packages previously shadowed.
+sudo apt upgrade
+cd ~/uma_environment_tools/scripts
+./install_uma_environment.sh
+```
+
+Then you'll ned to run
+
+```bash
+update_uma_environment
+```
+
+---
+
+## 2. Introduction
+
+This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the [Cartesian Trajectory Planning](https://github.com/jmgandarias/cartesian_trajectory_planning) package.
+
+
+## 2.1. Clone the package
+
+Open a new terminal, go to the `src` folder in yout worskpace and clone the repo
+
+```bash
+git clone https://github.com/jmgandarias/cartesian_trajectory_planning
+```
+
+Once this is done, complie the workspace (if you have isntalled the UMA environment you can just use `cb`).
+
+## 2.2. Package content
+
+It consists of the following:
+
+* bringup: launch files and ros2_controller configuration
+* controller: a controller for the 6-DOF robot
+* description: the 6-DOF robot description
+* hardware: ros2_control hardware interface
+* reference_generator: A KDL-based reference generator for a fixed trajectory
+
+Find the documentation in [doc/userdoc.rst](doc/userdoc.rst) or on [control.ros.org](https://control.ros.org/master/doc/ros2_control_demos/example_7/doc/userdoc.html).
+
+## 2.3. Test the demo
+
+In one terminal, run:
+
+```bash
+ros2 launch cartesian_trajectory_planning r6bot_controller.launch.py
+```
+
+In another terminal, run:
+
+```bash
+ros2 launch cartesian_trajectory_planning send_trajectory.launch.py
+```
+
+## 2.4. Show EE trail in Rviz
+
+* Go to RobotModel>Links>tool0 (or the link that refers to the EE).
+* Habilitate Show Trail.
+
+
+
 
 ## Matlab functions
 

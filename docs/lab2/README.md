@@ -1,56 +1,5 @@
 # Lab 2: Manipulator dynamics simulation
 
-## 1. Setup ROS 2
-
-For this lab session we will use ROS 2 Humble.
-
-You'll need to install the [uma_environment_tools](https://github.com/jmgandarias/uma_environment_tools) as it will install ROS2 Humble, and some important packages and libraries that we'll use in the course.
-In that repo, you'll find the required steps to install it.
-
-If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.
-
-A video of the installation, including the troubleshooting (if you don't find the errors, you don't need to run that part!) is shown below. Note that the video shows the installation with WSL. If you're using a native Ubuntu 22.04, you can skip the first instruction.
-
-![type:video](./videos/installation_error.mp4)
-
-### 1.1. Testing the UMA environment
-
-Once you have installed the UMA environment, you should see that everything is working correctly.
-
-Try the following;
-
-```bash
-create_catkin_ws
-```
-
-Put the name `advanced_robotics_ws` to your workspace. 
-
-If, after installing it, you go to your catkin workspace folder and when you run this alias
-
-```bash
-cb
-```
-
-you find an error like `'ROS colcon build is not installed'`, then you'll need to uninstall ros and install the environment again:
-
-```bash
-sudo apt remove ~nros-humble-* && sudo apt autoremove
-sudo rm /etc/apt/sources.list.d/ros2.list
-sudo apt update
-sudo apt autoremove
-# Consider upgrading for packages previously shadowed.
-sudo apt upgrade
-cd ~/uma_environment_tools/scripts
-./install_uma_environment.sh
-```
-
-Then you'll ned to run
-
-```bash
-update_uma_environment
-```
-
----
 
 ## 2. Install UMA manipulator package
 
