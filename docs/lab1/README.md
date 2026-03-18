@@ -66,7 +66,7 @@ Open a new terminal, go to the `src` folder in yout worskpace and clone the repo
 git clone https://github.com/jmgandarias/cartesian_trajectory_planning
 ```
 
-Once this is done, complie the workspace (if you have isntalled the UMA environment you can just use `cb`).
+Once this is done, complie the workspace (if you have installed the UMA environment you can just use `cb`).
 
 ## 2.2. Package content
 
