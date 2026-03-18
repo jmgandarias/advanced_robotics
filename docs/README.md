@@ -1,20 +1,8 @@
----
-hide:
-  - toc 
-  - navigation
----
-
-<center>
-
 # Advanced Robotics
 
-*Course material for the second part and Lab sesions of the Advanced Robotics course at [the University of Málaga](https://www.uma.es).* 
+Teaching material for [the Advanced Robotics course](https://jmgandarias.github.io/advanced_robotics), last year B.S. in Electronic, Robotics, and Mechatronics Engineering at [the University of Málaga](https://www.uma.es)
 
-By [Juan M. Gandarias](https://jmgandarias.com) 
+Developed by [Juan M. Gandarias](https://jmgandarias.github.io/)
 
-Systems Engineering and Automation Department
-
-[Find out more...](./about/README.md)
-
-
-</center>
+*Create your own material website:*
+Please, refer to [this repo.](https://github.com/jmgandarias/mkdocs_UMA_template)
