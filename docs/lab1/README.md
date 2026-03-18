@@ -78,7 +78,7 @@ It consists of the following:
 * hardware: ros2_control hardware interface
 * reference_generator: A KDL-based reference generator for a fixed trajectory
 
-Find the documentation in [doc/userdoc.rst](doc/userdoc.rst) or on [control.ros.org](https://control.ros.org/master/doc/ros2_control_demos/example_7/doc/userdoc.html).
+The content of this package is inspired by and built on the [ROS2 control example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html).
 
 ## 2.3. Test the demo
 
