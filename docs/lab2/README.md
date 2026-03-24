@@ -17,29 +17,6 @@ git clone https://github.com/jmgandarias/uma_arm_description.git
 !!! info 
     You don't have to modify anything in this package. You just need it visualize the manipulator.
 
-Now, before compiling it, you'll need to install a series of dependencies:
-
-```bash
-sudo apt install ros-${ROS_DISTRO}-xacro
-sudo apt install ros-${ROS_DISTRO}-gazebo-ros-pkgs
-sudo  apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers ros-${ROS_DISTRO}-gazebo-ros2-control
-sudo apt-get install -y ros-${ROS_DISTRO}-joint-state-publisher-gui ros-${ROS_DISTRO}-rviz2
-```
-
-If you find an error trying to install these dependencies, most probably you'll need to update the packages repositories and upgrade them to the last version
-
-```bash
-sudo apt update
-sudo apt upgrade
-```
-
-Once the dependencies are correctly installed, you can compile the workspace
-
-```bash
-cdw
-cb
-```
-
 ### 2.1. Test the UMA manipulator package
 
 Open one terminal and run:

@@ -58,7 +58,25 @@ update_uma_environment
 This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the [Cartesian Trajectory Planning](https://github.com/jmgandarias/cartesian_trajectory_planning) package.
 
 
-## 2.1. Clone the package
+## 2.1. Install the dependencies
+
+First, you'll need to install a series of dependencies:
+
+```bash
+sudo apt install ros-${ROS_DISTRO}-xacro
+sudo apt install ros-${ROS_DISTRO}-gazebo-ros-pkgs
+sudo  apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controllers ros-${ROS_DISTRO}-gazebo-ros2-control
+sudo apt-get install -y ros-${ROS_DISTRO}-joint-state-publisher-gui ros-${ROS_DISTRO}-rviz2
+```
+
+If you find an error trying to install these dependencies, most probably you'll need to update the packages repositories and upgrade them to the last version. Once upgraded, you can install the dependecies using the commands above.
+
+```bash
+sudo apt update
+sudo apt upgrade
+```
+
+## 2.2. Clone the package
 
 Open a new terminal, go to the `src` folder in yout worskpace and clone the repo
 
@@ -68,7 +86,11 @@ git clone https://github.com/jmgandarias/cartesian_trajectory_planning
 
 Once this is done, complie the workspace (if you have installed the UMA environment you can just use `cb`).
 
-## 2.2. Package content
+You should see something like this (don't worry about the warnings, this is because the code is incompleted - you'll need to complete it in this lab session)
+
+![first_compilation.png](images/first_compilation.png)
+
+## 2.3. Package content
 
 It consists of the following:
 
@@ -80,7 +102,7 @@ It consists of the following:
 
 The content of this package is inspired by and built on the [ROS2 control example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html).
 
-## 2.3. Test the demo
+## 2.4. Test the demo
 
 In one terminal, run:
 
@@ -91,16 +113,27 @@ ros2 launch cartesian_trajectory_planning r6bot_controller.launch.py
 In another terminal, run:
 
 ```bash
-ros2 launch cartesian_trajectory_planning send_trajectory.launch.py
+ros2 launch cartesian_trajectory_planning send_linear_trajectory.launch.py 
 ```
 
-## 2.4. Show EE trail in Rviz
-
+To show the EE trail in Rviz:
 * Go to RobotModel>Links>tool0 (or the link that refers to the EE).
 * Habilitate Show Trail.
 
+You should see the following:
+
+![terminal_test](images/terminal_test.png)
+
+![type:video](videos/test_trajectory.mp4)
 
 
+You can also try the circular trajectory if you want:
+
+```bash
+ros2 launch cartesian_trajectory_planning send_circular_trajectory.launch.py 
+```
+
+These trajectory are not actually generated 
 
 ## Matlab functions
 
