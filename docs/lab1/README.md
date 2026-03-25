@@ -12,7 +12,7 @@ If you already have a native version of Ubuntu 22.04 installed, you can skip ste
 
 A video of the installation, including the troubleshooting (if you don't find the errors, you don't need to run that part!) is shown below. Note that the video shows the installation with WSL. If you're using a native Ubuntu 22.04, you can skip the first instruction.
 
-![type:video](./videos/installation_error.mp4)
+![type:video](videos/installation_error.mp4)
 
 ### 1.1. Testing the UMA environment
 
@@ -183,11 +183,14 @@ However, in this lab you'll implement a Cartesian interpolation using the robot 
 
 ---
 
-# 3. Understand the code
+# 3. Understanding the code
 
 # 3.1. send_trajectory.cpp
 
-Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in $ZYZ$ Euler angles.
+This script performs the complete interpolation during all proposed segments. Let's see the code
+
+
+
 
 
 - **`cartesian_planning`**: Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in $ZYZ$ Euler angles.
