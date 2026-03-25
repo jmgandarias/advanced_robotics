@@ -498,6 +498,8 @@ Eigen::VectorXd calculate_position()
 }
 ```
 
+---
+
 ## 4. Launch the dynamics simulator node
 
 Once you have coded the dynamics, open a terminal and compile it:
@@ -553,6 +555,8 @@ rqt_graph
 You have to select the option `Node/Topics (all)` and then update the graph.
 
 ![rqt_graph](images/rqt_graph.png)
+
+---
 
 ## 5. Graphical representation
 
@@ -643,3 +647,4 @@ Plotjuggler allows you to save the data in *csv* format. This way, you can easil
     ![experiment_results](images/experiment_results.svg)
 
 An alternative to this is to directly use the [ROS toolbox in Matlab](https://es.mathworks.com/help/ros/ref/rosbag.html) to get the rosbag recorded data. But I'd rather export it with PlotJuggler.
+

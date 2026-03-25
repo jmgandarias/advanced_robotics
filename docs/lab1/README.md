@@ -94,11 +94,16 @@ You should see something like this (don't worry about the warnings, this is beca
 
 It consists of the following:
 
-* bringup: launch files and ros2_controller configuration
-* controller: a controller for the 6-DOF robot
-* description: the 6-DOF robot description
-* hardware: ros2_control hardware interface
-* reference_generator: A KDL-based reference generator for a fixed trajectory
+* bringup: launch files and ros2_controller configuration *:lock: You don't have to modify it.*
+* config: poses.yaml file with the definition of the EE poses for the lab session *:pencil: You need to modify it in this lab.*
+* controller: definition of the robot controller using ros2 control *:lock: You don't have to modify it.*
+* description: the 6-DOF robot description (URDF and visualizer launch file) *:lock: You don't have to modify it.*
+* experiment_data: you can use this folder to save and plot the data of the experiment *:pencil: You need to modify it in this lab.*
+* hardware: ros2_control hardware interface *:lock: You don't have to modify it.*
+* reference_generator: It has 3 cpp files
+    * send_circular_trajectory.cpp: Example using a velocity controller with a circular trajectory. *:lock: You don't have to modify it.*
+    * send_linear_trajectory.cpp:Example using a velocity controller with a linear trajectory. *:lock: You don't have to modify it.*
+    * send_trajectory.cpp: This is the main file where you have to implement the Cartesian trajectory. *:pencil: You need to modify it in this lab.*
 
 The content of this package is inspired by and built on the [ROS2 control example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html).
 
@@ -133,9 +138,57 @@ You can also try the circular trajectory if you want:
 ros2 launch cartesian_trajectory_planning send_circular_trajectory.launch.py 
 ```
 
-These trajectory are not actually generated 
+These trajectories are generated because the robot is under a joint velocity controller with an Inverse Kinematics solver (implemented using the[ros2 control package](https://control.ros.org/humble/index.html) - Described in [Example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html)).
 
-## Matlab functions
+
+Snippet of the velocity-based circular trajecotry:
+```cpp
+for (int i = 0; i < trajectory_len; i++)
+  {
+    // set endpoint twist
+    double t = i;
+
+    // circular trajectory in xy plane
+    double vx = 2.0 * 0.3 * cos(2 * M_PI * t / trajectory_len);
+    double vy = -0.3 * sin(2 * M_PI * t / trajectory_len);
+    twist.vel.x(vx);
+    twist.vel.y(vy);
+
+    // convert cart to joint velocities
+    ik_vel_solver_->CartToJnt(joint_positions, twist, joint_velocities);
+
+    ...
+  }
+```
+
+Snippet of the velocity-based linear trajecotry:
+```cpp
+for (int i = 0; i < trajectory_len; i++)
+  {
+    // set endpoint twist
+    double t = i;
+    // compute the desired linear x velocity once and set both x and y components
+    double vx = 2.0 * 0.3 * cos(2 * M_PI * t / trajectory_len);
+    twist.vel.x(vx);
+    twist.vel.y(vx);
+
+    // convert cart to joint velocities
+    ik_vel_solver_->CartToJnt(joint_positions, twist, joint_velocities);
+
+    ...
+  }
+```
+
+However, in this lab you'll implement a Cartesian interpolation using the robot under a joint position controller (using the same Inverse Kinematics solver that is already implemented with the [Kinemcatics and Dynamics Library (KDL)](https://www.orocos.org/kdl.html) — if you're interested, there are other libraries that can also do this (and much more), like [Pinocchio](https://stack-of-tasks.github.io/pinocchio/)).
+
+---
+
+# 3. Understand the code
+
+# 3.1. send_trajectory.cpp
+
+Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in $ZYZ$ Euler angles.
+
 
 - **`cartesian_planning`**: Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in $ZYZ$ Euler angles.
 
@@ -298,3 +351,11 @@ The expected result is illustrated in the following video and figures:
 <img src="images/orientation.png" alt="images/orientation" width="600"/>
 
 *Figure 4. Orientation trajectories.*
+
+# 4. Extra (optional)
+
+Create a node that implements the PD controller presented in Fig. 4 (stabilizing linear control block) of the lecture slides. Specify a desired joint position $\mathbf{q}_d$ (inside the joint workspace) and set $\dot{\mathbf{q}}_d = \boldsymbol{0}$, $\ddot{\mathbf{q}}_d = \boldsymbol{0}$. 
+
+This node must subscribe to the current joint state topic `/joint_states` to get the current joint positions ($\mathbf{q}$) and velocities ($\dot{\mathbf{q}}$); and it must then publish the desired joint accelerations ($\ddot{\mathbf{q}}_d$) in the topic `/desired_joint_accelerations` to which the dynamics cancellation node will subscribe.
+
+Select and report the values chosen for $\mathbf{K}_P$ and $\mathbf{K}_D$. You can use matlab to simulate the expected dynamic behavior of the overall system. 
