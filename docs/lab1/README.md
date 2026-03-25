@@ -185,12 +185,80 @@ However, in this lab you'll implement a Cartesian interpolation using the robot 
 
 # 3. Understanding the code
 
-# 3.1. send_trajectory.cpp
+## 3.1. send_trajectory.cpp
 
-This script performs the complete interpolation during all proposed segments. Let's see the code
+This script performs the complete interpolation during all proposed segments. Let's see the code (each part of the code is explained in detail below):
+
+<details>
+    <summary>Show send_trajectory.cpp</summary>
+    ```cpp title="send_trajectory.cpp"
+    --8<-- "snippets/lab1/send_trajectory.cpp"
+    ```
+</details>
+
+!!! warning 
+    This repo is under development and keeps improving. To check the latest version, visit [the github repo](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/reference_generator/send_trajectory.cpp).
 
 
+## 3.2. Code parts explained
 
+- **`Eigen::Matrix4d ParsePoseMatrix(const YAML::Node &root, const std::string &key)`:lock:**: This function parses a 4x4 matrix from a YAML file given a specific key word. It's used in the code to parse the pose matrices defined in [`config/poses.yaml`](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml). 
+
+    <details>
+        <summary>Show ParsePoseMatrix</summary>
+        ```cpp title="ParsePoseMatrix.cpp"
+        --8<-- "snippets/lab1/ParsePoseMatrix.cpp"
+        ```
+    </details>
+
+    !!! info
+        In the course you'll use the [`Eigen`](https://libeigen.gitlab.io/) library to work with linear algebra (matrices, vectors, etc) in C++. In this part of the code you are defining the object `pose` from the [`Matrix`](https://libeigen.gitlab.io/eigen/docs-nightly/group__TutorialMatrixClass.html) class.
+
+
+    !!! info
+        In the course you'll use [`YAML files`](https://yaml.org/).
+
+- **`tf2::Quaternion MuliplyQuaternions(const tf2::Quaternion &q1, const tf2::Quaternion &q2)` :lock:**: This function multiplies two quaternions q1 and q2 and returns the resulting quaternion. The multiplication is defined as: $q_{result} = q_1 * q_2$, where $q_1$ and $q_2$ are represented as $(x, y, z, w)$ and the product is performed using the [Hamilton product](https://en.wikipedia.org/wiki/Quaternion).
+
+    <details>
+        <summary>Show MuliplyQuaternions</summary>
+        ```cpp title="MuliplyQuaternions.cpp"
+        --8<-- "snippets/lab1/MuliplyQuaternions.cpp"
+        ```
+    </details>
+
+    !!! info
+        In the course you'll use the [`tf2`](https://docs.ros.org/en/humble/Tutorials/Intermediate/Tf2/Tf2-Main.html) package to work with coordinate frames and take advantage of useful classes and methods. In this part of the code you are using the class [`Quaternion`](https://docs.ros2.org/foxy/api/tf2/classtf2_1_1Quaternion.html).
+
+- **`tf2::Quaternion InverseQuaternion(const tf2::Quaternion &q)` :lock:**: This function computes the inverse of a quaternion $q$ and returns the resulting quaternion.
+
+    <details>
+        <summary>Show InverseQuaternion</summary>
+        ```cpp title="InverseQuaternion.cpp"
+        --8<-- "snippets/lab1/InverseQuaternion.cpp"
+        ```
+    </details>
+
+- **`tf2::Quaternion rot2Quat(const Eigen::Matrix3d &R, int m = 1)` :lock:**: This function converts a rotation matrix R to a quaternion representation.
+
+    <details>
+        <summary>Show rot2Quat</summary>
+        ```cpp title="rot2Quat.cpp"
+        --8<-- "snippets/lab1/rot2Quat.cpp"
+        ```
+    </details>
+
+- **`std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(const Eigen::Matrix4d &start_pose, const Eigen::Matrix4d &end_pose, double lambda)` :pencil:**: You must implement this function in the [Exercise 1](#1-exercise-1-quaternion-interpolation)
+
+    ```cpp title="PoseInterpolation.cpp"
+    --8<-- "snippets/lab1/PoseInterpolation.cpp"
+    ```
+
+- **`std::pair<tf2::Vector3, tf2::Quaternion> ComputeNextCartesianPose(const Eigen::Matrix4d &pose_0, const Eigen::Matrix4d &pose_1, const Eigen::Matrix4d &pose_2, double tau, double T, double t)` :pencil:**: You must implement this function in the [Exercise 2](#2-exercise-2-smooth-trajectory-generation)
+
+    ```cpp title="ComputeNextCartesianPose.cpp"
+    --8<-- "snippets/lab1/ComputeNextCartesianPose.cpp"
+    ```
 
 
 - **`cartesian_planning`**: Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in $ZYZ$ Euler angles.
@@ -199,8 +267,8 @@ This script performs the complete interpolation during all proposed segments. Le
     --8<-- "snippets/lab1/cartesian_planning.m"
     ```
 
-    1. Here you call the function ```qpinter``` that you have to code in [Exercise 1](#1-quaternion-interpolation)
-    2. Here you call the function ```generate_smooth_path``` that you have to code in [Exercise 2](#1-quaternion-interpolation)
+    1. Here you call the function ```qpinter``` that you have to code in [Exercise 1](#1-exercise-1-quaternion-interpolation)
+    2. Here you call the function ```generate_smooth_path``` that you have to code in [Exercise 2](#1-exercise-1-quaternion-interpolation)
 
 - **`function [pr, qr]=qpinter(P1, P2, lambda)`**: You have to code it. Explained in [Exercise 2](#2-smooth-trajectory-generation)
 
@@ -323,11 +391,11 @@ P_2 = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-### 1. Quaternion interpolation
+### 1. Exercise 1: Quaternion interpolation
 
 Define the quaternion interpolation function based on the Taylor method `[pr, qr]=qpinter(P1, P2, lambda)` that calculates the intermediate quaternion between $q_1$ (initial) and $q_2$ (final). The value $\lambda$ must satisfy $0\leq \lambda \leq 1$, so that `[p1, q1]=qpinter(P1, P2, 0)` and `[p2, q2]=qpinter(P1, P2, 1)`.
 
-### 2. Smooth trajectory generation
+### 2. Exercise 2: Smooth trajectory generation
 
 Create a MATLAB function in the format `P=generate_smooth_path(P0, P1, P2, tau, T, t)` that calculates the transformation $P$ corresponding to the movement from $P_0$ to $P_2$ via $P_1$ smoothed by the Taylor method. The parameters $\tau$ and $T$ correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1, and $T$ indicates the time at which the location of the calculated path $P$ is reached.
 
