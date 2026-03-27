@@ -260,89 +260,52 @@ This script performs the complete interpolation during all proposed segments. Le
     --8<-- "snippets/lab1/ComputeNextCartesianPose.cpp"
     ```
 
+- **`int main(int argc, char **argv)` - First part :lock:**: The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, created the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from the `config/poses.yaml`.
 
-- **`cartesian_planning`**: Script that performs the complete simulation during all proposed segments, using the Robotic Toolbox with the ABB IRB120 manipulator model and the graphical representation of the temporal evolution of Cartesian trajectories and orientation in $ZYZ$ Euler angles.
+    <details>
+        <summary>Show int main(int argc, char **argv)</summary>
+        ```cpp title="main.cpp"
+        --8<-- "snippets/lab1/main.cpp"
+        ```
+    </details>
 
-    ```matlab title="cartesian_planning.m"
-    --8<-- "snippets/lab1/cartesian_planning.m"
+- **Exercise 1: Cartesian interpolation :pencil:**: This block runs the first exercise and checks your interpolation function. It calls `PoseInterpolation` at the endpoints of two segments:
+    * pose0 -> pose1 with $\lambda = 0$ and $\lambda = 1$
+    * pose1 -> pose2 with $\lambda = 0$ and $\lambda = 1$
+    
+    It stores each result as position (p*) and orientation quaternion (q*) and prints all four positions and quaternions to verify correctness. What you should expect if `PoseInterpolation` is implemented properly:
+
+    * `p0, q0` should match pose0
+    * `p1, q1` should match pose1
+    * `p2, q2` should also match pose1 (start of second segment)
+    * `p3, q3` should match pose2
+
+    So this code does not generate the trajectory yet; it just validates that interpolation gives the correct boundary poses.
+
+    ```cpp title="exercise1.cpp"
+    --8<-- "snippets/lab1/exercise1.cpp"
     ```
 
-    1. Here you call the function ```qpinter``` that you have to code in [Exercise 1](#1-exercise-1-quaternion-interpolation)
-    2. Here you call the function ```generate_smooth_path``` that you have to code in [Exercise 2](#1-exercise-1-quaternion-interpolation)
+- **Exercise 2: Smooth trajectory generation. Part 1 :pencil:**: This block is the first part of the code needed for the exercise two. It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the exercise 1. It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
 
-- **`function [pr, qr]=qpinter(P1, P2, lambda)`**: You have to code it. Explained in [Exercise 2](#2-smooth-trajectory-generation)
-
-    ```matlab title="qpinter.m"
-    --8<-- "snippets/lab1/qpinter.m"
+    ```cpp title="exercise_part1.cpp"
+    --8<-- "snippets/lab1/exercise_part1.cpp"
     ```
 
-    1. Compute the position interpolation.
-    2. Compute the orientation interpolation
+- **Exercise 2: Smooth trajectory generation. Part 2 :lock:**: This block is the first part of the code needed for the exercise two. It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the exercise 1. It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
 
-- **`function P=generate_smooth_path(P0, P1, P2, tau, T, t)`**: You have to code it. Explained in [Exercise 2](#2-smooth-trajectory-generation)
-
-    ```matlab title="generate_smooth_path.m"
-    --8<-- "snippets/lab1/generate_smooth_path.m"
+    ```cpp title="exercise_part1.cpp"
+    --8<-- "snippets/lab1/exercise_part1.cpp"
     ```
 
-    1. Include the code for the first segment (from -t to T) using qpinter
-    2. Include the code for the third segment (from T to t) using qpinter
-    3. Include the code for the position smoothing in the second segment with [Equation P(t)](#equation-1)
-    4. Include the code for the orientation smoothing in the second segment with [Equation q(t)](#equation-2)
 
-- **`function T=zyz2tr(a)`**: Converts the row vector $a=[\alpha,\beta,\gamma]$ of $ZYZ$ Euler angles to a $4 \times 4$ homogeneous transformation $T$.
-    <details>
-        <summary>Show function zyz2tr.m</summary>
-        ```matlab title="zyz2tr.m"
-        --8<-- "snippets/lab1/zyz2tr.m"
-        ```
-    </details>
+---
 
-- **`function a=tr2zyz(T, m)`**: Obtains the representation $a=[\alpha,\beta,\gamma]$ of the $ZYZ$ Euler angles from the transformation $T$. The sign of the parameter $m$ chooses the solution. If not specified, the positive solution is taken by default.
-    <details>
-        <summary>Show function tr2zyz.m</summary>
-        ```matlab title="tr2zyz.m"
-        --8<-- "snippets/lab1/tr2zyz.m"
-        ```
-    </details>
+# 4. Smooth Cartesian interpolation
 
-- **`function q=tr2q(T, m)`**: Converts the homogeneous matrix $T$ to quaternion $q$. The sign of $m$ chooses the positive or negative solution. If $m$ is omitted, the positive solution is taken by default.
-    <details>
-        <summary>Show function tr2q.m</summary>
-        ```matlab title="tr2q.m"
-        --8<-- "snippets/lab1/tr2q.m"
-        ```
-    </details>
+Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. Hence, we're performing a [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). Original paper [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is actually implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the code of the implementation ros2 humble [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)) but you're going to implement it by yourself in this lab. 
 
-- **`function T=q2tr(q)`**: Calculates the $4 \times 4$ homogeneous matrix $T$ corresponding to the quaternion $q$.
-    <details>
-        <summary>Show function q2tr.m</summary>
-        ```matlab title="q2tr.m"
-        --8<-- "snippets/lab1/q2tr.m"
-        ```
-    </details>
-
-- **`function q=qqmul(q1, q2)`**: $q$ is the quaternion resulting from multiplying $q_1$ by $q_2$. Both $q_1$ and $q_2$ must be two row vectors of four components. The result will also have the same format.
-    <details>
-        <summary>Show function qqmul.m</summary>
-        ```matlab title="qqmul.m"
-        --8<-- "snippets/lab1/qqmul.m"
-        ```
-    </details>
-
-- **`function q2=qinv(q)`**: $q_2$ is the quaternion resulting from computing the inverse of $q$.
-    <details>
-        <summary>Show function qinv.m</summary>
-        ```matlab title="qinv.m"
-        --8<-- "snippets/lab1/qinv.m"
-        ```
-    </details>
-
-## Cartesian interpolation
-
-Cartesian interpolation is characterized by achieving a linear variation of position and orientation, the latter uses the representation of orientation through quaternions. Therefore, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point.
-
-Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ with another from $P_1$ to $P_2$. To avoid the velocity discontinuity that occurs at $P_1$, a constant acceleration is used to adapt the velocity variation of vector $X$ from the first segment to the second.
+Also, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point. Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ with another from $P_1$ to $P_2$. To avoid the velocity discontinuity that would occur at $P_1$, a constant acceleration is used to adapt the velocity variation of vector $X$ from the first segment to the second, resulting in a smooth transition across $P_1$.
 
 <img src="images/smooth_trajectory.png" alt="smooth_trajectory" width="400"/>
 
@@ -364,42 +327,43 @@ $$
 \mathbf{q}(t) = \mathbf{q}_1 \cdot  \mathbf{q} \left[\frac{-(\tau - t)^2}{4\tau T_1} \theta_1, \mathbf{n}_1 \right] \cdot \mathbf{q} \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, \mathbf{n}_2 \right]
 $$
 
-## Exercises
 
-Considering all the above, and the following values for $P_0, P_1, P_2$, the following exercises are requested:
+## 5. Exercises
+
+Considering all the above, and the following values for $\mathbf{P}_0, \mathbf{P}_1, \mathbf{P}_2$, the following exercises are requested:
 
 $$
-P_0 = \begin{bmatrix}
-1 & 0 & 0 & 0.374 \\
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & 0.63 \\
-0 & 0 & 0 & 1\\
+\mathbf{P}_0 = \begin{bmatrix}
+0 &  1 & 0 & -0.187\\
+1 & 0 &  0 &  1.038\\
+0 & 0 & -1 &  0.307\\
+0 &  0 &  0 & 1\\
 \end{bmatrix},
 \quad
-P_1 = \begin{bmatrix}
-0 & 0 & 1 & 0.3038 \\
-0 & 1 & 0 & 0 \\
--1 & 0 & 0 & 0.051 \\
-0 & 0 & 0 & 1\\
+\mathbf{P}_1 = \begin{bmatrix}
+0 &  1 & 0 &  0.150\\
+0 &  0 & -1 & 0.638\\
+1 & 0 & 0 &  0.607\\
+0 &  0 & 0 &  1\\
 \end{bmatrix},
 \quad
-P_2 = \begin{bmatrix}
-0 & -1 & 0 & 0 \\
-0 & 0 & 1 & 0.302 \\
--1 & 0 & 0 & 0.558 \\
-0 & 0 & 0 & 1 \\
+\mathbf{P}_2 = \begin{bmatrix}
+0 &  0 &  -1 & -0.950\\
+0 &  1 & 0 &  0.638\\
+1 &  0 & 0 &  0.607\\
+0 &  0 &  0 &  1\\
 \end{bmatrix}
 $$
 
-### 1. Exercise 1: Quaternion interpolation
+### 5.1. Exercise 1: Cartesian interpolation
 
 Define the quaternion interpolation function based on the Taylor method `[pr, qr]=qpinter(P1, P2, lambda)` that calculates the intermediate quaternion between $q_1$ (initial) and $q_2$ (final). The value $\lambda$ must satisfy $0\leq \lambda \leq 1$, so that `[p1, q1]=qpinter(P1, P2, 0)` and `[p2, q2]=qpinter(P1, P2, 1)`.
 
-### 2. Exercise 2: Smooth trajectory generation
+### 5.2. Exercise 2: Smooth trajectory generation
 
 Create a MATLAB function in the format `P=generate_smooth_path(P0, P1, P2, tau, T, t)` that calculates the transformation $P$ corresponding to the movement from $P_0$ to $P_2$ via $P_1$ smoothed by the Taylor method. The parameters $\tau$ and $T$ correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1, and $T$ indicates the time at which the location of the calculated path $P$ is reached.
 
-### 3. Graphical representation
+# 6. Graphical representation
 
 Plot the evolution of position and orientation (in ZYZ Euler angles) throughout the trajectory.
 
@@ -423,7 +387,7 @@ The expected result is illustrated in the following video and figures:
 
 *Figure 4. Orientation trajectories.*
 
-# 4. Extra (optional)
+# 7. Extra (optional)
 
 Create a node that implements the PD controller presented in Fig. 4 (stabilizing linear control block) of the lecture slides. Specify a desired joint position $\mathbf{q}_d$ (inside the joint workspace) and set $\dot{\mathbf{q}}_d = \boldsymbol{0}$, $\ddot{\mathbf{q}}_d = \boldsymbol{0}$. 
 
