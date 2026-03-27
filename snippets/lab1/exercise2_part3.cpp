@@ -1,52 +1,44 @@
-if (exercise_2)
+// Loop over the time range from -T to T with a step of sample_time and compute the interpolated Cartesian pose at each time step
+for (double t = -T; t <= T + 1e-9; t += sample_time)
 {
-    trajectory_msg.points.clear();
-    const double sample_time = 0.1;
-    int point_index = 0;
+    const auto [p_interp, q_interp] = ComputeNextCartesianPose(pose0, pose1, pose2, tau, T, t);
 
-    const std::string package_name = "cartesian_trajectory_planning";
-    const std::string package_share_dir =
-        ament_index_cpp::get_package_share_directory(package_name);
+    double roll = 0.0;
+    double pitch = 0.0;
+    double yaw = 0.0;
+    tf2::Matrix3x3(q_interp).getRPY(roll, pitch, yaw);
 
-    std::string output_base_dir = package_share_dir;
-    const std::string install_suffix =
-        "/install/" + package_name + "/share/" + package_name;
-    const std::size_t suffix_pos = package_share_dir.rfind(install_suffix);
-    if (suffix_pos != std::string::npos)
+    csv_file << t << ","
+             << p_interp.x() << "," << p_interp.y() << "," << p_interp.z() << ","
+             << roll << "," << pitch << "," << yaw << "\n";
+
+    const KDL::Frame desired_ee_pose(
+        KDL::Rotation::Quaternion(q_interp.x(), q_interp.y(), q_interp.z(), q_interp.w()),
+        KDL::Vector(p_interp.x(), p_interp.y(), p_interp.z()));
+
+    KDL::JntArray next_joint_positions(chain.getNrOfJoints());
+    const int ik_status = ik_pos_solver_->CartToJnt(joint_positions, desired_ee_pose, next_joint_positions);
+    if (ik_status < 0)
     {
-        const std::string workspace_root = package_share_dir.substr(0, suffix_pos);
-        const std::string source_candidate = workspace_root + "/src/" + package_name;
-
-        struct stat source_candidate_stat;
-        if (::stat(source_candidate.c_str(), &source_candidate_stat) == 0 &&
-            S_ISDIR(source_candidate_stat.st_mode))
-        {
-            output_base_dir = source_candidate;
-        }
+        std::fprintf(
+            stderr,
+            "IK failed at t=%.3f with error code %d. Skipping point.\n",
+            t, ik_status);
+        continue;
     }
 
-    const std::string output_dir = output_base_dir + "/experiment_data";
+    std::memcpy(
+        trajectory_point_msg.positions.data(), next_joint_positions.data.data(),
+        trajectory_point_msg.positions.size() * sizeof(double));
 
-    if (::mkdir(output_dir.c_str(), 0755) != 0 && errno != EEXIST)
-    {
-        std::fprintf(stderr, "Failed to create output directory '%s': %s.\n", output_dir.c_str(), std::strerror(errno));
-        return 1;
-    }
+    std::fill(trajectory_point_msg.velocities.begin(), trajectory_point_msg.velocities.end(), 0.0);
 
-    const auto now = std::chrono::system_clock::now();
-    const std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
-    std::tm local_tm;
-    localtime_r(&now_time_t, &local_tm);
+    const double elapsed = static_cast<double>(point_index + 1) * sample_time;
+    trajectory_point_msg.time_from_start.sec = static_cast<int32_t>(elapsed);
+    trajectory_point_msg.time_from_start.nanosec = static_cast<uint32_t>(
+        (elapsed - static_cast<double>(trajectory_point_msg.time_from_start.sec)) * 1e9);
 
-    std::ostringstream filename_builder;
-    filename_builder << "data_" << std::put_time(&local_tm, "%Y%m%d_%H%M%S") << ".csv";
-    const std::string output_csv = output_dir + "/" + filename_builder.str();
-    std::ofstream csv_file(output_csv, std::ios::out | std::ios::trunc);
-    if (!csv_file.is_open())
-    {
-        std::fprintf(stderr, "Failed to open CSV output file '%s'.\n", output_csv.c_str());
-        return 1;
-    }
-
-    csv_file << "t,X,Y,Z,roll,pitch,yaw\n";
-    csv_file << std::fixed << std::setprecision(9);
+    trajectory_msg.points.push_back(trajectory_point_msg);
+    joint_positions = next_joint_positions;
+    point_index++;
+}

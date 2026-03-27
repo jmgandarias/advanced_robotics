@@ -138,7 +138,7 @@ You can also try the circular trajectory if you want:
 ros2 launch cartesian_trajectory_planning send_circular_trajectory.launch.py 
 ```
 
-These trajectories are generated because the robot is under a joint velocity controller with an Inverse Kinematics solver (implemented using the[ros2 control package](https://control.ros.org/humble/index.html) - Described in [Example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html)).
+These trajectories are generated because the robot is under a joint velocity controller with an Inverse Kinematics solver (implemented using the [ros2 control package](https://control.ros.org/humble/index.html) - Described in [Example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html)).
 
 
 Snippet of the velocity-based circular trajecotry:
@@ -248,19 +248,19 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **`std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(const Eigen::Matrix4d &start_pose, const Eigen::Matrix4d &end_pose, double lambda)` :pencil:**: You must implement this function in the [Exercise 1](#1-exercise-1-quaternion-interpolation)
+- **`std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(const Eigen::Matrix4d &start_pose, const Eigen::Matrix4d &end_pose, double lambda)` :pencil:**: You must implement this function in the [Exercise 1](#51-exercise-1-cartesian-interpolation)
 
     ```cpp title="PoseInterpolation.cpp"
     --8<-- "snippets/lab1/PoseInterpolation.cpp"
     ```
 
-- **`std::pair<tf2::Vector3, tf2::Quaternion> ComputeNextCartesianPose(const Eigen::Matrix4d &pose_0, const Eigen::Matrix4d &pose_1, const Eigen::Matrix4d &pose_2, double tau, double T, double t)` :pencil:**: You must implement this function in the [Exercise 2](#2-exercise-2-smooth-trajectory-generation)
+- **`std::pair<tf2::Vector3, tf2::Quaternion> ComputeNextCartesianPose(const Eigen::Matrix4d &pose_0, const Eigen::Matrix4d &pose_1, const Eigen::Matrix4d &pose_2, double tau, double T, double t)` :pencil:**: You must implement this function in the [Exercise 2](#52-exercise-2-smooth-trajectory-generation)
 
     ```cpp title="ComputeNextCartesianPose.cpp"
     --8<-- "snippets/lab1/ComputeNextCartesianPose.cpp"
     ```
 
-- **`int main(int argc, char **argv)` - First part :lock:**: The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, created the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from the `config/poses.yaml`.
+- **`int main(int argc, char **argv)` - First part :lock:**: The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, creates the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from the `config/poses.yaml`.
 
     <details>
         <summary>Show int main(int argc, char **argv)</summary>
@@ -269,7 +269,7 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **Exercise 1: Cartesian interpolation :pencil:**: This block runs the first exercise and checks your interpolation function. It calls `PoseInterpolation` at the endpoints of two segments:
+- **Cartesian interpolation :pencil:**: This block runs the [Exercise 1](#51-exercise-1-cartesian-interpolation) code and checks your interpolation function. It calls `PoseInterpolation` at the endpoints of two segments:
     * pose0 -> pose1 with $\lambda = 0$ and $\lambda = 1$
     * pose1 -> pose2 with $\lambda = 0$ and $\lambda = 1$
     
@@ -286,24 +286,72 @@ This script performs the complete interpolation during all proposed segments. Le
     --8<-- "snippets/lab1/exercise1.cpp"
     ```
 
-- **Exercise 2: Smooth trajectory generation. Part 1 :pencil:**: This block is the first part of the code needed for the exercise two. It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the exercise 1. It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
+- **Smooth trajectory generation. Configuration :pencil:**: This block is the first part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the [Exercise 1](#51-exercise-1-cartesian-interpolation). It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
 
-    ```cpp title="exercise_part1.cpp"
-    --8<-- "snippets/lab1/exercise_part1.cpp"
+    ```cpp title="exercise2_part1.cpp"
+    --8<-- "snippets/lab1/exercise2_part1.cpp"
     ```
 
-- **Exercise 2: Smooth trajectory generation. Part 2 :lock:**: This block is the first part of the code needed for the exercise two. It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the exercise 1. It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
+- **Exercise 2: Smooth trajectory generation. Initialization :lock:**: This block is the second part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). If enabled, it initializes trajectory generation state:
 
-    ```cpp title="exercise_part1.cpp"
-    --8<-- "snippets/lab1/exercise_part1.cpp"
-    ```
+    * Clears previous points from trajectory_msg.
+    * Sets sampling period sample_time = 0.1 s.
+    * Initializes `point_index` for time stamps.
+    * It resolves where to save experiment data: a .csv file in the folder experiment_data.
 
+    This part is mostly preparation: configure run parameters, choose output location, and prepare a CSV logger before the actual trajectory loop starts.
+    Important detail: with `exercise_2 = false`, none of this executes.
+
+    <details>
+        <summary>Show Exercise 2, part 2</summary>
+        ```cpp title="exercise2_part2.cpp"
+        --8<-- "snippets/lab1/exercise2_part2.cpp"
+        ```
+    </details>
+
+- **Exercise 2: Smooth trajectory generation. Time loop :lock:**: This block is the third part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). This loop is the core trajectory sampler: for each time step, it computes one Cartesian pose, converts it to joint space, and appends one trajectory point.
+
+    * The loop iterates from $t= −T$ to $t=T$ in steps of `sample_time`.
+    * In every step, it calls `ComputeNextCartesianPose` (that you need to implement in [Exercise 2](#52-exercise-2-smooth-trajectory-generation)) to get the interpolated position `p_interp` and orientation quaternion `q_interp` at time t.
+    * It also logs the data for analysis: Converts quaternion to roll/pitch/yaw, and writes t, X, Y, Z, roll, pitch, yaw of every trajectory point to the CSV file.
+    * Packs `p_interp` and `q_interp` into a `KDL::Frame (desired_ee_pose)` for the end-effector. Then, it solves IK from current `joint_positions` to `desired_ee_pose`. If IK fails, prints an error and skips that time sample (continue).
+    * It copies solved joint angles into `trajectory_point_msg.positions` and pushes the point into `trajectory_msg.points`.
+    * Updates `joint_positions` with the solved values so next IK step starts near the previous one (improves continuity/convergence).
+
+    So in short: Cartesian path sample -> IK -> trajectory point, repeated until the whole ROS joint trajectory is built.
+
+    <details>
+        <summary>Show Exercise 2, part 3</summary>
+        ```cpp title="exercise2_part3.cpp"
+        --8<-- "snippets/lab1/exercise2_part3.cpp"
+        ```
+    </details>
+
+- **End of the program :lock:**: This is the publish-and-wait tail of the node.
+
+    * Safety check: If no trajectory points were generated, it prints an error and exits with code 1.
+    * Wait for a subscriber: It loops until something subscribes to `/r6bot_controller/joint_trajectory`. While waiting, it logs a message and sleeps 200 ms to avoid busy-waiting. 
+    * It sets the trajectory header stamp to “now + 0.2 s”. That small delay gives the controller a little lead time before execution starts.
+    * It logs how many points will be sent, then publishes the full trajectory message.
+    * It enters a loop while ROS is running. This keeps the process alive (instead of exiting immediately after publishing).
+
+    So this section ensures the message is valid to send, waits for a listener, publishes once with a future start time, and then keeps the node running.
+
+    <details>
+        <summary>Show End of the code</summary>
+        ```cpp title="end_of_code.cpp"
+        --8<-- "snippets/lab1/end_of_code.cpp"
+        ```
+    </details>
 
 ---
 
 # 4. Smooth Cartesian interpolation
 
-Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. Hence, we're performing a [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). Original paper [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is actually implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the code of the implementation ros2 humble [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)) but you're going to implement it by yourself in this lab. 
+Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. 
+
+!!! info
+    Hence, you're performing a [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). Original paper [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is actually implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the code of the implementation ros2 humble [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)) but you're going to implement it by yourself in this lab. 
 
 Also, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point. Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ with another from $P_1$ to $P_2$. To avoid the velocity discontinuity that would occur at $P_1$, a constant acceleration is used to adapt the velocity variation of vector $X$ from the first segment to the second, resulting in a smooth transition across $P_1$.
 
@@ -367,7 +415,7 @@ Create a MATLAB function in the format `P=generate_smooth_path(P0, P1, P2, tau, 
 
 Plot the evolution of position and orientation (in ZYZ Euler angles) throughout the trajectory.
 
-## Expected results
+## 7. Expected results
 
 The expected result is illustrated in the following video and figures:
 
