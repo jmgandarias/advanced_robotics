@@ -995,7 +995,7 @@ $$
 \mathbf{q}(t) = \mathbf{q}_1 \cdot  \mathbf{q} \left[\frac{-(\tau - t)^2}{4\tau T_1} \theta_1, \mathbf{n}_1 \right] \cdot \mathbf{q} \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, \mathbf{n}_2 \right]
 $$</p>
 <hr>
-<h2 id="2-setup-ros-2">2. Setup ROS 2<a class="headerlink" href="#2-setup-ros-2" title="Permanent link">¶</a></h2>
+<h1 id="2-setup-ros-2">2. Setup ROS 2<a class="headerlink" href="#2-setup-ros-2" title="Permanent link">¶</a></h1>
 <p>For this lab session we will use ROS 2 Humble.</p>
 <p>This is optional: You may want to install the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment_tools</a> as it will install ROS2 Humble, and some important packages and libraries that may be useful later in the course.
 In that repo, you'll find the required steps to install it.</p>
@@ -1025,7 +1025,7 @@ In that repo, you'll find the required steps to install it.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>update_uma_environment
 </code></pre></div>
 <hr>
-<h2 id="3-introduction">3. Introduction<a class="headerlink" href="#3-introduction" title="Permanent link">¶</a></h2>
+<h1 id="3-introduction">3. Introduction<a class="headerlink" href="#3-introduction" title="Permanent link">¶</a></h1>
 <p>This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the <a href="https://github.com/jmgandarias/cartesian_trajectory_planning">Cartesian Trajectory Planning</a> package.</p>
 <h2 id="31-install-the-dependencies">3.1. Install the dependencies<a class="headerlink" href="#31-install-the-dependencies" title="Permanent link">¶</a></h2>
 <p>First, you'll need to install a series of dependencies:</p>
@@ -1997,7 +1997,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 </li>
 </ul>
 <hr>
-<h2 id="5-exercises">5. Exercises<a class="headerlink" href="#5-exercises" title="Permanent link">¶</a></h2>
+<h1 id="5-exercises">5. Exercises<a class="headerlink" href="#5-exercises" title="Permanent link">¶</a></h1>
 <p>Considering all the above, and the following values for <span class="arithmatex">\(\mathbf{P}_0, \mathbf{P}_1, \mathbf{P}_2\)</span>, the following exercises are requested:</p>
 <div class="arithmatex">\[
 \mathbf{P}_0 = \begin{bmatrix}
@@ -2021,10 +2021,10 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 0 &amp;  0 &amp;  0 &amp;  1\\
 \end{bmatrix}
 \]</div>
-<h3 id="51-exercise-1-cartesian-interpolation">5.1. Exercise 1: Cartesian interpolation<a class="headerlink" href="#51-exercise-1-cartesian-interpolation" title="Permanent link">¶</a></h3>
+<h2 id="51-exercise-1-cartesian-interpolation">5.1. Exercise 1: Cartesian interpolation<a class="headerlink" href="#51-exercise-1-cartesian-interpolation" title="Permanent link">¶</a></h2>
 <p>Define the pose interpolation function based on the Taylor method in <code>std::pair&lt;tf2::Vector3, tf2::Quaternion&gt; PoseInterpolation(...)</code>. This function should perform a linear interpolation of the position and a slerp of the orientation between <code>start_pose</code> and <code>end_pose</code>. Hence, the function must return the intermediate position <code>p_interp</code> and intermediate quaternion <code>q_interp</code> based on <code>lambda</code> (knowing that <span class="arithmatex">\(\lambda \in [0, 1]\)</span>). </p>
 <p>With the code in the <a href="#cartesian-interpolation">caresian interpolation block</a> you can run the exercie 1 and verify whether your implementation of the Cartesian interpolation was correctly done.</p>
-<h4 id="511-expected-results">5.1.1. Expected results<a class="headerlink" href="#511-expected-results" title="Permanent link">¶</a></h4>
+<h3 id="511-expected-results">5.1.1. Expected results<a class="headerlink" href="#511-expected-results" title="Permanent link">¶</a></h3>
 <p>When launching the script, you should see the following results:</p>
 <p><img alt="resutls_Ex1" src="images/results_exercise1.png"></p>
 <p>You can check that the values <code>[p_inter, q_interp]</code> that the function <code>PoseInterpolation(pose0, pose1, lambda);</code> returns match the values of <span class="arithmatex">\(\mathbf{P}_0\)</span>, <span class="arithmatex">\(\mathbf{P}_1\)</span>, and <span class="arithmatex">\(\mathbf{P}_2\)</span> depending on which poses and lambda you're passing to the function.</p>
@@ -2044,7 +2044,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 <p><strong>Example with <code>q_0</code>:</strong></p>
 <p><img alt="rotation_converter_example" src="images/rotation_converter_example.png"></p>
 </div>
-<h3 id="52-exercise-2-smooth-trajectory-generation">5.2. Exercise 2: Smooth trajectory generation<a class="headerlink" href="#52-exercise-2-smooth-trajectory-generation" title="Permanent link">¶</a></h3>
+<h2 id="52-exercise-2-smooth-trajectory-generation">5.2. Exercise 2: Smooth trajectory generation<a class="headerlink" href="#52-exercise-2-smooth-trajectory-generation" title="Permanent link">¶</a></h2>
 <p>To carry out this exercise, first you need to set the boolean variable <code>exercise_2</code> in <code>int main()</code> to <code>true</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">exercise_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// Set to true to execute Exercise 2</span>
 </code></pre></div>
@@ -2056,7 +2056,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 <li>What happens when you change the value of <span class="arithmatex">\(T\)</span>? </li>
 </ul>
 </div>
-<h4 id="521-graphical-representation">5.2.1. Graphical representation<a class="headerlink" href="#521-graphical-representation" title="Permanent link">¶</a></h4>
+<h3 id="521-graphical-representation">5.2.1. Graphical representation<a class="headerlink" href="#521-graphical-representation" title="Permanent link">¶</a></h3>
 <p>Once the exercise is done, the data of the experiment is saved in the folder <code>YOUR_ROS_ws/src/cartesian_trajectory_planning/experiment_data</code>. </p>
 <p>The data is saved in a <code>.csv</code> file as a table with the following information: <code>t, X, Y, Z, roll, pitch, yaw</code>. This allow you to plot the position and orientation of the EE of the robot. The data is saved according to the following notation: <code>data_YearMonthDay_HourMinuteSecond</code> to be easy for you to find the experiment you want to plot.</p>
 <p>You can use the python script <code>plot_data.py</code> that is in that folder to easily plot the data. If you run:</p>
@@ -2066,7 +2066,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>python3<span class="w"> </span>plot_data.py<span class="w"> </span>NAME_OF_THE_FILE.csv
 </code></pre></div>
 <p>Alternatively, you can load the <code>.csv</code> with any other software that allows you to manipulate and plot data, such as MATLAB.</p>
-<h4 id="522-expected-results">5.2.2. Expected results<a class="headerlink" href="#522-expected-results" title="Permanent link">¶</a></h4>
+<h3 id="522-expected-results">5.2.2. Expected results<a class="headerlink" href="#522-expected-results" title="Permanent link">¶</a></h3>
 <p>The expected result of the complete is illustrated in the following video and figures:</p>
 <p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/result.mp4" type="video/mp4"></source></video></div></p>
 <p><em>Video 1. Expected result of the lab session.</em></p>
@@ -2098,7 +2098,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 1, 2026 15:56:58 UTC"><span class="timeago" datetime="2026-04-01T15:56:58+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 1, 2026 15:56:58 UTC">2026-04-01</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 1, 2026 16:10:23 UTC"><span class="timeago" datetime="2026-04-01T16:10:23+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 1, 2026 16:10:23 UTC">2026-04-01</span>
   </span>
 
     
