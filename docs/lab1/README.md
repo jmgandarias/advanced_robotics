@@ -1,7 +1,38 @@
 # Lab 1: Cartesian trajectory planning
 
 
-## 1. Setup ROS 2
+# 1. Smooth Cartesian interpolation
+
+Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. 
+
+!!! info
+    If you interpolate the orientation using quaternions, you're performing a [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). Original paper [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is actually implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the code of the implementation ros2 humble [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)) but you're going to implement it by yourself in this lab. 
+
+Also, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point. Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ (first segment) with another from $P_1$ to $P_2$ (second segment). To avoid the velocity discontinuity that would occur at $P_1$, a constant acceleration is used to linearly adapt the velocity variation from the first segment to the second, resulting in a smooth transition across $P_1$.
+
+<img src="images/smooth_trajectory.png" alt="smooth_trajectory" width="400"/>
+
+*Figure 1. Diagram of the variation of position and velocity in the movement from $P_0$ to $P_2$ via $P_1$.*
+
+This way, $-\tau$ units of time before reaching $P_1$ (time 0), the velocity will be linearly changed over time from $\Delta P_1/T_1$ to $\Delta P_2/T_2$, to accommodate the velocity $\tau$ units of time after passing $P_1$. Thus, the problem is defined as the calculation of a quadratic function $\mathbf{p}(t)$ that starts at point $P_A$ and ends at $P_B$ (start and end points of the smoothing) defined in the time range $[-\tau, \tau]$.
+
+Applying the boundary conditions at both ends of the segment and defining the acceleration in the area, the position is obtained as:
+
+<a id="equation-1"></a>
+$$
+\mathbf{p}(t) = \mathbf{p}_1 - \frac{(\tau - t)^2}{4\tau T_1} \Delta \mathbf{p}_1 + \frac{(\tau + t)^2}{4\tau T_2} \Delta \mathbf{p}_2
+$$
+
+And the orientation as:
+
+<a id="equation-2"></a>
+$$
+\mathbf{q}(t) = \mathbf{q}_1 \cdot  \mathbf{q} \left[\frac{-(\tau - t)^2}{4\tau T_1} \theta_1, \mathbf{n}_1 \right] \cdot \mathbf{q} \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, \mathbf{n}_2 \right]
+$$
+
+---
+
+## 2. Setup ROS 2
 
 For this lab session we will use ROS 2 Humble.
 
@@ -14,7 +45,7 @@ A video of the installation, including the troubleshooting (if you don't find th
 
 ![type:video](videos/installation_error.mp4)
 
-### 1.1. Testing the UMA environment
+### 2.1. Testing the UMA environment
 
 If you have installed the UMA environment, you should see that everything is working correctly.
 
@@ -53,12 +84,12 @@ update_uma_environment
 
 ---
 
-## 2. Introduction
+## 3. Introduction
 
 This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the [Cartesian Trajectory Planning](https://github.com/jmgandarias/cartesian_trajectory_planning) package.
 
 
-## 2.1. Install the dependencies
+## 3.1. Install the dependencies
 
 First, you'll need to install a series of dependencies:
 
@@ -76,7 +107,7 @@ sudo apt update
 sudo apt upgrade
 ```
 
-## 2.2. Clone the package
+## 3.2. Clone the package
 
 Open a new terminal, go to the `src` folder in yout worskpace and clone the repo
 
@@ -90,7 +121,7 @@ You should see something like this (don't worry about the warnings, this is beca
 
 ![first_compilation.png](images/first_compilation.png)
 
-## 2.3. Package content
+## 3.3. Package content
 
 It consists of the following:
 
@@ -107,7 +138,7 @@ It consists of the following:
 
 The content of this package is inspired by and built on the [ROS2 control example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html).
 
-## 2.4. Test the demo
+## 3.4. Test the demo
 
 In one terminal, run:
 
@@ -183,9 +214,9 @@ However, in this lab you'll implement a Cartesian interpolation using the robot 
 
 ---
 
-# 3. Understanding the code
+# 4. Understanding the code
 
-## 3.1. send_trajectory.cpp
+## 4.1. send_trajectory.cpp
 
 This script performs the complete interpolation during all proposed segments. Let's see the code (each part of the code is explained in detail below):
 
@@ -200,9 +231,10 @@ This script performs the complete interpolation during all proposed segments. Le
     This repo is under development and keeps improving. To check the latest version, visit [the github repo](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/reference_generator/send_trajectory.cpp).
 
 
-## 3.2. Code parts explained
+## 4.2. Code parts explained
 
-- **`Eigen::Matrix4d ParsePoseMatrix(const YAML::Node &root, const std::string &key)`:lock:**: This function parses a 4x4 matrix from a YAML file given a specific key word. It's used in the code to parse the pose matrices defined in [`config/poses.yaml`](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml). 
+- ### `Eigen::Matrix4d ParsePoseMatrix(const YAML::Node &root, const std::string &key)`:lock:: 
+    This function parses a 4x4 matrix from a YAML file given a specific key word. It's used in the code to parse the pose matrices defined in [`config/poses.yaml`](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml). 
 
     <details>
         <summary>Show ParsePoseMatrix</summary>
@@ -218,7 +250,9 @@ This script performs the complete interpolation during all proposed segments. Le
     !!! info
         In the course you'll use [`YAML files`](https://yaml.org/).
 
-- **`tf2::Quaternion MuliplyQuaternions(const tf2::Quaternion &q1, const tf2::Quaternion &q2)` :lock:**: This function multiplies two quaternions q1 and q2 and returns the resulting quaternion. The multiplication is defined as: $q_{result} = q_1 * q_2$, where $q_1$ and $q_2$ are represented as $(x, y, z, w)$ and the product is performed using the [Hamilton product](https://en.wikipedia.org/wiki/Quaternion).
+- ### `tf2::Quaternion MuliplyQuaternions(const tf2::Quaternion &q1, const tf2::Quaternion &q2)` :lock:: 
+
+    This function multiplies two quaternions q1 and q2 and returns the resulting quaternion. The multiplication is defined as: $q_{result} = q_1 * q_2$, where $q_1$ and $q_2$ are represented as $(x, y, z, w)$ and the product is performed using the [Hamilton product](https://en.wikipedia.org/wiki/Quaternion).
 
     <details>
         <summary>Show MuliplyQuaternions</summary>
@@ -230,7 +264,9 @@ This script performs the complete interpolation during all proposed segments. Le
     !!! info
         In the course you'll use the [`tf2`](https://docs.ros.org/en/humble/Tutorials/Intermediate/Tf2/Tf2-Main.html) package to work with coordinate frames and take advantage of useful classes and methods. In this part of the code you are using the class [`Quaternion`](https://docs.ros2.org/foxy/api/tf2/classtf2_1_1Quaternion.html).
 
-- **`tf2::Quaternion InverseQuaternion(const tf2::Quaternion &q)` :lock:**: This function computes the inverse of a quaternion $q$ and returns the resulting quaternion.
+- ### `tf2::Quaternion InverseQuaternion(const tf2::Quaternion &q)` :lock:: 
+    
+    This function computes the inverse of a quaternion $q$ and returns the resulting quaternion.
 
     <details>
         <summary>Show InverseQuaternion</summary>
@@ -239,7 +275,9 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **`tf2::Quaternion rot2Quat(const Eigen::Matrix3d &R, int m = 1)` :lock:**: This function converts a rotation matrix R to a quaternion representation.
+- ### `tf2::Quaternion rot2Quat(const Eigen::Matrix3d &R, int m = 1)` :lock:: 
+
+    This function converts a rotation matrix R to a quaternion representation.
 
     <details>
         <summary>Show rot2Quat</summary>
@@ -248,19 +286,42 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **`std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(const Eigen::Matrix4d &start_pose, const Eigen::Matrix4d &end_pose, double lambda)` :pencil:**: You must implement this function in the [Exercise 1](#51-exercise-1-cartesian-interpolation)
+- ### `std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(const Eigen::Matrix4d &start_pose, const Eigen::Matrix4d &end_pose, double lambda)` :pencil:: 
+
+    You must implement this function in the [Exercise 1](#51-exercise-1-cartesian-interpolation).
+    
+    This function interpolates between two poses (`start_pose` and `end_pose`) based on the interpolation parameter `lambda` $(\lambda \in [0, 1])$. It returns a pair containing the interpolated position (`tf2::Vector3`) and orientation (`tf2::Quaternion`).
 
     ```cpp title="PoseInterpolation.cpp"
     --8<-- "snippets/lab1/PoseInterpolation.cpp"
     ```
 
-- **`std::pair<tf2::Vector3, tf2::Quaternion> ComputeNextCartesianPose(const Eigen::Matrix4d &pose_0, const Eigen::Matrix4d &pose_1, const Eigen::Matrix4d &pose_2, double tau, double T, double t)` :pencil:**: You must implement this function in the [Exercise 2](#52-exercise-2-smooth-trajectory-generation)
+    !!! tip 
+        When computing the relative quaternion $\mathbf{q}_{C}$ between two orientations $\mathbf{q}_A$ and $\mathbf{q}_B$, you should check that is less than $180 ^o$ to ensure that you're taking the shortest path:
+
+        $$
+        \mathbf{q}_{C} = \mathbf{q}_A^{-1} * \mathbf{q}_B
+        $$
+
+        ```cpp
+        // Check that q_relative is less than 180 degrees to ensure the shortest path is taken
+        if (q_relative.w() < 0)
+        {
+            q_relative = tf2::Quaternion(-q_relative.x(), -q_relative.y(), -q_relative.z(), -q_relative.w());
+        }
+        ```
+
+- ### `std::pair<tf2::Vector3, tf2::Quaternion> ComputeNextCartesianPose(const Eigen::Matrix4d &pose_0, const Eigen::Matrix4d &pose_1, const Eigen::Matrix4d &pose_2, double tau, double T, double t)` :pencil:: 
+
+    You must implement this function in the [Exercise 2](#52-exercise-2-smooth-trajectory-generation)
 
     ```cpp title="ComputeNextCartesianPose.cpp"
     --8<-- "snippets/lab1/ComputeNextCartesianPose.cpp"
     ```
 
-- **`int main(int argc, char **argv)` - First part :lock:**: The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, creates the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from the `config/poses.yaml`.
+- ### `int main(int argc, char **argv)` - First part :lock:: 
+
+    The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, creates the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from the `config/poses.yaml`.
 
     <details>
         <summary>Show int main(int argc, char **argv)</summary>
@@ -269,7 +330,9 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **Cartesian interpolation :pencil:**: This block runs the [Exercise 1](#51-exercise-1-cartesian-interpolation) code and checks your interpolation function. It calls `PoseInterpolation` at the endpoints of two segments:
+- ### Cartesian interpolation :pencil:: 
+
+    This block runs the [Exercise 1](#51-exercise-1-cartesian-interpolation) code and checks your interpolation function. It calls `PoseInterpolation` at the endpoints of two segments:
     * pose0 -> pose1 with $\lambda = 0$ and $\lambda = 1$
     * pose1 -> pose2 with $\lambda = 0$ and $\lambda = 1$
     
@@ -286,13 +349,17 @@ This script performs the complete interpolation during all proposed segments. Le
     --8<-- "snippets/lab1/exercise1.cpp"
     ```
 
-- **Smooth trajectory generation. Configuration :pencil:**: This block is the first part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the [Exercise 1](#51-exercise-1-cartesian-interpolation). It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
+- ### Smooth trajectory generation. Configuration :pencil:: 
+
+    This block is the first part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the [Exercise 1](#51-exercise-1-cartesian-interpolation). It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
 
     ```cpp title="exercise2_part1.cpp"
     --8<-- "snippets/lab1/exercise2_part1.cpp"
     ```
 
-- **Exercise 2: Smooth trajectory generation. Initialization :lock:**: This block is the second part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). If enabled, it initializes trajectory generation state:
+- ### Exercise 2: Smooth trajectory generation. Initialization :lock:: 
+
+    This block is the second part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). If enabled, it initializes trajectory generation state:
 
     * Clears previous points from trajectory_msg.
     * Sets sampling period sample_time = 0.1 s.
@@ -309,7 +376,9 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **Exercise 2: Smooth trajectory generation. Time loop :lock:**: This block is the third part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). This loop is the core trajectory sampler: for each time step, it computes one Cartesian pose, converts it to joint space, and appends one trajectory point.
+- ### Exercise 2: Smooth trajectory generation. Time loop :lock:: 
+
+    This block is the third part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). This loop is the core trajectory sampler: for each time step, it computes one Cartesian pose, converts it to joint space, and appends one trajectory point.
 
     * The loop iterates from $t= −T$ to $t=T$ in steps of `sample_time`.
     * In every step, it calls `ComputeNextCartesianPose` (that you need to implement in [Exercise 2](#52-exercise-2-smooth-trajectory-generation)) to get the interpolated position `p_interp` and orientation quaternion `q_interp` at time t.
@@ -327,7 +396,9 @@ This script performs the complete interpolation during all proposed segments. Le
         ```
     </details>
 
-- **End of the program :lock:**: This is the publish-and-wait tail of the node.
+- ### End of the program :lock:: 
+
+    This is the publish-and-wait tail of the node.
 
     * Safety check: If no trajectory points were generated, it prints an error and exits with code 1.
     * Wait for a subscriber: It loops until something subscribes to `/r6bot_controller/joint_trajectory`. While waiting, it logs a message and sleeps 200 ms to avoid busy-waiting. 
@@ -346,36 +417,6 @@ This script performs the complete interpolation during all proposed segments. Le
 
 ---
 
-# 4. Smooth Cartesian interpolation
-
-Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. 
-
-!!! info
-    Hence, you're performing a [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). Original paper [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is actually implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the code of the implementation ros2 humble [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)) but you're going to implement it by yourself in this lab. 
-
-Also, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point. Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ with another from $P_1$ to $P_2$. To avoid the velocity discontinuity that would occur at $P_1$, a constant acceleration is used to adapt the velocity variation of vector $X$ from the first segment to the second, resulting in a smooth transition across $P_1$.
-
-<img src="images/smooth_trajectory.png" alt="smooth_trajectory" width="400"/>
-
-*Figure 1. Diagram of the variation of position and velocity in the movement from $P_0$ to $P_2$ via $P_1$.*
-
-This way, $-\tau$ units of time before reaching $P_1$ (time 0), the velocity will be linearly changed from $\Delta P_1/T_1$ to $\Delta P_2/T_2$, to accommodate the velocity $\tau$ units of time after passing $P_1$. Thus, the problem is defined as the calculation of a quadratic function $X(t)$ that starts at point $P_A$ and ends at $P_B$ (start and end points of the smoothing) defined in the time range $[-\tau, \tau]$.
-
-Applying the boundary conditions at both ends of the segment and defining the acceleration in the area, the position is obtained as:
-
-<a id="equation-1"></a>
-$$
-\mathbf{p}(t) = \mathbf{p}_1 - \frac{(\tau - t)^2}{4\tau T_1} \Delta \mathbf{p}_1 + \frac{(\tau + t)^2}{4\tau T_2} \Delta \mathbf{p}_2
-$$
-
-And the orientation as:
-
-<a id="equation-2"></a>
-$$
-\mathbf{q}(t) = \mathbf{q}_1 \cdot  \mathbf{q} \left[\frac{-(\tau - t)^2}{4\tau T_1} \theta_1, \mathbf{n}_1 \right] \cdot \mathbf{q} \left[ \frac{(\tau + t)^2}{4\tau T_2} \theta_2, \mathbf{n}_2 \right]
-$$
-
-
 ## 5. Exercises
 
 Considering all the above, and the following values for $\mathbf{P}_0, \mathbf{P}_1, \mathbf{P}_2$, the following exercises are requested:
@@ -389,9 +430,9 @@ $$
 \end{bmatrix},
 \quad
 \mathbf{P}_1 = \begin{bmatrix}
-0 &  1 & 0 &  0.150\\
-0 &  0 & -1 & 0.638\\
-1 & 0 & 0 &  0.607\\
+0 &  0 & -1 &  0.150\\
+-1 &  0 & 0 & 0.638\\
+0 & 1 & 0 &  0.607\\
 0 &  0 & 0 &  1\\
 \end{bmatrix},
 \quad
@@ -405,40 +446,92 @@ $$
 
 ### 5.1. Exercise 1: Cartesian interpolation
 
-Define the quaternion interpolation function based on the Taylor method `[pr, qr]=qpinter(P1, P2, lambda)` that calculates the intermediate quaternion between $q_1$ (initial) and $q_2$ (final). The value $\lambda$ must satisfy $0\leq \lambda \leq 1$, so that `[p1, q1]=qpinter(P1, P2, 0)` and `[p2, q2]=qpinter(P1, P2, 1)`.
+Define the pose interpolation function based on the Taylor method in `std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(...)`. This function should perform a linear interpolation of the position and a slerp of the orientation between `start_pose` and `end_pose`. Hence, the function must return the intermediate position `p_interp` and intermediate quaternion `q_interp` based on `lambda` (knowing that $\lambda \in [0, 1]$). 
+
+With the code in the [caresian interpolation block](#cartesian-interpolation) you can run the exercie 1 and verify whether your implementation of the Cartesian interpolation was correctly done.
+
+#### 5.1.1. Expected results
+
+When launching the script, you should see the following results:
+
+![resutls_Ex1](images/results_exercise1.png)
+
+You can check that the values `[p_inter, q_interp]` that the function `PoseInterpolation(pose0, pose1, lambda);` returns match the values of $\mathbf{P}_0$, $\mathbf{P}_1$, and $\mathbf{P}_2$ depending on which poses and lambda you're passing to the function.
+
+Hence, if implemented correctly, you should have get the following:
+
+```
+[send_trajectory-1] p0: -0.187000, 1.038000, 0.307000
+[send_trajectory-1] q0: 0.707107, 0.707107, 0.000000, 0.000000
+[send_trajectory-1] p1: 0.150000, 0.638000, 0.607000
+[send_trajectory-1] q1: 0.500000, -0.500000, -0.500000, 0.500000
+[send_trajectory-1] p2: 0.150000, 0.638000, 0.607000
+[send_trajectory-1] q2: 0.500000, -0.500000, -0.500000, 0.500000
+[send_trajectory-1] p3: -0.950000, 0.638000, 0.607000
+[send_trajectory-1] q3: 0.000000, -0.707107, 0.000000, 0.707107
+
+```
+
+!!! tip
+    You can easily check the quaternion-rotation match using the [3D Rotation Converter](https://www.andre-gaschler.com/rotationconverter/)
+
+    **Example with `q_0`:**
+
+    ![rotation_converter_example](images/rotation_converter_example.png)
+
 
 ### 5.2. Exercise 2: Smooth trajectory generation
 
-Create a MATLAB function in the format `P=generate_smooth_path(P0, P1, P2, tau, T, t)` that calculates the transformation $P$ corresponding to the movement from $P_0$ to $P_2$ via $P_1$ smoothed by the Taylor method. The parameters $\tau$ and $T$ correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1, and $T$ indicates the time at which the location of the calculated path $P$ is reached.
+To carry out this exercise, first you need to set the boolean variable `exercise_2` in `int main()` to `true`:
 
-# 6. Graphical representation
+```cpp
+bool exercise_2 = true; // Set to true to execute Exercise 2
+```
 
-Plot the evolution of position and orientation (in ZYZ Euler angles) throughout the trajectory.
+You must also define the [ComputeNextCartesianPose](#stdpairtf2vector3-tf2quaternion-computenextcartesianposeconst-eigenmatrix4d-pose_0-const-eigenmatrix4d-pose_1-const-eigenmatrix4d-pose_2-double-tau-double-t-double-t) function. This function is called inside the [trajectory loop](#exercise-2-smooth-trajectory-generation-time-loop) and returns the  corresponding pose (in the form of position – `tf2::Vector3 p_interp` and orientation – `tf2::Quaternion q_interp`) to the movement from $P_0$ (`pose0`) to $P_2$ (`pose2`) via $P_1$ (`pose1`) smoothed by the Taylor method at each timestep `t`. The parameters $\tau$ and $T$ correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1.
 
-## 7. Expected results
+!!! question
+    - What happens when you change the value of $\tau$? 
+    - What happens when you change the value of $T$? 
 
-The expected result is illustrated in the following video and figures:
+
+#### 5.2.1. Graphical representation
+
+Once the exercise is done, the data of the experiment is saved in the folder `YOUR_ROS_ws/src/cartesian_trajectory_planning/experiment_data`. 
+
+The data is saved in a `.csv` file as a table with the following information: `t, X, Y, Z, roll, pitch, yaw`. This allow you to plot the position and orientation of the EE of the robot. The data is saved according to the following notation: `data_YearMonthDay_HourMinuteSecond` to be easy for you to find the experiment you want to plot.
+
+You can use the python script `plot_data.py` that is in that folder to easily plot the data. If you run:
+
+```bash
+python3 plot_data.py
+```
+
+You'll plot the last experiment saved. Id you want to specify the experiemnt you want to plot, you can use:
+
+```bash
+python3 plot_data.py NAME_OF_THE_FILE.csv
+```
+
+Alternatively, you can load the `.csv` with any other software that allows you to manipulate and plot data, such as MATLAB.
+
+
+#### 5.2.2. Expected results
+
+The expected result of the complete is illustrated in the following video and figures:
 
 ![type:video](./videos/result.mp4)
 
 *Video 1. Expected result of the lab session.*
 
-<img src="images/final_config.png" alt="/final_configuration" width="400"/>
+<img src="images/position.svg" alt="images/position" width="600"/>
 
-*Figure 2. Final configuration and smooth path.*
+*Figure 2. Position trajectories.*
 
-<img src="images/position.png" alt="images/position" width="600"/>
+<img src="images/orientation.svg" alt="images/orientation" width="600"/>
 
-*Figure 3. Position trajectories.*
+*Figure 3. Orientation trajectories.*
 
-<img src="images/orientation.png" alt="images/orientation" width="600"/>
+# 6. Extra (optional)
 
-*Figure 4. Orientation trajectories.*
-
-# 7. Extra (optional)
-
-Create a node that implements the PD controller presented in Fig. 4 (stabilizing linear control block) of the lecture slides. Specify a desired joint position $\mathbf{q}_d$ (inside the joint workspace) and set $\dot{\mathbf{q}}_d = \boldsymbol{0}$, $\ddot{\mathbf{q}}_d = \boldsymbol{0}$. 
-
-This node must subscribe to the current joint state topic `/joint_states` to get the current joint positions ($\mathbf{q}$) and velocities ($\dot{\mathbf{q}}$); and it must then publish the desired joint accelerations ($\ddot{\mathbf{q}}_d$) in the topic `/desired_joint_accelerations` to which the dynamics cancellation node will subscribe.
-
-Select and report the values chosen for $\mathbf{K}_P$ and $\mathbf{K}_D$. You can use matlab to simulate the expected dynamic behavior of the overall system. 
+In the lab session we
