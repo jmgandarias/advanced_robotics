@@ -32,7 +32,7 @@ $$
 
 ---
 
-## 2. Setup ROS 2
+# 2. Setup ROS 2
 
 For this lab session we will use ROS 2 Humble.
 
@@ -84,7 +84,7 @@ update_uma_environment
 
 ---
 
-## 3. Introduction
+# 3. Introduction
 
 This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the [Cartesian Trajectory Planning](https://github.com/jmgandarias/cartesian_trajectory_planning) package.
 
@@ -417,7 +417,7 @@ This script performs the complete interpolation during all proposed segments. Le
 
 ---
 
-## 5. Exercises
+# 5. Exercises
 
 Considering all the above, and the following values for $\mathbf{P}_0, \mathbf{P}_1, \mathbf{P}_2$, the following exercises are requested:
 
@@ -444,13 +444,13 @@ $$
 \end{bmatrix}
 $$
 
-### 5.1. Exercise 1: Cartesian interpolation
+## 5.1. Exercise 1: Cartesian interpolation
 
 Define the pose interpolation function based on the Taylor method in `std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(...)`. This function should perform a linear interpolation of the position and a slerp of the orientation between `start_pose` and `end_pose`. Hence, the function must return the intermediate position `p_interp` and intermediate quaternion `q_interp` based on `lambda` (knowing that $\lambda \in [0, 1]$). 
 
 With the code in the [caresian interpolation block](#cartesian-interpolation) you can run the exercie 1 and verify whether your implementation of the Cartesian interpolation was correctly done.
 
-#### 5.1.1. Expected results
+### 5.1.1. Expected results
 
 When launching the script, you should see the following results:
 
@@ -480,7 +480,7 @@ Hence, if implemented correctly, you should have get the following:
     ![rotation_converter_example](images/rotation_converter_example.png)
 
 
-### 5.2. Exercise 2: Smooth trajectory generation
+## 5.2. Exercise 2: Smooth trajectory generation
 
 To carry out this exercise, first you need to set the boolean variable `exercise_2` in `int main()` to `true`:
 
@@ -495,7 +495,7 @@ You must also define the [ComputeNextCartesianPose](#stdpairtf2vector3-tf2quater
     - What happens when you change the value of $T$? 
 
 
-#### 5.2.1. Graphical representation
+### 5.2.1. Graphical representation
 
 Once the exercise is done, the data of the experiment is saved in the folder `YOUR_ROS_ws/src/cartesian_trajectory_planning/experiment_data`. 
 
@@ -516,7 +516,7 @@ python3 plot_data.py NAME_OF_THE_FILE.csv
 Alternatively, you can load the `.csv` with any other software that allows you to manipulate and plot data, such as MATLAB.
 
 
-#### 5.2.2. Expected results
+### 5.2.2. Expected results
 
 The expected result of the complete is illustrated in the following video and figures:
 
