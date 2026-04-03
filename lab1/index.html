@@ -975,10 +975,10 @@
 
 <div><h1 id="lab-1-cartesian-trajectory-planning">Lab 1: Cartesian trajectory planning<a class="headerlink" href="#lab-1-cartesian-trajectory-planning" title="Permanent link">¶</a></h1>
 <h1 id="1-smooth-cartesian-interpolation">1. Smooth Cartesian interpolation<a class="headerlink" href="#1-smooth-cartesian-interpolation" title="Permanent link">¶</a></h1>
-<p>Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. </p>
+<p>Cartesian interpolation is characterized by a linear variation of position and orientation. While position can be interpolated linearly in Cartesian space, orientation interpolation depends on how orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>If you interpolate the orientation using quaternions, you're performing a <a href="https://en.wikipedia.org/wiki/Spherical_linear_interpolation">Spherical Linear Interpolation (slerp)</a>. Original paper <a href="https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf">here</a>. The slerp method is actually implemented in <a href="https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html">tf2</a> (you can check the code of the implementation ros2 humble <a href="https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp">here</a>) but you're going to implement it by yourself in this lab. </p>
+<p>If you interpolate orientation using quaternions, you're performing <a href="https://en.wikipedia.org/wiki/Spherical_linear_interpolation">Spherical Linear Interpolation (slerp)</a>. The original paper is available <a href="https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf">here</a>. The slerp method is already implemented in <a href="https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html">tf2</a> (you can check the ROS 2 Humble implementation <a href="https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp">here</a>), but in this lab you will implement it yourself.</p>
 </div>
 <p>Also, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point. Figure 1 shows the described situation, using the example of concatenating a displacement from location <span class="arithmatex">\(P_0\)</span> to <span class="arithmatex">\(P_1\)</span> (first segment) with another from <span class="arithmatex">\(P_1\)</span> to <span class="arithmatex">\(P_2\)</span> (second segment). To avoid the velocity discontinuity that would occur at <span class="arithmatex">\(P_1\)</span>, a constant acceleration is used to linearly adapt the velocity variation from the first segment to the second, resulting in a smooth transition across <span class="arithmatex">\(P_1\)</span>.</p>
 <p><img src="images/smooth_trajectory.png" alt="smooth_trajectory" width="400"></p>
@@ -997,21 +997,21 @@ $$</p>
 <hr>
 <h1 id="2-setup-ros-2">2. Setup ROS 2<a class="headerlink" href="#2-setup-ros-2" title="Permanent link">¶</a></h1>
 <p>For this lab session we will use ROS 2 Humble.</p>
-<p>This is optional: You may want to install the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment_tools</a> as it will install ROS2 Humble, and some important packages and libraries that may be useful later in the course.
+<p>This is optional: you may want to install <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment_tools</a>, which installs ROS 2 Humble and some important packages and libraries that may be useful later in the course.
 In that repo, you'll find the required steps to install it.</p>
 <p>If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.</p>
 <p>A video of the installation, including the troubleshooting (if you don't find the errors, you don't need to run that part!) is shown below. Note that the video shows the installation with WSL. If you're using a native Ubuntu 22.04, you can skip the first instruction.</p>
 <p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/installation_error.mp4" type="video/mp4"></source></video></div></p>
 <h3 id="21-testing-the-uma-environment">2.1. Testing the UMA environment<a class="headerlink" href="#21-testing-the-uma-environment" title="Permanent link">¶</a></h3>
 <p>If you have installed the UMA environment, you should see that everything is working correctly.</p>
-<p>Try the following;</p>
+<p>Try the following:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>create_catkin_ws
 </code></pre></div>
-<p>Put the name <code>advanced_robotics_ws</code> to your workspace.</p>
+<p>Use <code>advanced_robotics_ws</code> as your workspace name.</p>
 <p>If, after installing it, you go to your catkin workspace folder and when you run this alias</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cb
 </code></pre></div>
-<p>you find an error like <code>'ROS colcon build is not installed'</code>, then you'll need to uninstall ros and install the environment again:</p>
+<p>you find an error like <code>'ROS colcon build is not installed'</code>, then you'll need to uninstall ROS and install the environment again:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>remove<span class="w"> </span>~nros-humble-*<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>autoremove
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>rm<span class="w"> </span>/etc/apt/sources.list.d/ros2.list
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
@@ -1021,12 +1021,12 @@ In that repo, you'll find the required steps to install it.</p>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nb">cd</span><span class="w"> </span>~/uma_environment_tools/scripts
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>./install_uma_environment.sh
 </code></pre></div>
-<p>Then you'll ned to run</p>
+<p>Then you'll need to run</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>update_uma_environment
 </code></pre></div>
 <hr>
 <h1 id="3-introduction">3. Introduction<a class="headerlink" href="#3-introduction" title="Permanent link">¶</a></h1>
-<p>This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the <a href="https://github.com/jmgandarias/cartesian_trajectory_planning">Cartesian Trajectory Planning</a> package.</p>
+<p>This exercise illustrates Cartesian trajectory generation using one of the methodologies studied in this course. For this purpose, you'll use the <a href="https://github.com/jmgandarias/cartesian_trajectory_planning">Cartesian Trajectory Planning</a> package.</p>
 <h2 id="31-install-the-dependencies">3.1. Install the dependencies<a class="headerlink" href="#31-install-the-dependencies" title="Permanent link">¶</a></h2>
 <p>First, you'll need to install a series of dependencies:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-xacro
@@ -1034,16 +1034,16 @@ In that repo, you'll find the required steps to install it.</p>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>sudo<span class="w">  </span>apt<span class="w"> </span>install<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-control<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-ros2-controllers<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-gazebo-ros2-control
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-joint-state-publisher-gui<span class="w"> </span>ros-<span class="si">${</span><span class="nv">ROS_DISTRO</span><span class="si">}</span>-rviz2
 </code></pre></div>
-<p>If you find an error trying to install these dependencies, most probably you'll need to update the packages repositories and upgrade them to the last version. Once upgraded, you can install the dependecies using the commands above.</p>
+<p>If you find an error while trying to install these dependencies, you will likely need to update the package repositories and upgrade them to the latest version. Once upgraded, you can install the dependencies using the commands above.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>upgrade
 </code></pre></div>
 <h2 id="32-clone-the-package">3.2. Clone the package<a class="headerlink" href="#32-clone-the-package" title="Permanent link">¶</a></h2>
-<p>Open a new terminal, go to the <code>src</code> folder in yout worskpace and clone the repo</p>
+<p>Open a new terminal, go to the <code>src</code> folder in your workspace, and clone the repository:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/jmgandarias/cartesian_trajectory_planning
 </code></pre></div>
-<p>Once this is done, complie the workspace (if you have installed the UMA environment you can just use <code>cb</code>).</p>
-<p>You should see something like this (don't worry about the warnings, this is because the code is incompleted - you'll need to complete it in this lab session)</p>
+<p>Once this is done, compile the workspace (if you have installed the UMA environment, you can just use <code>cb</code>).</p>
+<p>You should see something like this (don't worry about the warnings; they appear because the code is incomplete, and you'll complete it in this lab session).</p>
 <p><img alt="first_compilation.png" src="images/first_compilation.png"></p>
 <h2 id="33-package-content">3.3. Package content<a class="headerlink" href="#33-package-content" title="Permanent link">¶</a></h2>
 <p>It consists of the following:</p>
@@ -1056,7 +1056,7 @@ In that repo, you'll find the required steps to install it.</p>
 <li>hardware: ros2_control hardware interface <em><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:"> You don't have to modify it.</em></li>
 <li>reference_generator: It has 3 cpp files<ul>
 <li>send_circular_trajectory.cpp: Example using a velocity controller with a circular trajectory. <em><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:"> You don't have to modify it.</em></li>
-<li>send_linear_trajectory.cpp:Example using a velocity controller with a linear trajectory. <em><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:"> You don't have to modify it.</em></li>
+<li>send_linear_trajectory.cpp: Example using a velocity controller with a linear trajectory. <em><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:"> You don't have to modify it.</em></li>
 <li>send_trajectory.cpp: This is the main file where you have to implement the Cartesian trajectory. <em><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f4dd.svg" title=":pencil:"> You need to modify it in this lab.</em></li>
 </ul>
 </li>
@@ -1071,7 +1071,7 @@ In that repo, you'll find the required steps to install it.</p>
 </code></pre></div>
 <p>To show the EE trail in Rviz:
 * Go to RobotModel&gt;Links&gt;tool0 (or the link that refers to the EE).
-* Habilitate Show Trail.</p>
+* Enable Show Trail.</p>
 <p>You should see the following:</p>
 <p><img alt="terminal_test" src="images/terminal_test.png"></p>
 <p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/test_trajectory.mp4" type="video/mp4"></source></video></div></p>
@@ -1079,7 +1079,7 @@ In that repo, you'll find the required steps to install it.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>cartesian_trajectory_planning<span class="w"> </span>send_circular_trajectory.launch.py<span class="w"> </span>
 </code></pre></div>
 <p>These trajectories are generated because the robot is under a joint velocity controller with an Inverse Kinematics solver (implemented using the <a href="https://control.ros.org/humble/index.html">ros2 control package</a> - Described in <a href="https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html">Example 7</a>).</p>
-<p>Snippet of the velocity-based circular trajecotry:
+<p>Snippet of the velocity-based circular trajectory:
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">trajectory_len</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p">{</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="c1">// set endpoint twist</span>
@@ -1097,7 +1097,7 @@ In that repo, you'll find the required steps to install it.</p>
 <a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="p">...</span>
 <a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">  </span><span class="p">}</span>
 </code></pre></div>
-<p>Snippet of the velocity-based linear trajecotry:
+<p>Snippet of the velocity-based linear trajectory:
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">trajectory_len</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="p">{</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="c1">// set endpoint twist</span>
@@ -1113,7 +1113,7 @@ In that repo, you'll find the required steps to install it.</p>
 <a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="p">...</span>
 <a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="p">}</span>
 </code></pre></div>
-<p>However, in this lab you'll implement a Cartesian interpolation using the robot under a joint position controller (using the same Inverse Kinematics solver that is already implemented with the <a href="https://www.orocos.org/kdl.html">Kinemcatics and Dynamics Library (KDL)</a> — if you're interested, there are other libraries that can also do this (and much more), like <a href="https://stack-of-tasks.github.io/pinocchio/">Pinocchio</a>).</p>
+<p>However, in this lab you'll implement Cartesian interpolation with the robot under a joint position controller (using the same Inverse Kinematics solver already implemented with the <a href="https://www.orocos.org/kdl.html">Kinematics and Dynamics Library (KDL)</a>. If you're interested, other libraries can also do this (and much more), such as <a href="https://stack-of-tasks.github.io/pinocchio/">Pinocchio</a>).</p>
 <hr>
 <h1 id="4-understanding-the-code">4. Understanding the code<a class="headerlink" href="#4-understanding-the-code" title="Permanent link">¶</a></h1>
 <h2 id="41-send_trajectorycpp">4.1. send_trajectory.cpp<a class="headerlink" href="#41-send_trajectorycpp" title="Permanent link">¶</a></h2>
@@ -1514,7 +1514,7 @@ In that repo, you'll find the required steps to install it.</p>
 <ul>
 <li>
 <h3 id="eigenmatrix4d-parseposematrixconst-yamlnode-root-const-stdstring-key"><code>Eigen::Matrix4d ParsePoseMatrix(const YAML::Node &amp;root, const std::string &amp;key)</code><img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:">:<a class="headerlink" href="#eigenmatrix4d-parseposematrixconst-yamlnode-root-const-stdstring-key" title="Permanent link">¶</a></h3>
-<p>This function parses a 4x4 matrix from a YAML file given a specific key word. It's used in the code to parse the pose matrices defined in <a href="https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml"><code>config/poses.yaml</code></a>. </p>
+<p>This function parses a 4x4 matrix from a YAML file given a specific keyword. It is used in the code to parse the pose matrices defined in <a href="https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml"><code>config/poses.yaml</code></a>.</p>
 <p><details>
     <summary>Show ParsePoseMatrix</summary>
     <div class="highlight"><span class="filename">ParsePoseMatrix.cpp</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix4d</span><span class="w"> </span><span class="nf">ParsePoseMatrix</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">YAML</span><span class="o">::</span><span class="n">Node</span><span class="w"> </span><span class="o">&amp;</span><span class="n">root</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">key</span><span class="p">)</span>
@@ -1672,7 +1672,7 @@ In that repo, you'll find the required steps to install it.</p>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>When computing the relative quaternion <span class="arithmatex">\(\mathbf{q}_{C}\)</span> between two orientations <span class="arithmatex">\(\mathbf{q}_A\)</span> and <span class="arithmatex">\(\mathbf{q}_B\)</span>, you should check that is less than <span class="arithmatex">\(180 ^o\)</span> to ensure that you're taking the shortest path:</p>
+<p>When computing the relative quaternion <span class="arithmatex">\(\mathbf{q}_{C}\)</span> between two orientations <span class="arithmatex">\(\mathbf{q}_A\)</span> and <span class="arithmatex">\(\mathbf{q}_B\)</span>, you should check that it is less than <span class="arithmatex">\(180^\circ\)</span> to ensure that you're taking the shortest path:</p>
 <div class="arithmatex">\[
 \mathbf{q}_{C} = \mathbf{q}_A^{-1} * \mathbf{q}_B
 \]</div>
@@ -1710,7 +1710,7 @@ In that repo, you'll find the required steps to install it.</p>
 </li>
 <li>
 <h3 id="int-mainint-argc-char-argv-first-part"><code>int main(int argc, char **argv)</code> - First part <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:">:<a class="headerlink" href="#int-mainint-argc-char-argv-first-part" title="Permanent link">¶</a></h3>
-<p>The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, creates the kinematic chain and solvers using <a href="https://www.orocos.org/kdl.html">KDL</a>, creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (<code>pose0, pose1, pose2</code>) from the <code>config/poses.yaml</code>.</p>
+<p>The first part of <code>main</code> includes the code needed to run the application, which you do not need to change. It initializes the node and publisher, gets the robot description, creates the kinematic chain and solvers using <a href="https://www.orocos.org/kdl.html">KDL</a>, creates the ROS 2 joint trajectory message that will later be filled with the points you'll calculate, and gets the poses (<code>pose0, pose1, pose2</code>) from <code>config/poses.yaml</code>.</p>
 <p><details>
     <summary>Show int main(int argc, char **argv)</summary>
     <div class="highlight"><span class="filename">main.cpp</span><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="n">argv</span><span class="p">)</span>
@@ -1819,7 +1819,7 @@ In that repo, you'll find the required steps to install it.</p>
 </li>
 <li>
 <h3 id="smooth-trajectory-generation-configuration">Smooth trajectory generation. Configuration <img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f4dd.svg" title=":pencil:">:<a class="headerlink" href="#smooth-trajectory-generation-configuration" title="Permanent link">¶</a></h3>
-<p>This block is the first part of the code needed for the <a href="#52-exercise-2-smooth-trajectory-generation">Exercise 2</a>. It is disabled by default. you have to set the variable <code>exercise_2 = true</code> once you've finished the <a href="#51-exercise-1-cartesian-interpolation">Exercise 1</a>. It defines: <span class="arithmatex">\(\tau = 1\)</span> and <span class="arithmatex">\(T = 10\)</span> as trajectory timing parameters. If enabled, it enables the trajectory generation.</p>
+<p>This block is the first part of the code needed for the <a href="#52-exercise-2-smooth-trajectory-generation">Exercise 2</a>. It is disabled by default. You have to set the variable <code>exercise_2 = true</code> once you've finished <a href="#51-exercise-1-cartesian-interpolation">Exercise 1</a>. It defines <span class="arithmatex">\(\tau = 1\)</span> and <span class="arithmatex">\(T = 10\)</span> as trajectory timing parameters. If enabled, trajectory generation runs.</p>
 <div class="highlight"><span class="filename">exercise2_part1.cpp</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1">// Exercise 2 : Cartesian trajectory generation</span>
 <a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">tau</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 <a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
@@ -2023,12 +2023,12 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 \]</div>
 <h2 id="51-exercise-1-cartesian-interpolation">5.1. Exercise 1: Cartesian interpolation<a class="headerlink" href="#51-exercise-1-cartesian-interpolation" title="Permanent link">¶</a></h2>
 <p>Define the pose interpolation function based on the Taylor method in <code>std::pair&lt;tf2::Vector3, tf2::Quaternion&gt; PoseInterpolation(...)</code>. This function should perform a linear interpolation of the position and a slerp of the orientation between <code>start_pose</code> and <code>end_pose</code>. Hence, the function must return the intermediate position <code>p_interp</code> and intermediate quaternion <code>q_interp</code> based on <code>lambda</code> (knowing that <span class="arithmatex">\(\lambda \in [0, 1]\)</span>). </p>
-<p>With the code in the <a href="#cartesian-interpolation">caresian interpolation block</a> you can run the exercie 1 and verify whether your implementation of the Cartesian interpolation was correctly done.</p>
+<p>With the code in the <a href="#cartesian-interpolation">Cartesian interpolation block</a>, you can run Exercise 1 and verify whether your Cartesian interpolation implementation is correct.</p>
 <h3 id="511-expected-results">5.1.1. Expected results<a class="headerlink" href="#511-expected-results" title="Permanent link">¶</a></h3>
 <p>When launching the script, you should see the following results:</p>
-<p><img alt="resutls_Ex1" src="images/results_exercise1.png"></p>
-<p>You can check that the values <code>[p_inter, q_interp]</code> that the function <code>PoseInterpolation(pose0, pose1, lambda);</code> returns match the values of <span class="arithmatex">\(\mathbf{P}_0\)</span>, <span class="arithmatex">\(\mathbf{P}_1\)</span>, and <span class="arithmatex">\(\mathbf{P}_2\)</span> depending on which poses and lambda you're passing to the function.</p>
-<p>Hence, if implemented correctly, you should have get the following:</p>
+<p><img alt="results_Ex1" src="images/results_exercise1.png"></p>
+<p>You can check that the values <code>[p_interp, q_interp]</code> returned by <code>PoseInterpolation(pose0, pose1, lambda);</code> match the values of <span class="arithmatex">\(\mathbf{P}_0\)</span>, <span class="arithmatex">\(\mathbf{P}_1\)</span>, and <span class="arithmatex">\(\mathbf{P}_2\)</span>, depending on which poses and lambda values you pass to the function.</p>
+<p>Hence, if implemented correctly, you should get the following:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>[send_trajectory-1] p0: -0.187000, 1.038000, 0.307000
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>[send_trajectory-1] q0: 0.707107, 0.707107, 0.000000, 0.000000
 <a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>[send_trajectory-1] p1: 0.150000, 0.638000, 0.607000
@@ -2048,7 +2048,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 <p>To carry out this exercise, first you need to set the boolean variable <code>exercise_2</code> in <code>int main()</code> to <code>true</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">exercise_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// Set to true to execute Exercise 2</span>
 </code></pre></div>
-<p>You must also define the <a href="#stdpairtf2vector3-tf2quaternion-computenextcartesianposeconst-eigenmatrix4d-pose_0-const-eigenmatrix4d-pose_1-const-eigenmatrix4d-pose_2-double-tau-double-t-double-t">ComputeNextCartesianPose</a> function. This function is called inside the <a href="#exercise-2-smooth-trajectory-generation-time-loop">trajectory loop</a> and returns the  corresponding pose (in the form of position – <code>tf2::Vector3 p_interp</code> and orientation – <code>tf2::Quaternion q_interp</code>) to the movement from <span class="arithmatex">\(P_0\)</span> (<code>pose0</code>) to <span class="arithmatex">\(P_2\)</span> (<code>pose2</code>) via <span class="arithmatex">\(P_1\)</span> (<code>pose1</code>) smoothed by the Taylor method at each timestep <code>t</code>. The parameters <span class="arithmatex">\(\tau\)</span> and <span class="arithmatex">\(T\)</span> correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1.</p>
+<p>You must also define the <a href="#stdpairtf2vector3-tf2quaternion-computenextcartesianposeconst-eigenmatrix4d-pose_0-const-eigenmatrix4d-pose_1-const-eigenmatrix4d-pose_2-double-tau-double-t-double-t">ComputeNextCartesianPose</a> function. This function is called inside the <a href="#exercise-2-smooth-trajectory-generation-time-loop">trajectory loop</a> and returns the corresponding pose (position: <code>tf2::Vector3 p_interp</code>; orientation: <code>tf2::Quaternion q_interp</code>) for the movement from <span class="arithmatex">\(\mathbf{P}_0\)</span> (<code>pose0</code>) to <span class="arithmatex">\(\mathbf{P}_2\)</span> (<code>pose2</code>) via <span class="arithmatex">\(\mathbf{P}_1\)</span> (<code>pose1</code>), smoothed by the Taylor method at each timestep <code>t</code>. The parameters <span class="arithmatex">\(\tau\)</span> and <span class="arithmatex">\(T\)</span> correspond to the transition interval and total traversal time shown in Figure 1.</p>
 <div class="admonition question">
 <p class="admonition-title">Question</p>
 <ul>
@@ -2058,16 +2058,16 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 </div>
 <h3 id="521-graphical-representation">5.2.1. Graphical representation<a class="headerlink" href="#521-graphical-representation" title="Permanent link">¶</a></h3>
 <p>Once the exercise is done, the data of the experiment is saved in the folder <code>YOUR_ROS_ws/src/cartesian_trajectory_planning/experiment_data</code>. </p>
-<p>The data is saved in a <code>.csv</code> file as a table with the following information: <code>t, X, Y, Z, roll, pitch, yaw</code>. This allow you to plot the position and orientation of the EE of the robot. The data is saved according to the following notation: <code>data_YearMonthDay_HourMinuteSecond</code> to be easy for you to find the experiment you want to plot.</p>
-<p>You can use the python script <code>plot_data.py</code> that is in that folder to easily plot the data. If you run:</p>
+<p>The data is saved in a <code>.csv</code> file as a table with the following information: <code>t, X, Y, Z, roll, pitch, yaw</code>. This allows you to plot the position and orientation of the robot EE. The data is saved with the following naming format: <code>data_YearMonthDay_HourMinuteSecond</code>, making it easy to find the experiment you want to plot.</p>
+<p>You can use the Python script <code>plot_data.py</code> in that folder to plot the data easily. If you run:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>python3<span class="w"> </span>plot_data.py
 </code></pre></div>
-<p>You'll plot the last experiment saved. Id you want to specify the experiemnt you want to plot, you can use:</p>
+<p>This command plots the latest saved experiment. If you want to specify the experiment to plot, you can use:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>python3<span class="w"> </span>plot_data.py<span class="w"> </span>NAME_OF_THE_FILE.csv
 </code></pre></div>
 <p>Alternatively, you can load the <code>.csv</code> with any other software that allows you to manipulate and plot data, such as MATLAB.</p>
 <h3 id="522-expected-results">5.2.2. Expected results<a class="headerlink" href="#522-expected-results" title="Permanent link">¶</a></h3>
-<p>The expected result of the complete is illustrated in the following video and figures:</p>
+<p>The expected result of the complete exercise is illustrated in the following video and figures:</p>
 <p><div class="video-container"><video style="width:100%" loop muted autoplay alt="type:video"><source src="videos/result.mp4" type="video/mp4"></source></video></div></p>
 <p><em>Video 1. Expected result of the lab session.</em></p>
 <p><img src="images/position.svg" alt="images/position" width="600"></p>
@@ -2075,7 +2075,24 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
 <p><img src="images/orientation.svg" alt="images/orientation" width="600"></p>
 <p><em>Figure 3. Orientation trajectories.</em></p>
 <h1 id="6-extra-optional">6. Extra (optional)<a class="headerlink" href="#6-extra-optional" title="Permanent link">¶</a></h1>
-<p>In the lab session we</p></div>
+<p>Once both exercises of this lab session are completed, the following modifications are proposed as an extra exercise for those who want to deepen their understanding of the concepts.</p>
+<h2 id="61-differences-between-our-slerp-and-the-one-in-tf2">6.1. Differences between our slerp and the one in tf2<a class="headerlink" href="#61-differences-between-our-slerp-and-the-one-in-tf2" title="Permanent link">¶</a></h2>
+<p>What are the differences between the slerp method implemented in Exercise 1 and the one defined in <a href="https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp">tf2</a>?</p>
+<h2 id="62-pick-place">6.2. Pick &amp; Place<a class="headerlink" href="#62-pick-place" title="Permanent link">¶</a></h2>
+<p>Modify the exercise code to perform a pick &amp; place task. To do so, you will need to make the following modifications:</p>
+<ul>
+<li>The application must include the points <span class="arithmatex">\(\mathbf{P}_{pick}\)</span> and <span class="arithmatex">\(\mathbf{P}_{place}\)</span> for picking and placing, respectively, as well as two approach points above each of them at a given distance measured along the Z axis (<span class="arithmatex">\(\mathbf{P}_{pick}^{appro}\)</span> and <span class="arithmatex">\(\mathbf{P}_{place}^{appro}\)</span>). In addition, the application will include the initial point where the EE starts, <span class="arithmatex">\(\mathbf{P}_{ini}\)</span> (which should be the same as <span class="arithmatex">\(\mathbf{P}_{0}\)</span>).</li>
+<li>Assume that the EE starts at point <span class="arithmatex">\(\mathbf{P}_{pick}^{appro}\)</span>.</li>
+<li>The sequence of movements to be performed shall be:<ul>
+<li>Move from <span class="arithmatex">\(\mathbf{P}_{ini}\)</span> to <span class="arithmatex">\(\mathbf{P}_{pick}\)</span> passing through <span class="arithmatex">\(\mathbf{P}_{pick}^{appro}\)</span> with smoothing.</li>
+<li>Move from <span class="arithmatex">\(\mathbf{P}_{pick}\)</span> to <span class="arithmatex">\(\mathbf{P}_{ini}\)</span> passing through <span class="arithmatex">\(\mathbf{P}_{pick}^{appro}\)</span> with smoothing.</li>
+<li>Move from <span class="arithmatex">\(\mathbf{P}_{ini}\)</span> to <span class="arithmatex">\(\mathbf{P}_{place}\)</span> passing through <span class="arithmatex">\(\mathbf{P}_{place}^{appro}\)</span> with smoothing.</li>
+<li>Move from <span class="arithmatex">\(\mathbf{P}_{place}\)</span> to <span class="arithmatex">\(\mathbf{P}_{ini}\)</span> passing through <span class="arithmatex">\(\mathbf{P}_{place}^{appro}\)</span> with smoothing.</li>
+</ul>
+</li>
+</ul>
+<p>The figure below illustrates the requested motion. Note the change in orientation at the place points.</p>
+<p><img src="images/extra_pick_place.svg" alt="images/extra_pick_place" width="400"></p></div>
 
 
 
@@ -2098,7 +2115,7 @@ Important detail: with <code>exercise_2 = false</code>, none of this executes.</
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 1, 2026 16:10:23 UTC"><span class="timeago" datetime="2026-04-01T16:10:23+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 1, 2026 16:10:23 UTC">2026-04-01</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 3, 2026 07:18:29 UTC"><span class="timeago" datetime="2026-04-03T07:18:29+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 3, 2026 07:18:29 UTC">2026-04-03</span>
   </span>
 
     
