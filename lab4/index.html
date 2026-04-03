@@ -1027,7 +1027,7 @@
 
 <div><h1 id="lab-session-4-impedance-control">Lab Session 4: Impedance Control<a class="headerlink" href="#lab-session-4-impedance-control" title="Permanent link">¶</a></h1>
 <h2 id="41-cartesian-impedance-control">4.1. Cartesian impedance control<a class="headerlink" href="#41-cartesian-impedance-control" title="Permanent link">¶</a></h2>
-<p>In this lab session we are going to implement a Cartesian Impedance Controller according to the following scheme:</p>
+<p>In this lab session, we are going to implement a Cartesian Impedance Controller according to the following scheme:</p>
 <p><img alt="impedance_control" src="images/impedance_control.svg"></p>
 <h2 id="42-controller-implementation">4.2. Controller implementation<a class="headerlink" href="#42-controller-implementation" title="Permanent link">¶</a></h2>
 <p>The controller has two levels:</p>
@@ -1407,7 +1407,7 @@
 <li>The current joint states: joint_states (<span class="arithmatex">\(\mathbf{q}, \dot{\mathbf{q}}\)</span>)</li>
 <li>The external wrenches: external_wrenches (<span class="arithmatex">\(\mathbf{f}_{ext}\)</span>)</li>
 </ul>
-<p>The node gest the impedance parameters (<span class="arithmatex">\(\mathbf{M}\)</span>, <span class="arithmatex">\(\mathbf{B}\)</span>, <span class="arithmatex">\(\mathbf{K}\)</span>) from the <code>impedance_params.yaml</code> config file in the form of matrices called <code>mass_matrix_</code>, <code>damping_matrix_</code>, and <code>stiffness_matrix_</code>, respectively:</p>
+<p>The node gets the impedance parameters (<span class="arithmatex">\(\mathbf{M}\)</span>, <span class="arithmatex">\(\mathbf{B}\)</span>, <span class="arithmatex">\(\mathbf{K}\)</span>) from the <code>impedance_params.yaml</code> config file in the form of matrices called <code>mass_matrix_</code>, <code>damping_matrix_</code>, and <code>stiffness_matrix_</code>, respectively:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">auto</span><span class="w"> </span><span class="n">M_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"M"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">();</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">auto</span><span class="w"> </span><span class="n">B_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"B"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">();</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">auto</span><span class="w"> </span><span class="n">K_vec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">get_parameter</span><span class="p">(</span><span class="s">"K"</span><span class="p">).</span><span class="n">as_double_array</span><span class="p">();</span>
@@ -1538,7 +1538,7 @@
 </li>
 <li>
 <p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f4dd.svg" title=":pencil:"> Once <span class="arithmatex">\(\mathbf{J}(\mathbf{q})\)</span> has been computed, the controller can compute the <code>cartesian_velocities_</code> (<span class="arithmatex">\(\mathbf{x}\)</span>) using the first-order differential kinematics (i.e., the Jacobian):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">cartesian_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">differential_kinematics</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate Cartesian velocity with first-order differental kinematics</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">cartesian_velocities_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">differential_kinematics</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate Cartesian velocity with first-order differential kinematics</span>
 </code></pre></div>
 <p>You need to implement the <code>differential_kinematics()</code> method according to the following equations:</p>
 <div class="arithmatex">\[
@@ -1556,8 +1556,8 @@
 </code></pre></div>
 </li>
 <li>
-<p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f4dd.svg" title=":pencil:"> Once we have all the required data, we can compute de <code>desired_cartesian_accelerations_</code> (<span class="arithmatex">\(\ddot{\mathbf{x}}_d\)</span>) according to the desired impedance behavior with the method <code>impedance_controller()</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">desired_cartesian_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">impedance_controller</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate desired cartesian accelerations with impedance controller</span>
+<p><img alt="📝" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f4dd.svg" title=":pencil:"> Once we have all the required data, we can compute the <code>desired_cartesian_accelerations_</code> (<span class="arithmatex">\(\ddot{\mathbf{x}}_d\)</span>) according to the desired impedance behavior with the method <code>impedance_controller()</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">desired_cartesian_accelerations_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">impedance_controller</span><span class="p">();</span><span class="w"> </span><span class="c1">// Calculate desired Cartesian accelerations with impedance controller</span>
 </code></pre></div>
 <p>You can compute the desired cartesian accelerations according to the second-order impedance model:</p>
 <div class="arithmatex">\[
@@ -1781,16 +1781,16 @@
 <div class="admonition question">
 <p class="admonition-title">Question</p>
 <ul>
-<li>Does the forces applied in the X axis generate motions in the Y axis? And does the forces applied in the Y axis generate motions in the X axis? </li>
-<li>Can you explain why applying forces in one axis generate motions in the other axis? </li>
-<li>How do you think this phenomena can be mitigated?</li>
+<li>Do the forces applied along the X axis generate motions in the Y axis? And do the forces applied along the Y axis generate motions in the X axis?</li>
+<li>Can you explain why applying forces along one axis generates motions in the other axis?</li>
+<li>How do you think this phenomenon can be mitigated?</li>
 <li><strong>[OPTIONAL]</strong> Eliminate this undesired behavior to get results similar to the images below:</li>
 </ul>
 <p><img alt="results_force_x_good_cancellation" src="images/results_force_x_good_cancellation.png"></p>
 <p><img alt="results_force_xygood_cancellation" src="images/results_force_xygood_cancellation.png"></p>
 </div>
 <h2 id="44-experiment-2-change-the-equilibrium-pose">4.4. Experiment 2: Change the equilibrium pose<a class="headerlink" href="#44-experiment-2-change-the-equilibrium-pose" title="Permanent link">¶</a></h2>
-<p>To carry out this experiemnt, you'll need to use the <code>equilibrium_pose_publisher.py</code> (please, be sure that you're using the code below. You might have an outdated version of this script in your workspace)</p>
+<p>To carry out this experiment, you'll need to use <code>equilibrium_pose_publisher.py</code> (please make sure you're using the code below, as you might have an outdated version of this script in your workspace).</p>
 <details>
 <summary>Show the code</summary>
 <div class="highlight"><span class="filename">equilibrium_pose_publisher.py</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>    <span class="c1">#!/usr/bin/python3</span>
@@ -1921,7 +1921,7 @@
 <p>Play with the simulation by publishing different desired equilibrium poses. Test the simulation to the extreme by taking the robot to difficult joint configurations. Don't worry about the robot, it's just a simulation and it won't break :) </p>
 </li>
 <li>
-<p>Did you find that the robot makes strange or unwanted motions, can you report them and explain why it happens?</p>
+<p>Did you find that the robot makes strange or unwanted motions? If so, can you report them and explain why it happens?</p>
 </li>
 </ul>
 </div></div>
@@ -1947,7 +1947,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 21, 2025 19:22:15 UTC"><span class="timeago" datetime="2025-05-21T19:22:15+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 21, 2025 19:22:15 UTC">2025-05-21</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 3, 2026 08:34:50 UTC"><span class="timeago" datetime="2026-04-03T08:34:50+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 3, 2026 08:34:50 UTC">2026-04-03</span>
   </span>
 
     
