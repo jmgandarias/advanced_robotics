@@ -3,7 +3,7 @@
 
 ## 2. Install UMA manipulator package
 
-You'll need to clone the `uma_arm_description` repository inside 
+You'll need to clone the `uma_arm_description` repository into your workspace:
 
 ```bash
 cdw
@@ -15,7 +15,7 @@ git clone https://github.com/jmgandarias/uma_arm_description.git
     This is a work-in-progress repository. Don't pay attention to the README.md file of that repo.
 
 !!! info 
-    You don't have to modify anything in this package. You just need it visualize the manipulator.
+    You don't have to modify anything in this package. You just need it to visualize the manipulator.
 
 ### 2.1. Test the UMA manipulator package
 
@@ -24,11 +24,11 @@ Open one terminal and run:
 ros2 launch uma_arm_description uma_arm_visualization.launch.py
 ```
 
-You'll see RViz2 openning and showing the following:
+You'll see RViz2 opening and showing the following:
 
 ![rviz2_uma_arm](images/rviz2_uma_arm.png)
 
-You can open a new terminal and run the `joint_state_publisher_gui`to move joints of the robot
+You can open a new terminal and run `joint_state_publisher_gui` to move the joints of the robot:
 
 ```bash
 ros2 run joint_state_publisher_gui joint_state_publisher_gui 
@@ -57,13 +57,13 @@ You can also close all the terminals (press `ctrl + c`).
 The manipulator model you've loaded is purely a kinematic visualization (i.e., there is no dynamics - no forces, and there is no simulation)
 
 !!! info
-    RViz 2 is 3D visualization tool, not a simulator. It means it allows you to see the robot models, sensor data, and other information shared in your ROS 2 environment in real-time and offers you a GUI to select the information to be visualize, but it is NOT a simulation
+    RViz 2 is a 3D visualization tool, not a simulator. It allows you to see robot models, sensor data, and other information shared in your ROS 2 environment in real time, and offers a GUI to select what to display, but it is NOT a simulator.
 
-There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as [Gazebo](https://gazebosim.org/home). However, as we are roboticists and want to see, touch, and learn the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equations of motion) of the manipulator down into a node.
+There are different ways to simulate the dynamics. The (probably) most straightforward one is to use a simulator such as [Gazebo](https://gazebosim.org/home). However, as we are roboticists and want to see, touch, and learn the intrinsic effects of a manipulator's dynamics, we'll implement the dynamics (the equations of motion) of the manipulator as a ROS 2 node.
 
 ### 3.1. Clone the uma_arm_control package
 
-To do this, we'll work with another package. You have to do the following
+To do this, we'll work with another package. You need to do the following:
 
 ```bash
 cdw
@@ -76,7 +76,7 @@ Once you have done this, your workspace folder should look like this
 ![workspace_folders](images/workspace_folders.png)
 
 !!! tip
-    You can open the Ubuntu file manager even if you're using WSL running nautilus in a terminal
+    You can open the Ubuntu file manager even if you're using WSL, by running `nautilus` in a terminal:
     ```bash
     nautilus
     ```
@@ -145,7 +145,7 @@ Includes the needed libraries. You don't have to modify it.
 
 **ManipulatorDynamicsNode:** Inherits from rclcpp::Node, making it a ROS 2 node. The class `ManipulatorDynamicsNode` is a ROS 2 node responsible for computing the dynamics of the manipulator (robot arm). You don't have to modify it.
 
-**ManipulatorDynamicsNode():** Class constructor that Initializes the node with the name `manipulator_dynamics_node`.
+**ManipulatorDynamicsNode():** Class constructor that initializes the node with the name `manipulator_dynamics_node`.
 
 <details>
 <summary>Show the code</summary>
@@ -186,7 +186,7 @@ Includes the needed libraries. You don't have to modify it.
 **Subscriptions**
 
 - `joint_torques_subscription_`: Subscribes to the `joint_torques` topic, which is expected to publish messages of type `std_msgs::msg::Float64MultiArray`. The callback function `joint_torques_callback` is bound to handle incoming messages.
-- `external_wrenches_subscription_`: Subscribes to the `external_wrenches` topic, which is expected to publish messages of type- `geometry_msgs::msg::Wrench`. The callback function `external_wrenches_callback` is bound to handle incoming messages.
+- `external_wrenches_subscription_`: Subscribes to the `external_wrenches` topic, which is expected to publish messages of type `geometry_msgs::msg::Wrench`. The callback function `external_wrenches_callback` is bound to handle incoming messages.
 
 **Publishers**
 
@@ -387,7 +387,7 @@ m_2 \cdot g \cdot l_2 \cdot \cos(q_1 + q_2)\\
 \end{bmatrix}
 $$
 
-We'll also need to compute the jacobian to include the external wrenches applied at the EE in our model
+We'll also need to compute the Jacobian to include the external wrenches applied at the EE in our model:
 
 $$
 \mathbf{J}(\mathbf{q}) = \begin{bmatrix}
@@ -543,10 +543,10 @@ And the result of the simulation is
 
 
 !!! tip
-    - Note that the order when launching the scripts is important. You should first launch the `uma_arm_visualization`. By doing this, the robot model is loaded but it doesn't do anything until there's a message published in the topic `/joint_state`. 
-    - Then you can launch the `uma_arm_dynamics`. This is what the dynamics model does: Computes the dynamic model, and publishes the joint state to update the visualization. Note also that the dynamics node doesn't need the uma_arm_visualization to work. If you only launch the dynamics, they're computed without showing them in the uma_arm_visualization. If you run the visualization after launching the 
+    - Note that the order in which you launch the scripts is important. You should first launch `uma_arm_visualization`. This loads the robot model, but it won't move until a message is published on the `/joint_states` topic.
+    - Then you can launch `uma_arm_dynamics`. This is what the dynamics model does: it computes the dynamic model and publishes the joint state to update the visualization. Note that the dynamics node doesn't require `uma_arm_visualization` to work. If you only launch the dynamics, they are computed without being shown in the visualizer. If you launch the visualization after starting the dynamics, the robot model will start updating immediately.
 
-You can see the interaction between topics and nodes by openning another terminal and running
+You can see the interaction between topics and nodes by opening another terminal and running:
 
 ```bash
 rqt_graph
@@ -592,18 +592,18 @@ To record the data of the experiment, you can do the following:
     ros2 launch uma_arm_control uma_arm_dynamics_launch.py
     ```
 
-When the experiment is finished (let's say, after around 15 seconds - when the manipulator is more or less steady) you can stop it by cancel the recording and killing the nodes. 
+When the experiment is finished (for example, after around 15 seconds, when the manipulator is more or less steady), you can stop it by cancelling the recording and killing the nodes.
 
 To represent time series of data in ROS 2, the [uma_environment](https://github.com/jmgandarias/uma_environment_tools) has installed the tool [plotjuggler](https://plotjuggler.io/). You can find more information on how to use plotjuggler in [this video](https://www.youtube.com/watch?v=9kFRecDU1bg).
 
-You can run it by using the correspongind UMA environment alias
+You can run it using the corresponding UMA environment alias:
 
 ```bash
 plotjuggler
 ```
 
 Inside plotjuggler, and following the steps in the previous video, you can play the recorded rosbag. 
-If you use the layout in [pos_vel_acc_layout.xml](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/pos_vel_acc_layout.xml), you can plot the joint position, velocities, and accelerations.
+If you use the layout in [pos_vel_acc_layout.xml](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/pos_vel_acc_layout.xml), you can plot the joint positions, velocities, and accelerations.
 
 ![experiment_results](images/experiment_results.png)
 
@@ -619,20 +619,20 @@ If you use the layout in [pos_vel_acc_layout.xml](https://github.com/jmgandarias
 
 ### Optional - Nice plots and vector images
 
-Plotjuggler is an excellent tool to visualize ROS topics data, and it also gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with [matplotlib](https://matplotlib.org/stable/tutorials/pyplot.html)).
+PlotJuggler is an excellent tool for visualizing ROS topic data, and it also offers options to manipulate data. However, sometimes you may want to use a more powerful tool such as MATLAB or Python (with [matplotlib](https://matplotlib.org/stable/tutorials/pyplot.html)).
 
-Plotjuggler allows you to save the data in *csv* format. This way, you can easily import the data with your preferred software to plot it. Below is an expample:
+PlotJuggler allows you to save data in *CSV* format, which you can then easily import into your preferred software. Below is an example:
 
 1. Click on the CSV exporter and export the data (export the data range into a file).
 
     ![CSV_export](images/CSV_export.png)
 
-2. Go to matlab, open the CSV file and select the data you want to get. In the figure below you can see how I select the time stamp (column A), and the joint position data of joint 1 (column F) and joint 2 (column H). Don't forget to exclude the rows with uninmportable cells. Then, select *Import selection as Generate Script* to generate a script that  
+2. Go to MATLAB, open the CSV file, and select the data you want. In the figure below you can see how to select the timestamp (column A) and the joint position data for joint 1 (column F) and joint 2 (column H). Don't forget to exclude rows with non-importable cells. Then, select *Import Selection as Generate Script* to generate a script that imports your selected data.
 
     ![csv_matlab_import](images/csv_matlab_import.png)
 
-3. You'll probably need to modify that script to change CSV location or the name of the variable that will store your data.
-4. Repeat these steps as much as you need it to get the data you want to plot. Here I give you the matlab scripts to get the joint, velocity, and acceleration data, respectively. 
+    You'll probably need to modify that script to update the CSV file location or the name of the variable that stores your data.
+4. Repeat these steps as many times as needed to get the data you want to plot. The MATLAB scripts to retrieve joint position, velocity, and acceleration data are provided below, respectively.
 
     - [get_position_data.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_position_data.m)
     - [get_velocity_data.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_velocity_data.m)
@@ -640,11 +640,11 @@ Plotjuggler allows you to save the data in *csv* format. This way, you can easil
 
 5. Once you have the data in matlab, you can manipulate it the way you want. For example, you can create nicer plots with the units and names in the axes. Here I give you the script to create a nice plot with the experiment data.
 
-    - [plot_resutls.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/plot_resutls.m)
+    - [plot_results.m](https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/plot_resutls.m)
 
 6. You can also export the figures in a [vectorial graphic](https://en.wikipedia.org/wiki/Vector_graphics) format such as PDF to have the best resolution possible, such as this one:
 
     ![experiment_results](images/experiment_results.svg)
 
-An alternative to this is to directly use the [ROS toolbox in Matlab](https://es.mathworks.com/help/ros/ref/rosbag.html) to get the rosbag recorded data. But I'd rather export it with PlotJuggler.
+An alternative is to use the [ROS Toolbox in MATLAB](https://es.mathworks.com/help/ros/ref/rosbag.html) to read the recorded rosbag data directly. However, exporting via PlotJuggler is generally simpler.
 
