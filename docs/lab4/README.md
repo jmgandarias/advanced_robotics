@@ -1,7 +1,7 @@
 # Lab Session 4: Impedance Control
 
 ## 4.1. Cartesian impedance control
-In this lab session we are going to implement a Cartesian Impedance Controller according to the following scheme:
+In this lab session, we are going to implement a Cartesian Impedance Controller according to the following scheme:
 
 ![impedance_control](images/impedance_control.svg)
 
@@ -25,7 +25,7 @@ This node subscribes to:
 - The current joint states: joint_states ($\mathbf{q}, \dot{\mathbf{q}}$)
 - The external wrenches: external_wrenches ($\mathbf{f}_{ext}$)
 
-The node gest the impedance parameters ($\mathbf{M}$, $\mathbf{B}$, $\mathbf{K}$) from the `impedance_params.yaml` config file in the form of matrices called `mass_matrix_`, `damping_matrix_`, and `stiffness_matrix_`, respectively:
+The node gets the impedance parameters ($\mathbf{M}$, $\mathbf{B}$, $\mathbf{K}$) from the `impedance_params.yaml` config file in the form of matrices called `mass_matrix_`, `damping_matrix_`, and `stiffness_matrix_`, respectively:
 
 ```cpp
 auto M_vec = this->get_parameter("M").as_double_array();
@@ -144,7 +144,7 @@ In each loop (`timer_callback()`), the controller does the following:
 4. :pencil: Once $\mathbf{J}(\mathbf{q})$ has been computed, the controller can compute the `cartesian_velocities_` ($\mathbf{x}$) using the first-order differential kinematics (i.e., the Jacobian):
 
     ```cpp
-    cartesian_velocities_ = differential_kinematics(); // Calculate Cartesian velocity with first-order differental kinematics
+    cartesian_velocities_ = differential_kinematics(); // Calculate Cartesian velocity with first-order differential kinematics
     ```
 
     You need to implement the `differential_kinematics()` method according to the following equations:
@@ -166,10 +166,10 @@ In each loop (`timer_callback()`), the controller does the following:
     }
     ```
 
-5. :pencil: Once we have all the required data, we can compute de `desired_cartesian_accelerations_` ($\ddot{\mathbf{x}}_d$) according to the desired impedance behavior with the method `impedance_controller()`:
+5. :pencil: Once we have all the required data, we can compute the `desired_cartesian_accelerations_` ($\ddot{\mathbf{x}}_d$) according to the desired impedance behavior with the method `impedance_controller()`:
 
     ```cpp
-    desired_cartesian_accelerations_ = impedance_controller(); // Calculate desired cartesian accelerations with impedance controller
+    desired_cartesian_accelerations_ = impedance_controller(); // Calculate desired Cartesian accelerations with impedance controller
     ```
 
     You can compute the desired cartesian accelerations according to the second-order impedance model:
@@ -320,9 +320,9 @@ Note that to run the experiment you'll need to launch the following in different
     - What are the effects of having a "high impedance" in axis X and "low impedance" in axis Y?
 
 !!! question
-    - Does the forces applied in the X axis generate motions in the Y axis? And does the forces applied in the Y axis generate motions in the X axis? 
-    - Can you explain why applying forces in one axis generate motions in the other axis? 
-    - How do you think this phenomena can be mitigated?
+    - Do the forces applied along the X axis generate motions in the Y axis? And do the forces applied along the Y axis generate motions in the X axis?
+    - Can you explain why applying forces along one axis generates motions in the other axis?
+    - How do you think this phenomenon can be mitigated?
     - **[OPTIONAL]** Eliminate this undesired behavior to get results similar to the images below:
 
     ![results_force_x_good_cancellation](images/results_force_x_good_cancellation.png)
@@ -333,7 +333,7 @@ Note that to run the experiment you'll need to launch the following in different
 
 ## 4.4. Experiment 2: Change the equilibrium pose
 
-To carry out this experiemnt, you'll need to use the `equilibrium_pose_publisher.py` (please, be sure that you're using the code below. You might have an outdated version of this script in your workspace)
+To carry out this experiment, you'll need to use `equilibrium_pose_publisher.py` (please make sure you're using the code below, as you might have an outdated version of this script in your workspace).
 
 <details>
 <summary>Show the code</summary>
@@ -382,4 +382,4 @@ Note that to run the experiment you'll need to launch the following in different
 !!! question
     - Play with the simulation by publishing different desired equilibrium poses. Test the simulation to the extreme by taking the robot to difficult joint configurations. Don't worry about the robot, it's just a simulation and it won't break :) 
 
-    - Did you find that the robot makes strange or unwanted motions, can you report them and explain why it happens?
+    - Did you find that the robot makes strange or unwanted motions? If so, can you report them and explain why it happens?
