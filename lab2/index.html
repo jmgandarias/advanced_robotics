@@ -1244,7 +1244,7 @@
 
 <div><h1 id="lab-2-manipulator-dynamics-simulation">Lab 2: Manipulator dynamics simulation<a class="headerlink" href="#lab-2-manipulator-dynamics-simulation" title="Permanent link">¶</a></h1>
 <h2 id="2-install-uma-manipulator-package">2. Install UMA manipulator package<a class="headerlink" href="#2-install-uma-manipulator-package" title="Permanent link">¶</a></h2>
-<p>You'll need to clone the <code>uma_arm_description</code> repository inside </p>
+<p>You'll need to clone the <code>uma_arm_description</code> repository into your workspace:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cdw
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>src
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/jmgandarias/uma_arm_description.git
@@ -1255,15 +1255,15 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>You don't have to modify anything in this package. You just need it visualize the manipulator.</p>
+<p>You don't have to modify anything in this package. You just need it to visualize the manipulator.</p>
 </div>
 <h3 id="21-test-the-uma-manipulator-package">2.1. Test the UMA manipulator package<a class="headerlink" href="#21-test-the-uma-manipulator-package" title="Permanent link">¶</a></h3>
 <p>Open one terminal and run:
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ros2<span class="w"> </span>launch<span class="w"> </span>uma_arm_description<span class="w"> </span>uma_arm_visualization.launch.py
 </code></pre></div>
-<p>You'll see RViz2 openning and showing the following:</p>
+<p>You'll see RViz2 opening and showing the following:</p>
 <p><img alt="rviz2_uma_arm" src="images/rviz2_uma_arm.png"></p>
-<p>You can open a new terminal and run the <code>joint_state_publisher_gui</code>to move joints of the robot</p>
+<p>You can open a new terminal and run <code>joint_state_publisher_gui</code> to move the joints of the robot:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ros2<span class="w"> </span>run<span class="w"> </span>joint_state_publisher_gui<span class="w"> </span>joint_state_publisher_gui<span class="w"> </span>
 </code></pre></div>
 <div class="admonition tip">
@@ -1284,11 +1284,11 @@
 <p>The manipulator model you've loaded is purely a kinematic visualization (i.e., there is no dynamics - no forces, and there is no simulation)</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>RViz 2 is 3D visualization tool, not a simulator. It means it allows you to see the robot models, sensor data, and other information shared in your ROS 2 environment in real-time and offers you a GUI to select the information to be visualize, but it is NOT a simulation</p>
+<p>RViz 2 is a 3D visualization tool, not a simulator. It allows you to see robot models, sensor data, and other information shared in your ROS 2 environment in real time, and offers a GUI to select what to display, but it is NOT a simulator.</p>
 </div>
-<p>There are different ways to simulate the dynamics. The (probably) most straightforard one is to use a simulator as <a href="https://gazebosim.org/home">Gazebo</a>. However, as we are roboticists and want to see, touch, and learn the intrinsic effects of the dynamics of the robotic manipulator, we'll code the dynamics (the equations of motion) of the manipulator down into a node.</p>
+<p>There are different ways to simulate the dynamics. The (probably) most straightforward one is to use a simulator such as <a href="https://gazebosim.org/home">Gazebo</a>. However, as we are roboticists and want to see, touch, and learn the intrinsic effects of a manipulator's dynamics, we'll implement the dynamics (the equations of motion) of the manipulator as a ROS 2 node.</p>
 <h3 id="31-clone-the-uma_arm_control-package">3.1. Clone the uma_arm_control package<a class="headerlink" href="#31-clone-the-uma_arm_control-package" title="Permanent link">¶</a></h3>
-<p>To do this, we'll work with another package. You have to do the following</p>
+<p>To do this, we'll work with another package. You need to do the following:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cdw
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">cd</span><span class="w"> </span>src
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/jmgandarias/uma_arm_control.git
@@ -1297,7 +1297,7 @@
 <p><img alt="workspace_folders" src="images/workspace_folders.png"></p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>You can open the Ubuntu file manager even if you're using WSL running nautilus in a terminal
+<p>You can open the Ubuntu file manager even if you're using WSL, by running <code>nautilus</code> in a terminal:
 </p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>nautilus
 </code></pre></div>
 </div>
@@ -1368,7 +1368,7 @@
 
 <h5 id="332-constructor">3.3.2. Constructor <img alt="🔒" class="twemoji" src="../assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f512.svg" title=":lock:"><a class="headerlink" href="#332-constructor" title="Permanent link">¶</a></h5>
 <p><strong>ManipulatorDynamicsNode:</strong> Inherits from rclcpp::Node, making it a ROS 2 node. The class <code>ManipulatorDynamicsNode</code> is a ROS 2 node responsible for computing the dynamics of the manipulator (robot arm). You don't have to modify it.</p>
-<p><strong>ManipulatorDynamicsNode():</strong> Class constructor that Initializes the node with the name <code>manipulator_dynamics_node</code>.</p>
+<p><strong>ManipulatorDynamicsNode():</strong> Class constructor that initializes the node with the name <code>manipulator_dynamics_node</code>.</p>
 <details>
 <summary>Show the code</summary>
 <div class="highlight"><span class="filename">constructor_initialization</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">ManipulatorDynamicsNode</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">Node</span>
@@ -1461,7 +1461,7 @@
 <p><strong>Subscriptions</strong></p>
 <ul>
 <li><code>joint_torques_subscription_</code>: Subscribes to the <code>joint_torques</code> topic, which is expected to publish messages of type <code>std_msgs::msg::Float64MultiArray</code>. The callback function <code>joint_torques_callback</code> is bound to handle incoming messages.</li>
-<li><code>external_wrenches_subscription_</code>: Subscribes to the <code>external_wrenches</code> topic, which is expected to publish messages of type- <code>geometry_msgs::msg::Wrench</code>. The callback function <code>external_wrenches_callback</code> is bound to handle incoming messages.</li>
+<li><code>external_wrenches_subscription_</code>: Subscribes to the <code>external_wrenches</code> topic, which is expected to publish messages of type <code>geometry_msgs::msg::Wrench</code>. The callback function <code>external_wrenches_callback</code> is bound to handle incoming messages.</li>
 </ul>
 <p><strong>Publishers</strong></p>
 <ul>
@@ -1754,7 +1754,7 @@ m_2 \cdot g \cdot l_2 \cdot \cos(q_1 + q_2)\\
 &amp; \\
 \end{bmatrix}
 \]</div>
-<p>We'll also need to compute the jacobian to include the external wrenches applied at the EE in our model</p>
+<p>We'll also need to compute the Jacobian to include the external wrenches applied at the EE in our model:</p>
 <div class="arithmatex">\[
 \mathbf{J}(\mathbf{q}) = \begin{bmatrix}
 &amp; \\
@@ -1877,11 +1877,11 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <ul>
-<li>Note that the order when launching the scripts is important. You should first launch the <code>uma_arm_visualization</code>. By doing this, the robot model is loaded but it doesn't do anything until there's a message published in the topic <code>/joint_state</code>. </li>
-<li>Then you can launch the <code>uma_arm_dynamics</code>. This is what the dynamics model does: Computes the dynamic model, and publishes the joint state to update the visualization. Note also that the dynamics node doesn't need the uma_arm_visualization to work. If you only launch the dynamics, they're computed without showing them in the uma_arm_visualization. If you run the visualization after launching the </li>
+<li>Note that the order in which you launch the scripts is important. You should first launch <code>uma_arm_visualization</code>. This loads the robot model, but it won't move until a message is published on the <code>/joint_states</code> topic.</li>
+<li>Then you can launch <code>uma_arm_dynamics</code>. This is what the dynamics model does: it computes the dynamic model and publishes the joint state to update the visualization. Note that the dynamics node doesn't require <code>uma_arm_visualization</code> to work. If you only launch the dynamics, they are computed without being shown in the visualizer. If you launch the visualization after starting the dynamics, the robot model will start updating immediately.</li>
 </ul>
 </div>
-<p>You can see the interaction between topics and nodes by openning another terminal and running</p>
+<p>You can see the interaction between topics and nodes by opening another terminal and running:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>rqt_graph
 </code></pre></div>
 <p>You have to select the option <code>Node/Topics (all)</code> and then update the graph.</p>
@@ -1916,13 +1916,13 @@ l_1 \cdot \cos(q_1) + l_2 \cdot \cos(q_1 + q_2) &amp; l_2 \cdot \cos(q_1 + q_2)\
 </code></pre></div>
 </li>
 </ol>
-<p>When the experiment is finished (let's say, after around 15 seconds - when the manipulator is more or less steady) you can stop it by cancel the recording and killing the nodes. </p>
+<p>When the experiment is finished (for example, after around 15 seconds, when the manipulator is more or less steady), you can stop it by cancelling the recording and killing the nodes.</p>
 <p>To represent time series of data in ROS 2, the <a href="https://github.com/jmgandarias/uma_environment_tools">uma_environment</a> has installed the tool <a href="https://plotjuggler.io/">plotjuggler</a>. You can find more information on how to use plotjuggler in <a href="https://www.youtube.com/watch?v=9kFRecDU1bg">this video</a>.</p>
-<p>You can run it by using the correspongind UMA environment alias</p>
+<p>You can run it using the corresponding UMA environment alias:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>plotjuggler
 </code></pre></div>
 <p>Inside plotjuggler, and following the steps in the previous video, you can play the recorded rosbag. 
-If you use the layout in <a href="https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/pos_vel_acc_layout.xml">pos_vel_acc_layout.xml</a>, you can plot the joint position, velocities, and accelerations.</p>
+If you use the layout in <a href="https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/pos_vel_acc_layout.xml">pos_vel_acc_layout.xml</a>, you can plot the joint positions, velocities, and accelerations.</p>
 <p><img alt="experiment_results" src="images/experiment_results.png"></p>
 <div class="admonition question">
 <p class="admonition-title">Question</p>
@@ -1932,22 +1932,18 @@ Run different experiments and plot the data to see the effects of those paramete
 <p><em>Note that you only need to modify those inside <code>uma_arm_dynamics</code>.</em> </p>
 </div>
 <h3 id="optional-nice-plots-and-vector-images">Optional - Nice plots and vector images<a class="headerlink" href="#optional-nice-plots-and-vector-images" title="Permanent link">¶</a></h3>
-<p>Plotjuggler is an excellent tool to visualize ROS topics data, and it also gives you some options to manipulate the data. However, sometimes you'll like to use a more powerful tool to manipulate the data such as matlab or python (with <a href="https://matplotlib.org/stable/tutorials/pyplot.html">matplotlib</a>).</p>
-<p>Plotjuggler allows you to save the data in <em>csv</em> format. This way, you can easily import the data with your preferred software to plot it. Below is an expample:</p>
+<p>PlotJuggler is an excellent tool for visualizing ROS topic data, and it also offers options to manipulate data. However, sometimes you may want to use a more powerful tool such as MATLAB or Python (with <a href="https://matplotlib.org/stable/tutorials/pyplot.html">matplotlib</a>).</p>
+<p>PlotJuggler allows you to save data in <em>CSV</em> format, which you can then easily import into your preferred software. Below is an example:</p>
 <ol>
 <li>
 <p>Click on the CSV exporter and export the data (export the data range into a file).</p>
 <p><img alt="CSV_export" src="images/CSV_export.png"></p>
 </li>
 <li>
-<p>Go to matlab, open the CSV file and select the data you want to get. In the figure below you can see how I select the time stamp (column A), and the joint position data of joint 1 (column F) and joint 2 (column H). Don't forget to exclude the rows with uninmportable cells. Then, select <em>Import selection as Generate Script</em> to generate a script that  </p>
+<p>Go to MATLAB, open the CSV file, and select the data you want. In the figure below you can see how to select the timestamp (column A) and the joint position data for joint 1 (column F) and joint 2 (column H). Don't forget to exclude rows with non-importable cells. Then, select <em>Import Selection as Generate Script</em> to generate a script that imports your selected data.</p>
 <p><img alt="csv_matlab_import" src="images/csv_matlab_import.png"></p>
-</li>
-<li>
-<p>You'll probably need to modify that script to change CSV location or the name of the variable that will store your data.</p>
-</li>
-<li>
-<p>Repeat these steps as much as you need it to get the data you want to plot. Here I give you the matlab scripts to get the joint, velocity, and acceleration data, respectively. </p>
+<p>You'll probably need to modify that script to update the CSV file location or the name of the variable that stores your data.
+4. Repeat these steps as many times as needed to get the data you want to plot. The MATLAB scripts to retrieve joint position, velocity, and acceleration data are provided below, respectively.</p>
 <ul>
 <li><a href="https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_position_data.m">get_position_data.m</a></li>
 <li><a href="https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/get_velocity_data.m">get_velocity_data.m</a></li>
@@ -1957,7 +1953,7 @@ Run different experiments and plot the data to see the effects of those paramete
 <li>
 <p>Once you have the data in matlab, you can manipulate it the way you want. For example, you can create nicer plots with the units and names in the axes. Here I give you the script to create a nice plot with the experiment data.</p>
 <ul>
-<li><a href="https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/plot_resutls.m">plot_resutls.m</a></li>
+<li><a href="https://github.com/jmgandarias/advanced_robotics/blob/main/snippets/lab2/plot_resutls.m">plot_results.m</a></li>
 </ul>
 </li>
 <li>
@@ -1965,7 +1961,7 @@ Run different experiments and plot the data to see the effects of those paramete
 <p><img alt="experiment_results" src="images/experiment_results.svg"></p>
 </li>
 </ol>
-<p>An alternative to this is to directly use the <a href="https://es.mathworks.com/help/ros/ref/rosbag.html">ROS toolbox in Matlab</a> to get the rosbag recorded data. But I'd rather export it with PlotJuggler.</p></div>
+<p>An alternative is to use the <a href="https://es.mathworks.com/help/ros/ref/rosbag.html">ROS Toolbox in MATLAB</a> to read the recorded rosbag data directly. However, exporting via PlotJuggler is generally simpler.</p></div>
 
 
 
@@ -1988,7 +1984,7 @@ Run different experiments and plot the data to see the effects of those paramete
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="March 25, 2026 08:25:34 UTC"><span class="timeago" datetime="2026-03-25T08:25:34+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="March 25, 2026 08:25:34 UTC">2026-03-25</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="April 3, 2026 08:33:00 UTC"><span class="timeago" datetime="2026-04-03T08:33:00+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="April 3, 2026 08:33:00 UTC">2026-04-03</span>
   </span>
 
     
