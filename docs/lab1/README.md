@@ -3,10 +3,10 @@
 
 # 1. Smooth Cartesian interpolation
 
-Cartesian interpolation is characterized by achieving a linear variation of position and orientation. While when interpolating the position we can conduct a linear interpolation in the Cartesian space, for the orientation, the interpolation depends on how the orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions. 
+Cartesian interpolation is characterized by a linear variation of position and orientation. While position can be interpolated linearly in Cartesian space, orientation interpolation depends on how orientation is represented. As described in the course, the most appropriate way to do this is by using quaternions.
 
 !!! info
-    If you interpolate the orientation using quaternions, you're performing a [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). Original paper [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is actually implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the code of the implementation ros2 humble [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)) but you're going to implement it by yourself in this lab. 
+    If you interpolate orientation using quaternions, you're performing [Spherical Linear Interpolation (slerp)](https://en.wikipedia.org/wiki/Spherical_linear_interpolation). The original paper is available [here](https://www.cs.cmu.edu/~kiranb/animation/p245-shoemake.pdf). The slerp method is already implemented in [tf2](https://docs.ros.org/en/humble/p/tf2/generated/classtf2_1_1Quaternion.html) (you can check the ROS 2 Humble implementation [here](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)), but in this lab you will implement it yourself.
 
 Also, when linking two rectilinear displacements, a velocity discontinuity occurs at the transition point. Figure 1 shows the described situation, using the example of concatenating a displacement from location $P_0$ to $P_1$ (first segment) with another from $P_1$ to $P_2$ (second segment). To avoid the velocity discontinuity that would occur at $P_1$, a constant acceleration is used to linearly adapt the velocity variation from the first segment to the second, resulting in a smooth transition across $P_1$.
 
@@ -36,7 +36,7 @@ $$
 
 For this lab session we will use ROS 2 Humble.
 
-This is optional: You may want to install the [uma_environment_tools](https://github.com/jmgandarias/uma_environment_tools) as it will install ROS2 Humble, and some important packages and libraries that may be useful later in the course.
+This is optional: you may want to install [uma_environment_tools](https://github.com/jmgandarias/uma_environment_tools), which installs ROS 2 Humble and some important packages and libraries that may be useful later in the course.
 In that repo, you'll find the required steps to install it.
 
 If you already have a native version of Ubuntu 22.04 installed, you can skip steps 1 and 2.
@@ -49,13 +49,13 @@ A video of the installation, including the troubleshooting (if you don't find th
 
 If you have installed the UMA environment, you should see that everything is working correctly.
 
-Try the following;
+Try the following:
 
 ```bash
 create_catkin_ws
 ```
 
-Put the name `advanced_robotics_ws` to your workspace.
+Use `advanced_robotics_ws` as your workspace name.
 
 If, after installing it, you go to your catkin workspace folder and when you run this alias
 
@@ -63,7 +63,7 @@ If, after installing it, you go to your catkin workspace folder and when you run
 cb
 ```
 
-you find an error like `'ROS colcon build is not installed'`, then you'll need to uninstall ros and install the environment again:
+you find an error like `'ROS colcon build is not installed'`, then you'll need to uninstall ROS and install the environment again:
 
 ```bash
 sudo apt remove ~nros-humble-* && sudo apt autoremove
@@ -76,7 +76,7 @@ cd ~/uma_environment_tools/scripts
 ./install_uma_environment.sh
 ```
 
-Then you'll ned to run
+Then you'll need to run
 
 ```bash
 update_uma_environment
@@ -86,7 +86,7 @@ update_uma_environment
 
 # 3. Introduction
 
-This exercise illustrates the generation of Cartesian trajectories using one of the methodologies studied in this course. For this purpose, you'll use the the [Cartesian Trajectory Planning](https://github.com/jmgandarias/cartesian_trajectory_planning) package.
+This exercise illustrates Cartesian trajectory generation using one of the methodologies studied in this course. For this purpose, you'll use the [Cartesian Trajectory Planning](https://github.com/jmgandarias/cartesian_trajectory_planning) package.
 
 
 ## 3.1. Install the dependencies
@@ -100,7 +100,7 @@ sudo  apt install ros-${ROS_DISTRO}-ros2-control ros-${ROS_DISTRO}-ros2-controll
 sudo apt-get install -y ros-${ROS_DISTRO}-joint-state-publisher-gui ros-${ROS_DISTRO}-rviz2
 ```
 
-If you find an error trying to install these dependencies, most probably you'll need to update the packages repositories and upgrade them to the last version. Once upgraded, you can install the dependecies using the commands above.
+If you find an error while trying to install these dependencies, you will likely need to update the package repositories and upgrade them to the latest version. Once upgraded, you can install the dependencies using the commands above.
 
 ```bash
 sudo apt update
@@ -109,15 +109,15 @@ sudo apt upgrade
 
 ## 3.2. Clone the package
 
-Open a new terminal, go to the `src` folder in yout worskpace and clone the repo
+Open a new terminal, go to the `src` folder in your workspace, and clone the repository:
 
 ```bash
 git clone https://github.com/jmgandarias/cartesian_trajectory_planning
 ```
 
-Once this is done, complie the workspace (if you have installed the UMA environment you can just use `cb`).
+Once this is done, compile the workspace (if you have installed the UMA environment, you can just use `cb`).
 
-You should see something like this (don't worry about the warnings, this is because the code is incompleted - you'll need to complete it in this lab session)
+You should see something like this (don't worry about the warnings; they appear because the code is incomplete, and you'll complete it in this lab session).
 
 ![first_compilation.png](images/first_compilation.png)
 
@@ -133,7 +133,7 @@ It consists of the following:
 * hardware: ros2_control hardware interface *:lock: You don't have to modify it.*
 * reference_generator: It has 3 cpp files
     * send_circular_trajectory.cpp: Example using a velocity controller with a circular trajectory. *:lock: You don't have to modify it.*
-    * send_linear_trajectory.cpp:Example using a velocity controller with a linear trajectory. *:lock: You don't have to modify it.*
+    * send_linear_trajectory.cpp: Example using a velocity controller with a linear trajectory. *:lock: You don't have to modify it.*
     * send_trajectory.cpp: This is the main file where you have to implement the Cartesian trajectory. *:pencil: You need to modify it in this lab.*
 
 The content of this package is inspired by and built on the [ROS2 control example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html).
@@ -154,7 +154,7 @@ ros2 launch cartesian_trajectory_planning send_linear_trajectory.launch.py
 
 To show the EE trail in Rviz:
 * Go to RobotModel>Links>tool0 (or the link that refers to the EE).
-* Habilitate Show Trail.
+* Enable Show Trail.
 
 You should see the following:
 
@@ -172,7 +172,7 @@ ros2 launch cartesian_trajectory_planning send_circular_trajectory.launch.py
 These trajectories are generated because the robot is under a joint velocity controller with an Inverse Kinematics solver (implemented using the [ros2 control package](https://control.ros.org/humble/index.html) - Described in [Example 7](https://control.ros.org/humble/doc/ros2_control_demos/example_7/doc/userdoc.html)).
 
 
-Snippet of the velocity-based circular trajecotry:
+Snippet of the velocity-based circular trajectory:
 ```cpp
 for (int i = 0; i < trajectory_len; i++)
   {
@@ -192,7 +192,7 @@ for (int i = 0; i < trajectory_len; i++)
   }
 ```
 
-Snippet of the velocity-based linear trajecotry:
+Snippet of the velocity-based linear trajectory:
 ```cpp
 for (int i = 0; i < trajectory_len; i++)
   {
@@ -210,7 +210,7 @@ for (int i = 0; i < trajectory_len; i++)
   }
 ```
 
-However, in this lab you'll implement a Cartesian interpolation using the robot under a joint position controller (using the same Inverse Kinematics solver that is already implemented with the [Kinemcatics and Dynamics Library (KDL)](https://www.orocos.org/kdl.html) — if you're interested, there are other libraries that can also do this (and much more), like [Pinocchio](https://stack-of-tasks.github.io/pinocchio/)).
+However, in this lab you'll implement Cartesian interpolation with the robot under a joint position controller (using the same Inverse Kinematics solver already implemented with the [Kinematics and Dynamics Library (KDL)](https://www.orocos.org/kdl.html). If you're interested, other libraries can also do this (and much more), such as [Pinocchio](https://stack-of-tasks.github.io/pinocchio/)).
 
 ---
 
@@ -234,7 +234,7 @@ This script performs the complete interpolation during all proposed segments. Le
 ## 4.2. Code parts explained
 
 - ### `Eigen::Matrix4d ParsePoseMatrix(const YAML::Node &root, const std::string &key)`:lock:: 
-    This function parses a 4x4 matrix from a YAML file given a specific key word. It's used in the code to parse the pose matrices defined in [`config/poses.yaml`](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml). 
+    This function parses a 4x4 matrix from a YAML file given a specific keyword. It is used in the code to parse the pose matrices defined in [`config/poses.yaml`](https://github.com/jmgandarias/cartesian_trajectory_planning/blob/main/config/poses.yaml).
 
     <details>
         <summary>Show ParsePoseMatrix</summary>
@@ -297,7 +297,7 @@ This script performs the complete interpolation during all proposed segments. Le
     ```
 
     !!! tip 
-        When computing the relative quaternion $\mathbf{q}_{C}$ between two orientations $\mathbf{q}_A$ and $\mathbf{q}_B$, you should check that is less than $180 ^o$ to ensure that you're taking the shortest path:
+        When computing the relative quaternion $\mathbf{q}_{C}$ between two orientations $\mathbf{q}_A$ and $\mathbf{q}_B$, you should check that it is less than $180^\circ$ to ensure that you're taking the shortest path:
 
         $$
         \mathbf{q}_{C} = \mathbf{q}_A^{-1} * \mathbf{q}_B
@@ -321,7 +321,7 @@ This script performs the complete interpolation during all proposed segments. Le
 
 - ### `int main(int argc, char **argv)` - First part :lock:: 
 
-    The first part of the main include code needed to run the application that you don't need to change. The first part of the main initialices the node and publisher, gets the robot description, creates the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will be later filled in with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from the `config/poses.yaml`.
+    The first part of `main` includes the code needed to run the application, which you do not need to change. It initializes the node and publisher, gets the robot description, creates the kinematic chain and solvers using [KDL](https://www.orocos.org/kdl.html), creates the ROS 2 joint trajectory message that will later be filled with the points you'll calculate, and gets the poses (`pose0, pose1, pose2`) from `config/poses.yaml`.
 
     <details>
         <summary>Show int main(int argc, char **argv)</summary>
@@ -351,7 +351,7 @@ This script performs the complete interpolation during all proposed segments. Le
 
 - ### Smooth trajectory generation. Configuration :pencil:: 
 
-    This block is the first part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). It is disabled by default. you have to set the variable `exercise_2 = true` once you've finished the [Exercise 1](#51-exercise-1-cartesian-interpolation). It defines: $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, it enables the trajectory generation.
+    This block is the first part of the code needed for the [Exercise 2](#52-exercise-2-smooth-trajectory-generation). It is disabled by default. You have to set the variable `exercise_2 = true` once you've finished [Exercise 1](#51-exercise-1-cartesian-interpolation). It defines $\tau = 1$ and $T = 10$ as trajectory timing parameters. If enabled, trajectory generation runs.
 
     ```cpp title="exercise2_part1.cpp"
     --8<-- "snippets/lab1/exercise2_part1.cpp"
@@ -448,17 +448,17 @@ $$
 
 Define the pose interpolation function based on the Taylor method in `std::pair<tf2::Vector3, tf2::Quaternion> PoseInterpolation(...)`. This function should perform a linear interpolation of the position and a slerp of the orientation between `start_pose` and `end_pose`. Hence, the function must return the intermediate position `p_interp` and intermediate quaternion `q_interp` based on `lambda` (knowing that $\lambda \in [0, 1]$). 
 
-With the code in the [caresian interpolation block](#cartesian-interpolation) you can run the exercie 1 and verify whether your implementation of the Cartesian interpolation was correctly done.
+With the code in the [Cartesian interpolation block](#cartesian-interpolation), you can run Exercise 1 and verify whether your Cartesian interpolation implementation is correct.
 
 ### 5.1.1. Expected results
 
 When launching the script, you should see the following results:
 
-![resutls_Ex1](images/results_exercise1.png)
+![results_Ex1](images/results_exercise1.png)
 
-You can check that the values `[p_inter, q_interp]` that the function `PoseInterpolation(pose0, pose1, lambda);` returns match the values of $\mathbf{P}_0$, $\mathbf{P}_1$, and $\mathbf{P}_2$ depending on which poses and lambda you're passing to the function.
+You can check that the values `[p_interp, q_interp]` returned by `PoseInterpolation(pose0, pose1, lambda);` match the values of $\mathbf{P}_0$, $\mathbf{P}_1$, and $\mathbf{P}_2$, depending on which poses and lambda values you pass to the function.
 
-Hence, if implemented correctly, you should have get the following:
+Hence, if implemented correctly, you should get the following:
 
 ```
 [send_trajectory-1] p0: -0.187000, 1.038000, 0.307000
@@ -488,7 +488,7 @@ To carry out this exercise, first you need to set the boolean variable `exercise
 bool exercise_2 = true; // Set to true to execute Exercise 2
 ```
 
-You must also define the [ComputeNextCartesianPose](#stdpairtf2vector3-tf2quaternion-computenextcartesianposeconst-eigenmatrix4d-pose_0-const-eigenmatrix4d-pose_1-const-eigenmatrix4d-pose_2-double-tau-double-t-double-t) function. This function is called inside the [trajectory loop](#exercise-2-smooth-trajectory-generation-time-loop) and returns the  corresponding pose (in the form of position – `tf2::Vector3 p_interp` and orientation – `tf2::Quaternion q_interp`) to the movement from $P_0$ (`pose0`) to $P_2$ (`pose2`) via $P_1$ (`pose1`) smoothed by the Taylor method at each timestep `t`. The parameters $\tau$ and $T$ correspond respectively to the transition interval and total time used to traverse the path as shown in Figure 1.
+You must also define the [ComputeNextCartesianPose](#stdpairtf2vector3-tf2quaternion-computenextcartesianposeconst-eigenmatrix4d-pose_0-const-eigenmatrix4d-pose_1-const-eigenmatrix4d-pose_2-double-tau-double-t-double-t) function. This function is called inside the [trajectory loop](#exercise-2-smooth-trajectory-generation-time-loop) and returns the corresponding pose (position: `tf2::Vector3 p_interp`; orientation: `tf2::Quaternion q_interp`) for the movement from $\mathbf{P}_0$ (`pose0`) to $\mathbf{P}_2$ (`pose2`) via $\mathbf{P}_1$ (`pose1`), smoothed by the Taylor method at each timestep `t`. The parameters $\tau$ and $T$ correspond to the transition interval and total traversal time shown in Figure 1.
 
 !!! question
     - What happens when you change the value of $\tau$? 
@@ -499,15 +499,15 @@ You must also define the [ComputeNextCartesianPose](#stdpairtf2vector3-tf2quater
 
 Once the exercise is done, the data of the experiment is saved in the folder `YOUR_ROS_ws/src/cartesian_trajectory_planning/experiment_data`. 
 
-The data is saved in a `.csv` file as a table with the following information: `t, X, Y, Z, roll, pitch, yaw`. This allow you to plot the position and orientation of the EE of the robot. The data is saved according to the following notation: `data_YearMonthDay_HourMinuteSecond` to be easy for you to find the experiment you want to plot.
+The data is saved in a `.csv` file as a table with the following information: `t, X, Y, Z, roll, pitch, yaw`. This allows you to plot the position and orientation of the robot EE. The data is saved with the following naming format: `data_YearMonthDay_HourMinuteSecond`, making it easy to find the experiment you want to plot.
 
-You can use the python script `plot_data.py` that is in that folder to easily plot the data. If you run:
+You can use the Python script `plot_data.py` in that folder to plot the data easily. If you run:
 
 ```bash
 python3 plot_data.py
 ```
 
-You'll plot the last experiment saved. Id you want to specify the experiemnt you want to plot, you can use:
+This command plots the latest saved experiment. If you want to specify the experiment to plot, you can use:
 
 ```bash
 python3 plot_data.py NAME_OF_THE_FILE.csv
@@ -518,7 +518,7 @@ Alternatively, you can load the `.csv` with any other software that allows you t
 
 ### 5.2.2. Expected results
 
-The expected result of the complete is illustrated in the following video and figures:
+The expected result of the complete exercise is illustrated in the following video and figures:
 
 ![type:video](./videos/result.mp4)
 
@@ -534,4 +534,24 @@ The expected result of the complete is illustrated in the following video and fi
 
 # 6. Extra (optional)
 
-In the lab session we
+Once both exercises of this lab session are completed, the following modifications are proposed as an extra exercise for those who want to deepen their understanding of the concepts.
+
+## 6.1. Differences between our slerp and the one in tf2
+
+What are the differences between the slerp method implemented in Exercise 1 and the one defined in [tf2](https://github.com/ros2/geometry2/blob/humble/tf2/include/tf2/LinearMath/Quaternion.hpp)?
+
+## 6.2. Pick & Place
+
+Modify the exercise code to perform a pick & place task. To do so, you will need to make the following modifications:
+
+- The application must include the points $\mathbf{P}_{pick}$ and $\mathbf{P}_{place}$ for picking and placing, respectively, as well as two approach points above each of them at a given distance measured along the Z axis ($\mathbf{P}_{pick}^{appro}$ and $\mathbf{P}_{place}^{appro}$). In addition, the application will include the initial point where the EE starts, $\mathbf{P}_{ini}$ (which should be the same as $\mathbf{P}_{0}$).
+- Assume that the EE starts at point $\mathbf{P}_{pick}^{appro}$.
+- The sequence of movements to be performed shall be:
+    - Move from $\mathbf{P}_{ini}$ to $\mathbf{P}_{pick}$ passing through $\mathbf{P}_{pick}^{appro}$ with smoothing.
+    - Move from $\mathbf{P}_{pick}$ to $\mathbf{P}_{ini}$ passing through $\mathbf{P}_{pick}^{appro}$ with smoothing.
+    - Move from $\mathbf{P}_{ini}$ to $\mathbf{P}_{place}$ passing through $\mathbf{P}_{place}^{appro}$ with smoothing.
+    - Move from $\mathbf{P}_{place}$ to $\mathbf{P}_{ini}$ passing through $\mathbf{P}_{place}^{appro}$ with smoothing.
+
+The figure below illustrates the requested motion. Note the change in orientation at the place points.
+
+<img src="images/extra_pick_place.svg" alt="images/extra_pick_place" width="400"/>
