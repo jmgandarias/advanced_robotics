@@ -493,6 +493,7 @@ You must also define the [ComputeNextCartesianPose](#stdpairtf2vector3-tf2quater
 !!! question
     - What happens when you change the value of $\tau$? 
     - What happens when you change the value of $T$? 
+    - Can you change the velovity of the robot? How?
 
 
 ### 5.2.1. Graphical representation
