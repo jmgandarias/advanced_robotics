@@ -1,7 +1,7 @@
 # Lab Session 5: Force Control
 
 ## 4.1. Introduction
-In this lab we will simulate the dynamic behavior of the RR manipulator under a force control shceme with an internal position loop. As in the previous situation, the robot's dynamic behavior is linearized through the control law we used in the previous Labs
+In this lab, we will simulate the dynamic behavior of the RR manipulator under a force control scheme with an internal position loop. As in the previous lab sessions, the robot's dynamic behavior is linearized through the control law used in the previous labs:
 
 $$
 \boldsymbol{\tau} = \mathbf{M}(\mathbf{q}) \cdot \ddot{\mathbf{q}}_d + \underbrace{\mathbf{C} (\mathbf{q}, \dot{\mathbf{q}}) \cdot \dot{\mathbf{q}} + \mathbf{F}_b \cdot \dot{\mathbf{q}} + \mathbf{g}}_{\mathbf{n}(\mathbf{q}, \dot{\mathbf{q}})} + \mathbf{J}^T(\mathbf{q})\mathbf{f}_{e}
@@ -16,7 +16,7 @@ $$
 $$
 
 
-In this case, the goal is to implement the force control law indicated illustrated in the following schema according to the expression
+In this case, the goal is to implement the force control law illustrated in the following diagram, according to the expression:
 
 
 $$
@@ -25,7 +25,7 @@ $$
 
 ![force_position](images/force_position.png)
 
-Here, the input signal to the system is now the reference force instead of a desired position. In the mentioned expression, $\mathbf{M}_d$, $\mathbf{K}_P$, and $\mathbf{K}_D$ retain the same meaning as the matrices $\mathbf{M}$, $\mathbf{B}$, and $\mathbf{K}$, respectively, and take the following values:
+Here, the input signal to the system is now the reference force instead of a desired position. In the expression above, $\mathbf{M}_d$, $\mathbf{K}_P$, and $\mathbf{K}_D$ retain the same meaning as the matrices $\mathbf{M}$, $\mathbf{B}$, and $\mathbf{K}$, respectively.
 
 The variable $\mathbf{x}_F$ constitutes the system input and is defined as follows:
 
@@ -107,7 +107,7 @@ $$
 ## 4.3. Simulate PI control
    
 
-With the proposed control scheme, due to disturbances introduced by $\mathbf{x}_r $, the reference force may not be reached in steady state. To address this, it is proposed to convert the constant CF into a proportional-integral action:
+With the proposed control scheme, due to disturbances introduced by $\mathbf{x}_r$, the reference force may not be reached in steady state. To address this, it is proposed to convert the constant $\mathbf{C}_F$ into a proportional-integral action:
 
 $$
 \mathbf{C}_F = \mathbf{K}_F + \mathbf{K}_I \int^t (\cdot)  d \varsigma
