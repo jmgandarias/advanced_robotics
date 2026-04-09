@@ -3,10 +3,9 @@
 
 ## 2. Install UMA manipulator package
 
-You'll need to clone the `uma_arm_description` repository into your workspace:
+You'll need to clone the `uma_arm_description` repository into your ROS2 workspace:
 
 ```bash
-cdw
 cd src
 git clone https://github.com/jmgandarias/uma_arm_description.git
 ```
@@ -16,6 +15,8 @@ git clone https://github.com/jmgandarias/uma_arm_description.git
 
 !!! info 
     You don't have to modify anything in this package. You just need it to visualize the manipulator.
+
+Compile your workspace.
 
 ### 2.1. Test the UMA manipulator package
 
