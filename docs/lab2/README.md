@@ -1,11 +1,12 @@
 # Lab 2: Manipulator dynamics simulation
 
 
-## 2. Install UMA manipulator package
+# 1. Install UMA manipulator package
 
 You'll need to clone the `uma_arm_description` repository into your ROS2 workspace:
 
 ```bash
+cd YOUR_ROS2_WS
 cd src
 git clone https://github.com/jmgandarias/uma_arm_description.git
 ```
@@ -18,7 +19,7 @@ git clone https://github.com/jmgandarias/uma_arm_description.git
 
 Compile your workspace.
 
-### 2.1. Test the UMA manipulator package
+## 1.1. Test the UMA manipulator package
 
 Open one terminal and run:
 ```bash
@@ -53,7 +54,7 @@ You can also close all the terminals (press `ctrl + c`).
 
 ---
 
-## 3. Simulate the robot dynamics
+# 2. Simulate the robot dynamics
 
 The manipulator model you've loaded is purely a kinematic visualization (i.e., there is no dynamics - no forces, and there is no simulation)
 
@@ -62,12 +63,12 @@ The manipulator model you've loaded is purely a kinematic visualization (i.e., t
 
 There are different ways to simulate the dynamics. The (probably) most straightforward one is to use a simulator such as [Gazebo](https://gazebosim.org/home). However, as we are roboticists and want to see, touch, and learn the intrinsic effects of a manipulator's dynamics, we'll implement the dynamics (the equations of motion) of the manipulator as a ROS 2 node.
 
-### 3.1. Clone the uma_arm_control package
+## 2.1. Clone the uma_arm_control package
 
 To do this, we'll work with another package. You need to do the following:
 
 ```bash
-cdw
+cd YOUR_ROS2_WS
 cd src
 git clone https://github.com/jmgandarias/uma_arm_control.git
 ```
@@ -82,7 +83,9 @@ Once you have done this, your workspace folder should look like this
     nautilus
     ```
 
-Now you can compile your workspace
+Now you can compile your workspace:
+
+(If you're using the UMA environment, you can just do:)
 ```bash
 cdw
 cb
@@ -93,7 +96,7 @@ cb
 
 But first, let's have a look at the `uma_arm_control` package distribution
 
-### 3.2. Understanding the uma_arm_control package
+## 2.2. Understanding the uma_arm_control package
 
 The package is structured as shown in the following image
 
@@ -129,9 +132,9 @@ The package is structured as shown in the following image
 - **README.md:** Provides an overview of the project, instructions for setup, usage, and other relevant information. *:pencil: You should modify it and keep it updated as you work on the lab sessions.*
 
 
-### 3.3. Understanding the uma_arm_dynamics.cpp code
+## 2.3. Understanding the uma_arm_dynamics.cpp code
 
-##### 3.3.1. Libraries :lock:
+### 2.3.1. Libraries :lock:
 
 Includes the needed libraries. You don't have to modify it.
 
@@ -142,7 +145,7 @@ Includes the needed libraries. You don't have to modify it.
 ```
 </details>
 
-##### 3.3.2. Constructor :lock:
+### 2.3.2. Constructor :lock:
 
 **ManipulatorDynamicsNode:** Inherits from rclcpp::Node, making it a ROS 2 node. The class `ManipulatorDynamicsNode` is a ROS 2 node responsible for computing the dynamics of the manipulator (robot arm). You don't have to modify it.
 
@@ -202,7 +205,7 @@ $$
 period \, \text{[ms]} = \frac{1 \, [\cancel{\text{s}}] \cdot 1000 \, [\text{ms}/\cancel{\text{s}}]}{frequency \, [\text{Hz}]} 
 $$
 
-##### 3.3.3. Timer callback :lock:
+### 2.3.3. Timer callback :lock:
 
 The `timer_callback` function is responsible for:
 
@@ -219,7 +222,7 @@ This function ensures that the manipulator's state is updated and communicated a
 ```
 </details>
 
-##### 3.3.4. Topic callbacks :lock:
+### 2.3.4. Topic callbacks :lock:
 
 These callback functions ensure that the node's state is updated with the latest data from the subscribed topics. Specifically:
 
@@ -233,7 +236,7 @@ These callback functions ensure that the node's state is updated with the latest
 ```
 </details>
 
-##### 3.3.5. Calculate acceleration :pencil:
+### 2.3.5. Calculate acceleration :pencil:
 This method computes the `joint_accelerations_` of the manipulator by considering the equations of motion, including inertia, Coriolis and centrifugal forces, friction, gravitational forces, and external torques. You have to implement it as explained later.
 
 At the moment, the method returns $\mathbf{\ddot{q}} = [0, 0]$.
@@ -245,7 +248,7 @@ At the moment, the method returns $\mathbf{\ddot{q}} = [0, 0]$.
 ```
 </details>
 
-##### 3.3.6. Integrate position and velocity :pencil:
+### 2.3.6. Integrate position and velocity :pencil:
 This method computes the joint velocities and positions by integrating over the elapsed time. You have to implement it as explained later.
 
 At the moment, the methods return $\mathbf{\dot{q}} = \mathbf{q} = [0, 0]$.
@@ -257,7 +260,7 @@ At the moment, the methods return $\mathbf{\dot{q}} = \mathbf{q} = [0, 0]$.
 ```
 </details>
 
-##### 3.3.7. Publish the data :lock:
+### 2.3.7. Publish the data :lock:
 This method is responsible for publishing the computed `joint_accelerations_` and `joint_state` (`joint_positions_` and `joint_velocities_`) to their respective topics.
 
  <details>
@@ -267,7 +270,7 @@ This method is responsible for publishing the computed `joint_accelerations_` an
 ```
 </details>
 
-#### 3.3.8. Member variables
+### 2.3.8. Member variables
 
 Defines the member variables for the ManipulatorDynamicsNode class. Here's a detailed breakdown of these variables:
 Member Variables
@@ -310,7 +313,7 @@ Member Variables
 - `previous_time_`: Stores the time of the previous callback execution.
 - `elapsed_time_`: Stores the elapsed time between the current and previous callback executions ($\Delta t$).
 
-#### 3.3.9. Main
+### 2.3.9. Main
 
 Initializes the ROS 2 node, creates a shared pointer to an instance of the `ManipulatorDynamicsNode` class, keeps the node running, and shuts down the ROS 2 node when the node execution finishes.
 
@@ -321,7 +324,7 @@ Initializes the ROS 2 node, creates a shared pointer to an instance of the `Mani
 ```
 </details>
 
-### 3.4. Implementing the dynamics model
+## 2.4. Implementing the dynamics model
 
 The dynamics of an open kinematic chain robotic manipulator is given by 
 
@@ -501,7 +504,7 @@ Eigen::VectorXd calculate_position()
 
 ---
 
-## 4. Launch the dynamics simulator node
+# 3. Launch the dynamics simulator node
 
 Once you have coded the dynamics, open a terminal and compile it:
 
@@ -559,7 +562,7 @@ You have to select the option `Node/Topics (all)` and then update the graph.
 
 ---
 
-## 5. Graphical representation
+# 4. Graphical representation
 
 As robotics engineers, just seeing things work isn't enough for us. We want to understand how they work and be able to measure every parameter. One of the best ways to record the data of an experiment in ROS is to use [ros bags](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playing-Back-Data/Recording-And-Playing-Back-Data.html).
 
@@ -618,7 +621,7 @@ If you use the layout in [pos_vel_acc_layout.xml](https://github.com/jmgandarias
     *Note that you only need to modify those inside `uma_arm_dynamics`.* 
 
 
-### Optional - Nice plots and vector images
+### Nice plots and vector images
 
 PlotJuggler is an excellent tool for visualizing ROS topic data, and it also offers options to manipulate data. However, sometimes you may want to use a more powerful tool such as MATLAB or Python (with [matplotlib](https://matplotlib.org/stable/tutorials/pyplot.html)).
 
