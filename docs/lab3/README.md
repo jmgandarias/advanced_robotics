@@ -232,10 +232,28 @@ If you record the data of the experiment, you'll see the following:
 
     - What is the behavior of the robot under the inverse dynamics controller when you apply virtual forces to the EE? Use videos and/or plots to support your answer.
 
-## 3.4. Extra (optional)
+## 4. Joint-space PD controller with non-linear dynamics compensation
 
-Create a node that implements the PD controller presented in Fig. 4 (stabilizing linear control block) of the lecture slides. Specify a desired joint position $\mathbf{q}_d$ (inside the joint workspace) and set $\dot{\mathbf{q}}_d = \boldsymbol{0}$, $\ddot{\mathbf{q}}_d = \boldsymbol{0}$. 
+Create a node that implements the PD controller presented in the stabilizing linear control block of the follwing figure. 
+
+![joint_space_inverse_dynamics_control](images/joint_space_inverse_dynamics_control.png)
+*(Source: B. Siciliano, L. Sciavicco, L. Villani, and G. Oriolo, Robotics: modelling, planning and control. Springer, 2010.)*
+
+
+Specify a desired joint position $\mathbf{q}_d$ (inside the joint workspace) and set $\dot{\mathbf{q}}_d = \boldsymbol{0}$, $\ddot{\mathbf{q}}_d = \boldsymbol{0}$. 
 
 This node must subscribe to the current joint state topic `/joint_states` to get the current joint positions ($\mathbf{q}$) and velocities ($\dot{\mathbf{q}}$); and it must then publish the desired joint accelerations ($\ddot{\mathbf{q}}_d$) in the topic `/desired_joint_accelerations` to which the dynamics cancellation node will subscribe.
 
-Select and report the values chosen for $\mathbf{K}_P$ and $\mathbf{K}_D$. You can use MATLAB to simulate the expected dynamic behavior of the overall system.
+Select and report the values chosen for $\mathbf{K}_P$ and $\mathbf{K}_D$. 
+You can use MATLAB to simulate the expected dynamic behavior of the overall system.
+
+## 5. Extra (optional) Operational-space PD controller with non-linear dynamics compensation
+
+Implement the whole operational space PD controller with dynamics compensation of the follwing figure. 
+
+![inverse_dynamics_control_operational](images/inverse_dynamics_control_operational.png)
+*(Source: B. Siciliano, L. Sciavicco, L. Villani, and G. Oriolo, Robotics: modelling, planning and control. Springer, 2010.)*
+
+Specify a desired cartesian position $\mathbf{x}_d$ (inside the cartesian workspace) and set $\dot{\mathbf{x}}_d = \boldsymbol{0}$, $\ddot{\mathbf{x}}_d = \boldsymbol{0}$. 
+
+Consider that you'll need to implement the first and second-order differential kinematics $J_A(\boldsymbol{q})$, $\dot{J}_A(\boldsymbol{q}, \boldsymbol{\dot{q}})$, the inverse Jacobian $J_A^{-1}(\boldsymbol{q})$, the forward kinematics $k(\cdot)$ 
