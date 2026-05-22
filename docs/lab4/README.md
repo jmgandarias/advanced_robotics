@@ -175,13 +175,13 @@ In each loop (`timer_callback()`), the controller does the following:
     You can compute the desired cartesian accelerations according to the second-order impedance model:
 
     $$
-    \mathbf{M} \ddot{\mathbf{\~{x}}} + \mathbf{B} \dot{\mathbf{\~{x}}} + \mathbf{B} \mathbf{\~{x}} = \mathbf{f}_{ext}
+    \mathbf{M} \ddot{\mathbf{\~{x}}} + \mathbf{B} \dot{\mathbf{\~{x}}} + \mathbf{K} \mathbf{\~{x}} = \mathbf{f}_{ext}
     $$
 
     Hence, if we assume that the only contribution to the motion of the robot is that given by the mechanical impedance model:
 
     $$
-     \ddot{\mathbf{x}}_d = \mathbf{M}^{-1}( -\mathbf{B} \dot{\mathbf{\~{x}}} - \mathbf{B} \mathbf{\~{x}} + \mathbf{f}_{ext})
+     \ddot{\mathbf{x}}_d = \mathbf{M}^{-1}( -\mathbf{B} \dot{\mathbf{\~{x}}} - \mathbf{K} \mathbf{\~{x}} + \mathbf{f}_{ext})
     $$
 
     where
